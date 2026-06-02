@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+env/
+
+# .env
+
+.venv/
+venv/
+
+# Uploads / exports / logs (données locales)
+uploads/*
+exports/*
+logs/*
+!uploads/.gitkeep
+!exports/.gitkeep
+!logs/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/

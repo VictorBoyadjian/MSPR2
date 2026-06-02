@@ -1,0 +1,26 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mspr1-api
+    ports:
+      - "8080:80"
+    env_file:
+      - .env
+    environment:
+      APP_NAME: "MSPR1-API"
+      APP_ENV: ${APP_ENV:-local}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_TIMEZONE: UTC
+      LOG_CHANNEL: stderr
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+      SESSION_DRIVER: database
+
+    volumes:
+      - app_storage:/var/www/html/storage
+    restart: unless-stopped
+
+volumes:
+  app_storage:

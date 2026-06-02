@@ -1,0 +1,1207 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "MSPR1 API",
+        "description": "API for exercise, food, and meal tracking",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/",
+            "description": "MSPR1 API Server"
+        },
+        {
+            "url": "/api"
+        }
+    ],
+    "paths": {
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Connexion utilisateur",
+                "operationId": "1fe1a561a165b943dbaa719736e16340",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User logged in"
+                    }
+                }
+            }
+        },
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Inscription utilisateur",
+                "operationId": "e64b3947841dfeae7e8b6764cb035333",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "Admin"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "User"
+                                    },
+                                    "age": {
+                                        "type": "integer",
+                                        "example": 30
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "example": "male"
+                                    },
+                                    "weight_kg": {
+                                        "type": "integer",
+                                        "example": 80
+                                    },
+                                    "height_cm": {
+                                        "type": "integer",
+                                        "example": 180
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User registered"
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Déconnexion",
+                "operationId": "26df96a30ef9f7a5d74ecbc59a80dae2",
+                "responses": {
+                    "200": {
+                        "description": "Logged out"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exercises/search": {
+            "post": {
+                "tags": [
+                    "Exercises"
+                ],
+                "summary": "Rechercher des exercices",
+                "operationId": "4a2b824b8f54b5a52e0281c16e136894",
+                "responses": {
+                    "200": {
+                        "description": "List exercises"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exercises/mutate": {
+            "post": {
+                "tags": [
+                    "Exercises"
+                ],
+                "summary": "Créer / modifier des exercices",
+                "operationId": "58338106c0600790c5a042184539b026",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "mutate": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "operation": {
+                                                    "type": "string",
+                                                    "example": "create",
+                                                    "enum": [
+                                                        "create",
+                                                        "update",
+                                                        "delete"
+                                                    ]
+                                                },
+                                                "key": {
+                                                    "description": "Requis pour update/delete",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "attributes": {
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Squat"
+                                                        },
+                                                        "category": {
+                                                            "type": "string",
+                                                            "example": "strength"
+                                                        },
+                                                        "body_part": {
+                                                            "type": "string",
+                                                            "example": "legs"
+                                                        },
+                                                        "equipment": {
+                                                            "type": "string",
+                                                            "example": "barbell"
+                                                        },
+                                                        "difficulty": {
+                                                            "type": "string",
+                                                            "example": "intermediaire"
+                                                        },
+                                                        "instructions": {
+                                                            "type": "string",
+                                                            "example": "Descendre en gardant le dos droit"
+                                                        },
+                                                        "source": {
+                                                            "type": "string",
+                                                            "example": "https://example.com"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "example": [
+                                            {
+                                                "operation": "create",
+                                                "attributes": {
+                                                    "name": "Squat",
+                                                    "category": "strength",
+                                                    "body_part": "legs",
+                                                    "equipment": "barbell",
+                                                    "difficulty": "intermediaire",
+                                                    "instructions": "Descendre en gardant le dos droit",
+                                                    "source": "https://example.com"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Exercises mutated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exercises": {
+            "delete": {
+                "tags": [
+                    "Exercises"
+                ],
+                "summary": "Supprimer un exercice",
+                "operationId": "b53ced622476faaef89a54475c7c7fd6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "resources"
+                                ],
+                                "properties": {
+                                    "resources": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Exercise deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/food-categories/search": {
+            "post": {
+                "tags": [
+                    "Food Categories"
+                ],
+                "summary": "Rechercher des catégories",
+                "operationId": "2d079dcdfd50ab1fc77af47aa60bbf2b",
+                "responses": {
+                    "200": {
+                        "description": "List food categories"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/food-categories/mutate": {
+            "post": {
+                "tags": [
+                    "Food Categories"
+                ],
+                "summary": "Créer / modifier des catégories",
+                "operationId": "7ae09703660fd16fac44a48d896ac5a0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "mutate": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "operation": {
+                                                    "type": "string",
+                                                    "example": "create",
+                                                    "enum": [
+                                                        "create",
+                                                        "update",
+                                                        "delete"
+                                                    ]
+                                                },
+                                                "key": {
+                                                    "description": "Requis pour update/delete",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "attributes": {
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Légumes"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "example": [
+                                            {
+                                                "operation": "create",
+                                                "attributes": {
+                                                    "name": "proteins"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Food categories mutated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/foods/search": {
+            "post": {
+                "tags": [
+                    "Foods"
+                ],
+                "summary": "Rechercher des aliments",
+                "operationId": "2ba416a0df3015800c97a303454cb8e7",
+                "responses": {
+                    "200": {
+                        "description": "List foods"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/foods/mutate": {
+            "post": {
+                "tags": [
+                    "Foods"
+                ],
+                "summary": "Créer / modifier des aliments",
+                "operationId": "a14fe7218ce8b8d92acc974aa1b3f0c1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "mutate": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "operation": {
+                                                    "type": "string",
+                                                    "example": "create",
+                                                    "enum": [
+                                                        "create",
+                                                        "update",
+                                                        "delete"
+                                                    ]
+                                                },
+                                                "key": {
+                                                    "description": "Requis pour update/delete",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "attributes": {
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Poulet grillé"
+                                                        },
+                                                        "food_category_id": {
+                                                            "type": "number",
+                                                            "example": 0
+                                                        },
+                                                        "calories_kcal": {
+                                                            "type": "number",
+                                                            "example": 165
+                                                        },
+                                                        "proteins_g": {
+                                                            "type": "number",
+                                                            "example": 31
+                                                        },
+                                                        "carbs_g": {
+                                                            "type": "number",
+                                                            "example": 0
+                                                        },
+                                                        "fats_g": {
+                                                            "type": "number",
+                                                            "example": 3.6
+                                                        },
+                                                        "fiber_g": {
+                                                            "type": "number",
+                                                            "example": 0
+                                                        },
+                                                        "sugars_g": {
+                                                            "type": "number",
+                                                            "example": 0
+                                                        },
+                                                        "sodium_mg": {
+                                                            "type": "number",
+                                                            "example": 0.07
+                                                        },
+                                                        "cholesterol_mg": {
+                                                            "type": "number",
+                                                            "example": 85
+                                                        },
+                                                        "meal_type": {
+                                                            "type": "string",
+                                                            "example": "lunch"
+                                                        },
+                                                        "water_intake_ml": {
+                                                            "type": "number",
+                                                            "example": 0
+                                                        },
+                                                        "source": {
+                                                            "type": "string",
+                                                            "example": "https://example.com"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "example": [
+                                            {
+                                                "operation": "create",
+                                                "attributes": {
+                                                    "name": "Poulet grillé",
+                                                    "food_category_id": 0,
+                                                    "calories_kcal": 165,
+                                                    "proteins_g": 31,
+                                                    "carbs_g": 0,
+                                                    "fats_g": 3.6,
+                                                    "fiber_g": 0,
+                                                    "sugars_g": 0,
+                                                    "sodium_mg": 0.07,
+                                                    "cholesterol_mg": 85,
+                                                    "meal_type": "lunch",
+                                                    "water_intake_ml": 0,
+                                                    "source": "https://example.com"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Foods mutated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/foods": {
+            "delete": {
+                "tags": [
+                    "Foods"
+                ],
+                "summary": "Supprimer un aliment",
+                "operationId": "4adcd0ed6478723690b678b3868cd479",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "resources"
+                                ],
+                                "properties": {
+                                    "resources": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Food deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/meal-logs/search": {
+            "post": {
+                "tags": [
+                    "Meal Logs"
+                ],
+                "summary": "Rechercher des logs de repas",
+                "operationId": "378ac82949229ae9d438796c7de9b6e6",
+                "responses": {
+                    "200": {
+                        "description": "List meal logs"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/meal-logs/mutate": {
+            "post": {
+                "tags": [
+                    "Meal Logs"
+                ],
+                "summary": "Créer / modifier des logs de repas",
+                "operationId": "1e25211f39abb5c71c6b4e4f3ba95edc",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "mutate": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "operation": {
+                                                    "type": "string",
+                                                    "example": "create",
+                                                    "enum": [
+                                                        "create",
+                                                        "update",
+                                                        "delete"
+                                                    ]
+                                                },
+                                                "key": {
+                                                    "description": "Requis pour update/delete",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "attributes": {
+                                                    "properties": {
+                                                        "user_id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "food_id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "meal_type": {
+                                                            "type": "string",
+                                                            "example": "lunch"
+                                                        },
+                                                        "quantity_g": {
+                                                            "type": "number",
+                                                            "example": 150
+                                                        },
+                                                        "logged_at": {
+                                                            "type": "string",
+                                                            "example": "2024-01-15 12:00:00"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "example": [
+                                            {
+                                                "operation": "create",
+                                                "attributes": {
+                                                    "user_id": 1,
+                                                    "food_id": 1,
+                                                    "meal_type": "lunch",
+                                                    "quantity_g": 150,
+                                                    "logged_at": "2024-01-15 12:00:00"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Meal logs mutated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/meal-logs": {
+            "delete": {
+                "tags": [
+                    "Meal Logs"
+                ],
+                "summary": "Supprimer un log de repas",
+                "operationId": "eb0a50e36266324f26e7680a33ebf0bb",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "resources"
+                                ],
+                                "properties": {
+                                    "resources": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Meal log deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/sessions/search": {
+            "post": {
+                "tags": [
+                    "Sessions"
+                ],
+                "summary": "Rechercher des sessions",
+                "operationId": "585d59bfbc6ce34acb817d5d5a2cc328",
+                "responses": {
+                    "200": {
+                        "description": "List sessions"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/sessions/mutate": {
+            "post": {
+                "tags": [
+                    "Sessions"
+                ],
+                "summary": "Créer / modifier des sessions",
+                "operationId": "c60cab12d72bb0bebc2f5cd19e0fd182",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "mutate": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "operation": {
+                                                    "type": "string",
+                                                    "example": "create",
+                                                    "enum": [
+                                                        "create",
+                                                        "update",
+                                                        "delete"
+                                                    ]
+                                                },
+                                                "key": {
+                                                    "description": "Requis pour update/delete",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "attributes": {
+                                                    "properties": {
+                                                        "user_id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "duration_min": {
+                                                            "type": "integer",
+                                                            "example": 45
+                                                        },
+                                                        "performed_at": {
+                                                            "type": "string",
+                                                            "example": "2024-01-15 09:00:00"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "example": [
+                                            {
+                                                "operation": "create",
+                                                "attributes": {
+                                                    "user_id": 1,
+                                                    "duration_min": 45,
+                                                    "performed_at": "2024-01-15 09:00:00"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Sessions mutated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/sessions": {
+            "delete": {
+                "tags": [
+                    "Sessions"
+                ],
+                "summary": "Supprimer une session",
+                "operationId": "cd86d94d3828f2c21fddd9ac95ece896",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "resources"
+                                ],
+                                "properties": {
+                                    "resources": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Session deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/users/search": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Rechercher des utilisateurs",
+                "operationId": "ce29cb87b6498e0a2ab6f422e93da794",
+                "responses": {
+                    "200": {
+                        "description": "List users"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/users/mutate": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Modifier un utilisateur",
+                "operationId": "b9cfce456ea7d75c3985d7551cee8052",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "mutate": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "operation": {
+                                                    "type": "string",
+                                                    "example": "update",
+                                                    "enum": [
+                                                        "update"
+                                                    ]
+                                                },
+                                                "key": {
+                                                    "description": "ID de l'utilisateur à modifier",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "attributes": {
+                                                    "properties": {
+                                                        "email": {
+                                                            "type": "string",
+                                                            "example": "user@example.com"
+                                                        },
+                                                        "first_name": {
+                                                            "type": "string",
+                                                            "example": "Jean"
+                                                        },
+                                                        "last_name": {
+                                                            "type": "string",
+                                                            "example": "Dupont"
+                                                        },
+                                                        "age": {
+                                                            "type": "integer",
+                                                            "example": 30
+                                                        },
+                                                        "gender": {
+                                                            "type": "string",
+                                                            "example": "male"
+                                                        },
+                                                        "weight_kg": {
+                                                            "type": "number",
+                                                            "example": 80
+                                                        },
+                                                        "height_cm": {
+                                                            "type": "number",
+                                                            "example": 180
+                                                        },
+                                                        "is_premium": {
+                                                            "type": "boolean",
+                                                            "example": false
+                                                        },
+                                                        "is_active": {
+                                                            "type": "boolean",
+                                                            "example": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "example": [
+                                            {
+                                                "operation": "update",
+                                                "key": 1,
+                                                "attributes": {
+                                                    "first_name": "Jean"
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User mutated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/metrics/search": {
+            "post": {
+                "tags": [
+                    "Metrics"
+                ],
+                "summary": "Rechercher des métriques",
+                "operationId": "0774e0743e47fbf445c619515c322902",
+                "responses": {
+                    "200": {
+                        "description": "List metrics"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/metrics/mutate": {
+            "post": {
+                "tags": [
+                    "Metrics"
+                ],
+                "summary": "Créer / modifier des métriques",
+                "operationId": "6bc489c1be1a283b2c97e398507e8f83",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "mutate": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "operation": {
+                                                    "type": "string",
+                                                    "example": "create",
+                                                    "enum": [
+                                                        "create",
+                                                        "update",
+                                                        "delete"
+                                                    ]
+                                                },
+                                                "key": {
+                                                    "description": "Requis pour update/delete",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "attributes": {
+                                                    "properties": {
+                                                        "user_id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "recorded_at": {
+                                                            "type": "string",
+                                                            "example": "2024-01-15 08:00:00"
+                                                        },
+                                                        "weight_kg": {
+                                                            "type": "number",
+                                                            "example": 80.5
+                                                        },
+                                                        "bmi": {
+                                                            "type": "number",
+                                                            "example": 24.8
+                                                        },
+                                                        "body_fat_pct": {
+                                                            "type": "number",
+                                                            "example": 18.5
+                                                        },
+                                                        "heart_rate_avg": {
+                                                            "type": "integer",
+                                                            "example": 72
+                                                        },
+                                                        "heart_rate_max": {
+                                                            "type": "integer",
+                                                            "example": 165
+                                                        },
+                                                        "heart_rate_resting": {
+                                                            "type": "integer",
+                                                            "example": 58
+                                                        },
+                                                        "calories_burned": {
+                                                            "type": "integer",
+                                                            "example": 450
+                                                        },
+                                                        "session_duration_h": {
+                                                            "type": "number",
+                                                            "example": 1.5
+                                                        },
+                                                        "workout_type": {
+                                                            "type": "string",
+                                                            "example": "strength"
+                                                        },
+                                                        "workout_frequency": {
+                                                            "type": "integer",
+                                                            "example": 4
+                                                        },
+                                                        "water_intake_l": {
+                                                            "type": "number",
+                                                            "example": 2.5
+                                                        },
+                                                        "experience_level": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "example": [
+                                            {
+                                                "operation": "create",
+                                                "attributes": {
+                                                    "user_id": 1,
+                                                    "recorded_at": "2024-01-15 08:00:00",
+                                                    "weight_kg": 80.5,
+                                                    "bmi": 24.8,
+                                                    "body_fat_pct": 18.5,
+                                                    "heart_rate_avg": 72,
+                                                    "heart_rate_max": 165,
+                                                    "heart_rate_resting": 58,
+                                                    "calories_burned": 450,
+                                                    "session_duration_h": 1.5,
+                                                    "workout_type": "strength",
+                                                    "workout_frequency": 4,
+                                                    "water_intake_l": 2.5,
+                                                    "experience_level": 1
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Metrics mutated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/metrics": {
+            "delete": {
+                "tags": [
+                    "Metrics"
+                ],
+                "summary": "Supprimer des métriques",
+                "operationId": "c9c299d6f5ed5e56e90dc5bb24029ce2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "resources"
+                                ],
+                                "properties": {
+                                    "resources": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Metrics deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Exercises",
+            "description": "Exercises"
+        },
+        {
+            "name": "Food Categories",
+            "description": "Food Categories"
+        },
+        {
+            "name": "Foods",
+            "description": "Foods"
+        },
+        {
+            "name": "Meal Logs",
+            "description": "Meal Logs"
+        },
+        {
+            "name": "Sessions",
+            "description": "Sessions"
+        },
+        {
+            "name": "Users",
+            "description": "Users"
+        },
+        {
+            "name": "Metrics",
+            "description": "Metrics"
+        }
+    ]
+}

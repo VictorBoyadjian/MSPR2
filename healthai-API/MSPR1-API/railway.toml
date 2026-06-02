@@ -1,0 +1,12 @@
+
+[build]
+builder        = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+releaseCommand          = "php artisan migrate --force"
+healthcheckPath         = "/up"
+healthcheckTimeout      = 300
+
+restartPolicyType       = "on_failure"
+restartPolicyMaxRetries = 5

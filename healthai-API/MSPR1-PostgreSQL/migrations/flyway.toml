@@ -1,0 +1,32 @@
+databaseType = "PostgreSql"
+id = "b33f4d25-22c8-4355-9b01-571b2597f965"
+name = "MSPR1"
+
+[flyway]
+callbackLocations = [ "filesystem:callbacks" ]
+locations = [ "filesystem:migrations" ]
+mixed = true
+outOfOrder = true
+schemaModelLocation = "schema-model"
+validateMigrationNaming = true
+
+[flywayDesktop]
+enableMigrations = true
+developmentEnvironment = "development"
+shadowEnvironment = "shadow"
+
+  [flywayDesktop.generate]
+  undoScripts = false
+
+[redgateCompare]
+filterFile = "filter.rgf"
+
+[redgateCompare.postgresql.options.behavior]
+detectRenames = "identical-only"
+
+[redgateCompare.postgresql.options.ignores]
+ignoreNewlinesInTextObjects = "off"
+
+[environments.MSPR1]
+url = "jdbc:postgresql://metro.proxy.rlwy.net:23387/healthai"
+schemas = [ "Data" ]
