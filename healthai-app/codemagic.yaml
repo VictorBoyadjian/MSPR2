@@ -1,0 +1,97 @@
+workflows:
+  ios-workflow:
+    name: iOS — TestFlight
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: healthai-app
+      vars:
+        XCODE_WORKSPACE: ios/healthaiapp.xcworkspace
+        XCODE_SCHEME: healthaiapp
+      node: latest
+      xcode: latest
+    scripts:
+      - name: Install dependencies
+        script: npm install
+
+      - name: Expo prebuild (iOS)
+        script: npx expo prebuild --platform ios --non-interactive
+
+      - name: Set up code signing
+        script: |
+          xcode-project use-profiles --custom-export-options='{"testFlightInternalTestingOnly": true}'
+
+      - name: Build iOS archive
+        script: |
+          xcodebuild \
+            -workspace "$XCODE_WORKSPACE" \
+            -scheme "$XCODE_SCHEME" \
+            -configuration Release \
+            -archivePath "$CM_BUILD_DIR/build/$XCODE_SCHEME.xcarchive" \
+            archive | xcpretty
+
+      - name: Export IPA
+        script: |
+          xcodebuild \
+            -exportArchive \
+            -archivePath "$CM_BUILD_DIR/build/$XCODE_SCHEME.xcarchive" \
+            -exportOptionsPlist /Users/builder/export_options.plist \
+            -exportPath "$CM_BUILD_DIR/build/ipa" | xcpretty
+
+    artifacts:
+      - $CM_BUILD_DIR/build/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      email:
+        recipients:
+          - victor.boyadjian5@gmail.com
+        notify:
+          success: true
+          failure: true
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        beta_groups:
+          - Internal Testers
+
+  android-workflow:
+    name: Android — Google Play Internal
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+    environment:
+      android_signing:
+        - keystore_reference  # TODO: remplace par le nom de ton keystore dans Codemagic
+      vars:
+        PACKAGE_NAME: healthai-app  # TODO: remplace par ton package name (ex: com.yourname.healthai)
+      node: latest
+      java: 17
+    scripts:
+      - name: Install dependencies
+        script: npm install
+
+      - name: Expo prebuild (Android)
+        script: npx expo prebuild --platform android --non-interactive
+
+      - name: Build Android AAB (Release)
+        script: |
+          cd android
+          ./gradlew bundleRelease
+
+    artifacts:
+      - android/app/build/outputs/**/*.aab
+      - android/app/build/outputs/**/mapping.txt
+
+    publishing:
+      email:
+        recipients:
+          - victor.boyadjian5@gmail.com
+        notify:
+          success: true
+          failure: true
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: internal
+        submit_as_draft: true
