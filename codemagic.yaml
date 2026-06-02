@@ -5,7 +5,7 @@ workflows:
     instance_type: mac_mini_m2
     working_directory: healthai-app
     integrations:
-      app_store_connect: App Store for Zest  # TODO: remplace par le nom exact de ta connexion dans Codemagic > Teams > Integrations
+      app_store_connect: AppStoreConnectKey  # TODO: remplace par le nom exact de ta connexion dans Codemagic > Teams > Integrations
     environment:
       ios_signing:
         distribution_type: app_store
