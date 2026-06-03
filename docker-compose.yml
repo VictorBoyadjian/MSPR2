@@ -9,7 +9,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - mspr1-network
+      - mspr-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -29,7 +29,7 @@ services:
     volumes:
       - app_storage:/var/www/html/storage
     networks:
-      - mspr1-network
+      - mspr-network
     restart: unless-stopped
 
   etl-api:
@@ -46,7 +46,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - mspr1-network
+      - mspr-network
 
   grafana:
     build: ./MSPR1-Grafana
@@ -61,7 +61,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - mspr1-network
+      - mspr-network
     restart: unless-stopped
 
   react:
@@ -81,11 +81,46 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - mspr1-network
+      - mspr-network
     restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama
+    platform: linux/amd64
+    container_name: ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_MAX_LOADED_MODELS=1
+      - OLLAMA_NUM_PARALLEL=1
+      - OLLAMA_KEEP_ALIVE=5m
+    networks:
+      - mspr-network
+    mem_limit: 12g
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  image-analysis-api:
+    build: ./MSPR2-Image-Analysis-API
+    container_name: mspr2-image-analysis-api
+    ports:
+      - "2021:2021"
+    env_file:
+      - ./MSPR2-Image-Analysis-API/.env
+    networks:
+      - mspr-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     
 networks:
-  mspr1-network:
+  mspr-network:
     driver: bridge
 
 volumes:

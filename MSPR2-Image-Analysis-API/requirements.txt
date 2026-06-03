@@ -1,0 +1,7 @@
+ollama
+dotenv
+fastapi
+uvicorn
+colorama
+pydantic
+requests
