@@ -16,7 +16,6 @@ class Session extends Model
 
     protected $fillable = [
         'id',
-        'user_id',
         'duration_min',
         'performed_at',
         'created_at',
@@ -34,8 +33,9 @@ class Session extends Model
             ->withPivot(['reps', 'sets', 'duration_min']);
     }
 
-    public function User() : BelongsTo
+    public function User() : BelongsToMany
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsToMany(User::class, 'user_sessions')
+            ->withPivot(['performed_at']);
     }
 }

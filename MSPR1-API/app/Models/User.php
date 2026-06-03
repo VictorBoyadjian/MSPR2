@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\{BelongsToMany, HasMany};
 use Laravel\Scout\Searchable;
 use Lomkit\Access\Controls\HasControl;
 use Spatie\Permission\Traits\HasRoles;
@@ -45,9 +45,10 @@ class User extends Authenticatable
         'updated_at'
     ];
 
-    public function Sessions(): HasMany
+    public function Sessions(): BelongsToMany
     {
-        return $this->hasMany(Session::class);
+        return $this->belongsToMany(Session::class, 'user_sessions')
+            ->withPivot(['performed_at']);
     }
 
     public function Metrics(): HasMany
@@ -58,5 +59,10 @@ class User extends Authenticatable
     public function MealLogs(): HasMany
     {
         return $this->hasMany(MealLog::class);
+    }
+
+    public function Image(): HasMany
+    {
+        return $this->hasMany(Image::class);
     }
 }
