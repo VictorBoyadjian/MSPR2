@@ -18,9 +18,10 @@ async def health():
 
 @router.post('/analyze/', response_model=Union[OutputResponse, dict])
 async def upload_dish(data : UploadDish, token: str = Depends(oauth2_scheme)):
-
+    if Authorization.verify_token(token):
         return OllamaService.generate(data)
-
+    else:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
 app.include_router(router)
 
