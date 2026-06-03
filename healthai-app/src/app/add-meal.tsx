@@ -8,6 +8,7 @@ import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { AddMealButton, SplashAnimation } from '@/components/add-meal/add-meal-button';
 import { ModalButtonContainer } from '@/components/ui/modal-button-container';
 import Camera from '@/components/ui/camera';
+import { AddMealModal } from '@/components/add-meal/add-meal-modal';
 
 function getDevMenuHint() {
   if (Platform.OS === 'web') {
@@ -49,7 +50,7 @@ export default function TabThreeScreen() {
                 <AddMealButton />
                 } 
               modalChild={
-                <ThemedText style={styles.mealRow}>Show Modal</ThemedText>
+                <AddMealModal />
               } 
             />
           </ThemedView>
@@ -63,7 +64,7 @@ export default function TabThreeScreen() {
                 <AddMealButton />
                 } 
               modalChild={
-               <Camera />
+               <AddMealModal />
               } 
             />
           </ThemedView>
@@ -77,7 +78,7 @@ export default function TabThreeScreen() {
                 <AddMealButton />
                 } 
               modalChild={
-                <ThemedText style={styles.mealRow}>Show Modal</ThemedText>
+                <AddMealModal />
               } 
             />
           </ThemedView>
