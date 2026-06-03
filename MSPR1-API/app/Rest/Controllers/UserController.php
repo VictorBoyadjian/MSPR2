@@ -4,6 +4,7 @@ namespace App\Rest\Controllers;
 
 use App\Rest\Controllers\Controller;
 use App\Rest\Resources\UserResource;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -16,6 +17,6 @@ class UserController extends Controller
 
     public function me()
     {
-        return auth()->user();
+        return Auth::user();
     }
 }

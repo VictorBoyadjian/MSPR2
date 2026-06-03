@@ -30,3 +30,7 @@ ignoreNewlinesInTextObjects = "off"
 [environments.MSPR1]
 url = "jdbc:postgresql://metro.proxy.rlwy.net:23387/healthai"
 schemas = [ "Data" ]
+
+[environments.target2]
+url = "jdbc:postgresql://127.0.0.1:5433/healthai"
+schemas = [ "Data" ]

@@ -2,7 +2,6 @@
 
 namespace App\Rest\Resources;
 
-use App\Models\Exercise;
 use App\Models\Goal;
 use App\Rest\Resources\Resource;
 use Lomkit\Rest\Relations\BelongsToMany;
@@ -39,8 +38,8 @@ class GoalResource extends Resource
     public function relations(\Lomkit\Rest\Http\Requests\RestRequest $request): array
     {
         return [
-            BelongsToMany::make('Sessions', SessionResource::class)
-                ->withPivotFields(['reps', 'sets', 'duration_min'])
+            BelongsToMany::make('users', UserResource::class),
+            BelongsToMany::make('sportSessions', SportSessionResource::class)
         ];
     }
 

@@ -49,7 +49,7 @@ class MetricResource extends Resource
     public function relations(\Lomkit\Rest\Http\Requests\RestRequest $request): array
     {
         return [
-            BelongsTo::make('User', UserResource::class)
+            BelongsTo::make('user', UserResource::class)
         ];
     }
 

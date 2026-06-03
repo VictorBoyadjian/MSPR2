@@ -17,10 +17,9 @@ return new class extends Migration
         $userRole = Role::create(['name' => 'User']);
 
         $tables = [
+            'dishes',
             'exercises',
-            'foods',
-            'food_categories',
-            'meal_logs',
+            'goals',
             'metrics',
             'sessions',
             'users',
@@ -46,7 +45,7 @@ return new class extends Migration
             $userRole->givePermissionTo($permissions[$table]['view']);
         }
 
-        $crudTables = ['sessions', 'metrics', 'meal_logs'];
+        $crudTables = ['dishes', 'metrics'];
 
         foreach ($crudTables as $table) {
             foreach ($actions as $action) {

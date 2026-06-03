@@ -3,21 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Laravel\Scout\Searchable;
 use Lomkit\Access\Controls\HasControl;
 
-class Session extends Model
+class SportSession extends Model
 {
-    use HasControl, Searchable;
+    use HasControl;
 
-    protected $table = "sessions";
+    protected $table = "sport_sessions";
 
     protected $fillable = [
         'id',
         'duration_min',
-        'performed_at',
         'created_at',
         'updated_at'
     ];
@@ -27,15 +24,20 @@ class Session extends Model
         'updated_at'
     ];
 
-    public function Exercises() : BelongsToMany
+    public function exercises() : BelongsToMany
     {
         return $this->belongsToMany(Exercise::class, 'sessions_exercises')
             ->withPivot(['reps', 'sets', 'duration_min']);
     }
 
-    public function User() : BelongsToMany
+    public function users() : BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_sessions')
             ->withPivot(['performed_at']);
+    }
+
+    public function goals() : BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'session_goals');
     }
 }

@@ -2,18 +2,19 @@
 
 namespace App\Rest\Resources;
 
-use App\Models\Image;
+use App\Models\SportSession;
 use App\Rest\Resources\Resource;
-use Lomkit\Rest\Relations\BelongsToMany;
+use Lomkit\Rest\Relations\BelongsTo;
+use Lomkit\Rest\Relations\BelongsToMany as BelongsToMany;
 
-class ImageResource extends Resource
+class SportSessionResource extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var class-string<\Illuminate\Database\Eloquent\Model>
      */
-    public static $model = Image::class;
+    public static $model = SportSession::class;
 
     /**
      * The exposed fields that could be provided
@@ -24,9 +25,7 @@ class ImageResource extends Resource
     {
         return [
             'id',
-            'path',
-            'created_at',
-            'updated_at'
+            'duration_min'
         ];
     }
 
@@ -38,7 +37,10 @@ class ImageResource extends Resource
     public function relations(\Lomkit\Rest\Http\Requests\RestRequest $request): array
     {
         return [
-            BelongsToMany::make('Dishes', DishResource::class)
+            BelongsToMany::make('users', UserResource::class),
+            BelongsToMany::make('exercises', ExerciseResource::class)
+                ->withPivotFields(['reps', 'sets', 'duration_min']),
+            BelongsToMany::make('goals', GoalResource::class)
         ];
     }
 

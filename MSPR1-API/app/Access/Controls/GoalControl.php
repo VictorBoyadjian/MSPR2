@@ -3,18 +3,18 @@
 namespace App\Access\Controls;
 
 use App\Access\Perimeters\GlobalPerimiter;
-use App\Models\Food;
+use App\Models\Goal;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Lomkit\Access\Controls\Control;
 
-class FoodControl extends Control
+class GoalControl extends Control
 {
      /**
       * The model the control refers to.
       * @var class-string<Model>
       */
-     protected string $model = Food::class;
+     protected string $model = Goal::class;
 
     /**
      * Retrieve the list of perimeter definitions for the current control.
@@ -26,7 +26,7 @@ class FoodControl extends Control
         return [
             GlobalPerimiter::new()
                 ->allowed(function (Model $user, string $method) {
-                    return $user->can(sprintf('%s foods', $method));
+                    return $user->can(sprintf('%s goals', $method));
                 })
                 ->should(function (Model $user, Model $model) {
                     return true;

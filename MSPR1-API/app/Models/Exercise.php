@@ -30,9 +30,9 @@ class Exercise extends Model
         'updated_at'
     ];
 
-    public function Sessions(): BelongsToMany
+    public function sportSessions(): BelongsToMany
     {
-        return $this->belongsToMany(Session::class, 'sessions_exercises')
+        return $this->belongsToMany(SportSession::class, 'sport_session_exercises')
             ->withPivot(['reps', 'sets', 'duration_min']);
     }
 }

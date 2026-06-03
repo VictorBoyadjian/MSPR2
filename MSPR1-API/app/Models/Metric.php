@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Laravel\Scout\Searchable;
 use Lomkit\Access\Controls\HasControl;
 
 class Metric extends Model
 {
-    use HasControl, Searchable;
+    use HasControl;
 
     protected $table = "metrics";
 
@@ -38,7 +37,7 @@ class Metric extends Model
         'updated_at'
     ];
 
-    public function User(): BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }

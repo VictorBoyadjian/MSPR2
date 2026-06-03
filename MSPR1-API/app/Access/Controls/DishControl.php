@@ -3,18 +3,18 @@
 namespace App\Access\Controls;
 
 use App\Access\Perimeters\OwnPerimiter;
-use App\Models\MealLog;
+use App\Models\Dish;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Lomkit\Access\Controls\Control;
 
-class MealLogControl extends Control
+class DishControl extends Control
 {
      /**
       * The model the control refers to.
       * @var class-string<Model>
       */
-     protected string $model = MealLog::class;
+     protected string $model = Dish::class;
 
     /**
      * Retrieve the list of perimeter definitions for the current control.
@@ -26,14 +26,14 @@ class MealLogControl extends Control
         return [
             OwnPerimiter::new()
                 ->allowed(function (Model $user, string $method) {
-                    return $user->can(sprintf('%s meal_logs', $method));
+                    return $user->can(sprintf('%s dishes', $method));
                 })
                 ->should(function (Model $user, Model $model) {
                     return $model->user_id === $user->getKey();
                 })
                 ->query(function (Builder $query, Model $user) {
-                    return $query->
-                        where('user_id', $user->getKey());
+                    return $query
+                        ->where('user_id', $user->getKey());
                 })
         ];
     }

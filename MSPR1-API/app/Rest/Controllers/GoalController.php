@@ -3,14 +3,14 @@
 namespace App\Rest\Controllers;
 
 use App\Rest\Controllers\Controller;
-use App\Rest\Resources\SessionResource;
+use App\Rest\Resources\GoalResource;
 
-class SessionController extends Controller
+class GoalController extends Controller
 {
     /**
      * The resource the controller corresponds to.
      *
      * @var class-string<\Lomkit\Rest\Http\Resource>
      */
-    public static $resource = SessionResource::class;
+    public static $resource = GoalResource::class;
 }

@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\{BelongsToMany, BelongsTo};
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Lomkit\Access\Controls\HasControl;
 
 class Dish extends Model
@@ -24,7 +24,7 @@ class Dish extends Model
         'sodium_mg',
         'cholesterol_mg',
         'meal_type',
-        'water_intake_ml',
+        'is_scanned',
         'created_at',
         'updated_at'
     ];
@@ -34,13 +34,8 @@ class Dish extends Model
         'updated_at'
     ];
 
-    public function User(): BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function Image(): BelongsTo
-    {
-        return $this->belongsTo(Image::class);
     }
 }
