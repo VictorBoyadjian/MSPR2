@@ -7,6 +7,7 @@ class ColorEnum(Enum):
     WARNING = 'Warning'
     CHECK_MARK = 'CheckMark'
     MODEL = 'Model'
+    TIME = 'Time'
     
     def format(self, value : str) -> str:
         if self == ColorEnum.INFO:
@@ -19,3 +20,5 @@ class ColorEnum(Enum):
             return f'{Fore.GREEN}{value}{Fore.RESET}'
         if self == ColorEnum.MODEL:
             return f'{Fore.YELLOW}{value}{Fore.RESET}'
+        if self == ColorEnum.TIME:
+            return f'{Fore.BLUE}{value}{Fore.RESET}'

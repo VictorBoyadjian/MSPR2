@@ -65,7 +65,7 @@ class OllamaService:
             model_pass = cls.pull_models()
 
         if model_pass:
-            print(f"{ColorEnum.INFO.format('[INFO]')} : {cls._selected_model} is thinking ...")
+            print(f"\n{ColorEnum.INFO.format('[INFO]')} : {cls._selected_model} is thinking ...")
             
             response = cls._client.chat( 
                 model=cls._selected_model,
@@ -88,13 +88,21 @@ class OllamaService:
                                 - If uncertain, use a lower accuracy score.
                                 - Accuracy must be a float between 0 and 1.
                                 - Quantity must be an integer estimate.
+                                - List ONLY foods you can actually see in this photo
+                                - Do NOT use placeholder or example foods
+                                - Estimate quantities from visual portion size
 
                                 Expected format:
 
                                 {
                                     "<food_name>": {
                                         "quantity": <integer>,
-                                        "kcal" : <float>
+                                        "quantity_g": <integer estimate>,
+                                        "calories_kcal": <integer>,
+                                        "proteins_g": <float>,
+                                        "carbs_g": <float>,
+                                        "fats_g": <float>,
+                                        "fiber_g": <float>,
                                         "accuracy": <float>
                                     }
                                 }

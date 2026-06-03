@@ -11,7 +11,11 @@ class Parser():
         try:            
             return OutputResponse(
                 aliments=json.loads(
-                    str(response.message.content).replace('`', '').replace('json', '')
+                    str(response.message.content)
+                        .replace('`', '')
+                        .replace('json', '')
+                        .replace('\\', '')
+                        .replace('/', '')
                 )
             )
         except Exception as e:
