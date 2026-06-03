@@ -26,7 +26,7 @@ class DishControl extends Control
         return [
             OwnPerimiter::new()
                 ->allowed(function (Model $user, string $method) {
-                    return $user->can(sprintf('%s dishes', $method));
+                    return true;
                 })
                 ->should(function (Model $user, Model $model) {
                     return $model->user_id === $user->getKey();

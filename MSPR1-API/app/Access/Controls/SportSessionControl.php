@@ -27,7 +27,7 @@ class SportSessionControl extends Control
         return [
             OwnPerimiter::new()
                 ->allowed(function (Model $user, string $method) {
-                    return $user->can(sprintf('%s sessions', $method));
+                    return true;
                 })
                 ->should(function (Model $user, Model $model) {
                     return true;

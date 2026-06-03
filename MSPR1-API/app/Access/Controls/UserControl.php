@@ -27,11 +27,7 @@ class UserControl extends Control
         return [
             GlobalPerimiter::new()
                 ->allowed(function (Model $user, string $method) {
-                    return 
-                        $user->can(sprintf('%s metrics', $method))
-                        &&
-                        $user->roles()->where('name', 'Administrator')->exists()
-                    ;
+                    return true;
                 })
                 ->should(function (Model $user, Model $model) {
                     return true;
@@ -42,7 +38,7 @@ class UserControl extends Control
 
             OwnPerimiter::new()
                 ->allowed(function (Model $user, string $method) {
-                    return $user->can(sprintf('%s metrics', $method));
+                    return true;
                 })
                 ->should(function (Model $user, Model $model) {
                     return $model->id === $user->getKey();

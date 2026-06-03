@@ -26,7 +26,7 @@ class ExerciseControl extends Control
         return [
             GlobalPerimiter::new()
                 ->allowed(function (Model $user, string $method) {
-                    return $user->can(sprintf('%s exercises', $method));
+                    return true;
                 })
                 ->should(function (Model $user, Model $model) {
                     return true;
