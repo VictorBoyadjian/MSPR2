@@ -1,0 +1,9 @@
+# This file prevents Railway from auto-deploying from the monorepo root.
+# Each service is configured in its own subdirectory (MSPR1-API, MSPR1-PostgreSQL).
+# Set the "Root Directory" for each Railway service to the correct subfolder.
+
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "echo 'No service at root. Set Root Directory to MSPR1-API or MSPR1-PostgreSQL.'"
