@@ -1,5 +1,7 @@
 FROM postgres:16
 
+ENV PGDATA=/var/lib/postgresql/data/pgdata
+
 # Accept remote connections
 RUN echo "host all all 0.0.0.0/0 scram-sha-256" >> /usr/share/postgresql/pg_hba.conf.sample
 
