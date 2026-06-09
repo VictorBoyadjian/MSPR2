@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Lomkit\Access\Controls\HasControl;
-use Laravel\Scout\Searchable;
 
 class Exercise extends Model
 {
@@ -31,9 +30,9 @@ class Exercise extends Model
         'updated_at'
     ];
 
-    public function Sessions(): BelongsToMany
+    public function sportSessions(): BelongsToMany
     {
-        return $this->belongsToMany(Session::class, 'sessions_exercises')
+        return $this->belongsToMany(SportSession::class, 'sport_session_exercises')
             ->withPivot(['reps', 'sets', 'duration_min']);
     }
 }

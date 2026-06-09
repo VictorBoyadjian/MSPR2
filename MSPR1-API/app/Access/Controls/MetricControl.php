@@ -26,7 +26,7 @@ class MetricControl extends Control
         return [
             OwnPerimiter::new()
                 ->allowed(function (Model $user, string $method) {
-                    return $user->can(sprintf('%s metrics', $method));
+                    return true;
                 })
                 ->should(function (Model $user, Model $model) {
                     return $model->user_id === $user->getKey();

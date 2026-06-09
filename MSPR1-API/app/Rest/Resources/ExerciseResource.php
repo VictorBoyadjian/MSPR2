@@ -42,7 +42,7 @@ class ExerciseResource extends Resource
     public function relations(\Lomkit\Rest\Http\Requests\RestRequest $request): array
     {
         return [
-            BelongsToMany::make('Sessions', SessionResource::class)
+            BelongsToMany::make('sportSessions', SportSessionResource::class)
                 ->withPivotFields(['reps', 'sets', 'duration_min'])
         ];
     }

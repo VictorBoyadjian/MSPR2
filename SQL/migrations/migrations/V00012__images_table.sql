@@ -1,7 +1,0 @@
-CREATE TABLE "images" (
-  "id" SERIAL PRIMARY KEY,
-  "path" VARCHAR(255) NOT NULL
-);
-
-ALTER TABLE users
-ADD COLUMN image_id INT REFERENCES images(id) ON DELETE SET NULL;

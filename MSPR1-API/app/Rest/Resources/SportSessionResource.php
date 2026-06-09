@@ -2,18 +2,19 @@
 
 namespace App\Rest\Resources;
 
-use App\Models\Metric;
+use App\Models\SportSession;
 use App\Rest\Resources\Resource;
 use Lomkit\Rest\Relations\BelongsTo;
+use Lomkit\Rest\Relations\BelongsToMany as BelongsToMany;
 
-class MetricResource extends Resource
+class SportSessionResource extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var class-string<\Illuminate\Database\Eloquent\Model>
      */
-    public static $model = Metric::class;
+    public static $model = SportSession::class;
 
     /**
      * The exposed fields that could be provided
@@ -24,20 +25,7 @@ class MetricResource extends Resource
     {
         return [
             'id',
-            'user_id',
-            'recorded_at',
-            'weight_kg',
-            'bmi',
-            'body_fat_pct',
-            'heart_rate_avg',
-            'heart_rate_max',
-            'heart_rate_resting',
-            'calories_burned',
-            'session_duration_h',
-            'workout_type',
-            'workout_frequency',
-            'water_intake_l',
-            'experience_level',
+            'duration_min'
         ];
     }
 
@@ -49,7 +37,10 @@ class MetricResource extends Resource
     public function relations(\Lomkit\Rest\Http\Requests\RestRequest $request): array
     {
         return [
-            BelongsTo::make('user', UserResource::class)
+            BelongsToMany::make('users', UserResource::class),
+            BelongsToMany::make('exercises', ExerciseResource::class)
+                ->withPivotFields(['reps', 'sets', 'duration_min']),
+            BelongsToMany::make('goals', GoalResource::class)
         ];
     }
 

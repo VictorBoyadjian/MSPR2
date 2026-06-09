@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\{BelongsToMany, HasMany};
-use Laravel\Scout\Searchable;
 use Lomkit\Access\Controls\HasControl;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -11,7 +10,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasControl, HasRoles, HasApiTokens, Searchable;
+    use HasControl, HasRoles, HasApiTokens;
 
     protected $table = "users";
 
@@ -45,24 +44,14 @@ class User extends Authenticatable
         'updated_at'
     ];
 
-    public function Sessions(): BelongsToMany
+    public function sportSessions(): BelongsToMany
     {
-        return $this->belongsToMany(Session::class, 'user_sessions')
+        return $this->belongsToMany(SportSession::class, 'user_sport_sessions')
             ->withPivot(['performed_at']);
     }
 
-    public function Metrics(): HasMany
+    public function metrics(): HasMany
     {
         return $this->hasMany(Metric::class);
-    }
-
-    public function MealLogs(): HasMany
-    {
-        return $this->hasMany(MealLog::class);
-    }
-
-    public function Image(): HasMany
-    {
-        return $this->hasMany(Image::class);
     }
 }

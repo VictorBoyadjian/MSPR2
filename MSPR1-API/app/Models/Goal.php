@@ -24,13 +24,13 @@ class Goal extends Model
         'updated_at'
     ];
 
-    public function Sessions(): BelongsToMany
-    {
-        return $this->belongsToMany(Session::class, 'session_goals');
-    }
-
-    public function Users(): HasMany
+    public function users(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+        public function sportSessions() : BelongsToMany
+    {
+        return $this->belongsToMany(SportSession::class, 'sport_session_goals');
     }
 }

@@ -3,18 +3,18 @@
 namespace App\Access\Controls;
 
 use App\Access\Perimeters\GlobalPerimiter;
-use App\Models\Exercise;
+use App\Models\Goal;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Lomkit\Access\Controls\Control;
 
-class ExerciseControl extends Control
+class GoalControl extends Control
 {
      /**
       * The model the control refers to.
       * @var class-string<Model>
       */
-     protected string $model = Exercise::class;
+     protected string $model = Goal::class;
 
     /**
      * Retrieve the list of perimeter definitions for the current control.

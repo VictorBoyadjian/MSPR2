@@ -2,6 +2,7 @@
 
 namespace App\Rest\Resources;
 
+use App\Models\Dish;
 use App\Models\Food;
 use App\Rest\Resources\Resource;
 use Lomkit\Rest\Relations\{ BelongsTo, BelongsToMany };
@@ -13,7 +14,7 @@ class DishResource extends Resource
      *
      * @var class-string<\Illuminate\Database\Eloquent\Model>
      */
-    public static $model = Food::class;
+    public static $model = Dish::class;
 
     /**
      * The exposed fields that could be provided
@@ -34,7 +35,8 @@ class DishResource extends Resource
             'sodium_mg',
             'cholesterol_mg',
             'meal_type',
-            'water_intake_ml',
+            'is_scanned',
+            'user_id',
             'created_at',
             'updated_at'
         ];
@@ -48,8 +50,7 @@ class DishResource extends Resource
     public function relations(\Lomkit\Rest\Http\Requests\RestRequest $request): array
     {
         return [
-            BelongsTo::make('User', UserResource::class),
-            BelongsTo::make('Image', ImageResource::class)
+            BelongsTo::make('user', UserResource::class),
         ];
     }
 

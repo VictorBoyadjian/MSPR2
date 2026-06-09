@@ -9,7 +9,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - mspr1-network
+      - mspr-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -29,7 +29,7 @@ services:
     volumes:
       - app_storage:/var/www/html/storage
     networks:
-      - mspr1-network
+      - mspr-network
     restart: unless-stopped
 
   # etl-api:
@@ -61,7 +61,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - mspr1-network
+      - mspr-network
     restart: unless-stopped
 
   # react:
@@ -85,7 +85,7 @@ services:
   #   restart: unless-stopped
     
 networks:
-  mspr1-network:
+  mspr-network:
     driver: bridge
 
 volumes:

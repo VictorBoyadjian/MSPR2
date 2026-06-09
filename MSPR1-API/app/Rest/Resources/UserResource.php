@@ -46,9 +46,8 @@ class UserResource extends Resource
     public function relations(\Lomkit\Rest\Http\Requests\RestRequest $request): array
     {
         return [
-            HasMany::make('Sessions', SessionResource::class),
-            HasMany::make('Metrics', MetricResource::class),
-            HasMany::make('MealLogs', MealLogResource::class)
+            HasMany::make('sportSessions', SportSessionResource::class),
+            HasMany::make('metrics', MetricResource::class),
         ];
     }
 
