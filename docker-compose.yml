@@ -32,21 +32,21 @@ services:
       - mspr1-network
     restart: unless-stopped
 
-  etl-api:
-    build: ./MSPR1-ETL
-    container_name: mspr1-etl
-    restart: unless-stopped
-    ports:
-      - "5005:5000"
-    env_file:
-      - ./MSPR1-ETL/.env
-    volumes:
-      - ./MSPR1-ETL/data:/app/data
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - mspr1-network
+  # etl-api:
+  #   build: ./MSPR1-ETL
+  #   container_name: mspr1-etl
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5005:5000"
+  #   env_file:
+  #     - ./MSPR1-ETL/.env
+  #   volumes:
+  #     - ./MSPR1-ETL/data:/app/data
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - mspr1-network
 
   grafana:
     build: ./MSPR1-Grafana
@@ -64,25 +64,25 @@ services:
       - mspr1-network
     restart: unless-stopped
 
-  react:
-    build:
-      context: ./MSPR1-REACT
-      args:
-        NEXT_PUBLIC_API_URL: http://localhost:8080/api
-        NEXT_PUBLIC_GRAFANA_URL: http://localhost:1506/d/user_quality/user-quality?orgId=1&from=2026-03-31T04:35:40.929Z&to=2026-04-16T04:35:40.929Z&timezone=browser
-        NEXT_PUBLIC_ETL_URL: http://localhost:5005
-    container_name: mspr1-react
-    ports:
-      - "3000:3000"
-    environment:
-      NODE_ENV: production
-      INTERNAL_API_URL: http://laravel:80/api
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - mspr1-network
-    restart: unless-stopped
+  # react:
+  #   build:
+  #     context: ./MSPR1-REACT
+  #     args:
+  #       NEXT_PUBLIC_API_URL: http://localhost:8080/api
+  #       NEXT_PUBLIC_GRAFANA_URL: http://localhost:1506/d/user_quality/user-quality?orgId=1&from=2026-03-31T04:35:40.929Z&to=2026-04-16T04:35:40.929Z&timezone=browser
+  #       NEXT_PUBLIC_ETL_URL: http://localhost:5005
+  #   container_name: mspr1-react
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     NODE_ENV: production
+  #     INTERNAL_API_URL: http://laravel:80/api
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - mspr1-network
+  #   restart: unless-stopped
     
 networks:
   mspr1-network:
