@@ -32,21 +32,21 @@ services:
       - mspr-network
     restart: unless-stopped
 
-  etl-api:
-    build: ./MSPR1-ETL
-    container_name: mspr1-etl
-    restart: unless-stopped
-    ports:
-      - "5005:5000"
-    env_file:
-      - ./MSPR1-ETL/.env
-    volumes:
-      - ./MSPR1-ETL/data:/app/data
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - mspr-network
+  # etl-api:
+  #   build: ./MSPR1-ETL
+  #   container_name: mspr1-etl
+  #   restart: unless-stopped
+  #   ports:
+  #     - "5005:5000"
+  #   env_file:
+  #     - ./MSPR1-ETL/.env
+  #   volumes:
+  #     - ./MSPR1-ETL/data:/app/data
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - mspr1-network
 
   grafana:
     build: ./MSPR1-Grafana
@@ -64,60 +64,25 @@ services:
       - mspr-network
     restart: unless-stopped
 
-  react:
-    build:
-      context: ./MSPR1-REACT
-      args:
-        NEXT_PUBLIC_API_URL: http://localhost:8080/api
-        NEXT_PUBLIC_GRAFANA_URL: http://localhost:1506/d/user_quality/user-quality?orgId=1&from=2026-03-31T04:35:40.929Z&to=2026-04-16T04:35:40.929Z&timezone=browser
-        NEXT_PUBLIC_ETL_URL: http://localhost:5005
-    container_name: mspr1-react
-    ports:
-      - "3000:3000"
-    environment:
-      NODE_ENV: production
-      INTERNAL_API_URL: http://laravel:80/api
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - mspr-network
-    restart: unless-stopped
-
-  ollama:
-    image: ollama/ollama
-    platform: linux/amd64
-    container_name: ollama
-    restart: unless-stopped
-    ports:
-      - "11434:11434"
-    environment:
-      - OLLAMA_HOST=0.0.0.0
-      - OLLAMA_MAX_LOADED_MODELS=1
-      - OLLAMA_NUM_PARALLEL=1
-      - OLLAMA_KEEP_ALIVE=5m
-    networks:
-      - mspr-network
-    mem_limit: 12g
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-
-  image-analysis-api:
-    build: ./MSPR2-Image-Analysis-API
-    container_name: mspr2-image-analysis-api
-    ports:
-      - "2021:2021"
-    env_file:
-      - ./MSPR2-Image-Analysis-API/.env
-    networks:
-      - mspr-network
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+  # react:
+  #   build:
+  #     context: ./MSPR1-REACT
+  #     args:
+  #       NEXT_PUBLIC_API_URL: http://localhost:8080/api
+  #       NEXT_PUBLIC_GRAFANA_URL: http://localhost:1506/d/user_quality/user-quality?orgId=1&from=2026-03-31T04:35:40.929Z&to=2026-04-16T04:35:40.929Z&timezone=browser
+  #       NEXT_PUBLIC_ETL_URL: http://localhost:5005
+  #   container_name: mspr1-react
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     NODE_ENV: production
+  #     INTERNAL_API_URL: http://laravel:80/api
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - mspr1-network
+  #   restart: unless-stopped
     
 networks:
   mspr-network:
