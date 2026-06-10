@@ -15,7 +15,6 @@ pg_restore \
     --dbname "$POSTGRES_DB" \
     --no-owner \
     --no-acl \
-    --no-create-db \
-    "$DUMP_FILE" || echo "[restore] pg_restore finished (some non-fatal errors may appear above)"
+    "$DUMP_FILE"
 
 echo "[restore] Done."
