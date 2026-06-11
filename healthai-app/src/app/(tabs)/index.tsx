@@ -1,14 +1,13 @@
 import * as Device from 'expo-device';
 import { Platform, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { AnimatedIcon } from '@/components/animated-icon';
+import { HintRow } from '@/components/hint-row';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { WebBadge } from '@/components/web-badge';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import { AddMealButton, SplashAnimation } from '@/components/add-meal/add-meal-button';
-import { ModalButtonContainer } from '@/components/ui/modal-button-container';
-import Camera from '@/components/ui/camera';
-import { AddMealModal } from '@/components/add-meal/add-meal-modal';
 
 function getDevMenuHint() {
   if (Platform.OS === 'web') {
@@ -29,61 +28,28 @@ function getDevMenuHint() {
   );
 }
 
-export default function TabThreeScreen() {
+export default function DashboardScreen() {
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
         <ThemedView style={styles.heroSection}>
+          <AnimatedIcon />
           <ThemedText type="title" style={styles.title}>
-            Ajouter un repas
+            Welcome to&nbsp;HealthAI
           </ThemedText>
         </ThemedView>
 
         <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <ThemedView style={styles.mealRow}>
-            <ThemedText type="smallBold" style={styles.title}>
-              Petit déjeuner
-            </ThemedText>
-            <SplashAnimation />
-            <ModalButtonContainer 
-              buttonChild={
-                <AddMealButton />
-                } 
-              modalChild={
-                <AddMealModal />
-              } 
-            />
-          </ThemedView>
-          <ThemedView style={styles.mealRow}>
-            <ThemedText type="smallBold" style={styles.title}>
-              Déjeuner
-            </ThemedText>
-            <SplashAnimation />
-            <ModalButtonContainer 
-              buttonChild={
-                <AddMealButton />
-                } 
-              modalChild={
-               <AddMealModal />
-              } 
-            />
-          </ThemedView>
-          <ThemedView style={styles.mealRow}>
-            <ThemedText type="smallBold" style={styles.title}>
-              Diner
-            </ThemedText>
-            <SplashAnimation />
-            <ModalButtonContainer
-              buttonChild={
-                <AddMealButton />
-                } 
-              modalChild={
-                <AddMealModal />
-              } 
-            />
-          </ThemedView>
+          <HintRow
+            title="Try editing"
+            hint={<ThemedText type="code">src/app/(tabs)/index.tsx</ThemedText>}
+          />
+          <HintRow title="Dev tools" hint={getDevMenuHint()} />
+          <HintRow
+            title="Fresh start"
+            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
+          />
         </ThemedView>
-
 
         {Platform.OS === 'web' && <WebBadge />}
       </SafeAreaView>
@@ -115,20 +81,11 @@ const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
   },
-  code: {
-    textTransform: 'uppercase',
-  },
   stepContainer: {
     gap: Spacing.three,
     alignSelf: 'stretch',
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.four,
     borderRadius: Spacing.four,
-  },
-  mealRow: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: Spacing.three,
   },
 });

@@ -46,28 +46,6 @@ export class ApiError extends Error {
   }
 }
 
-// --- Auth ---
-
-export const auth = {
-  login: (email: string, password: string) =>
-    request<{ bearer_token: string }>('POST', '/login', { email, password }),
-
-  register: (data: {
-    email: string;
-    password: string;
-    first_name: string;
-    last_name: string;
-    age?: number;
-    gender?: string;
-    weight_kg?: number;
-    height_cm?: number;
-  }) => request<{ message: string }>('POST', '/register', data),
-
-  logout: () => request<{ message: string }>('POST', '/logout'),
-
-  me: () => request<User>('GET', '/me'),
-};
-
 // --- lomkit/rest resource helpers ---
 // Each resource exposes: search, details, mutate, delete
 
@@ -107,6 +85,7 @@ function resource<T>(path: string) {
 }
 
 // --- Resources ---
+export const sendRequest = request;
 
 export const foods = resource<Food>('/foods');
 export const foodCategories = resource<FoodCategory>('/food-categories');

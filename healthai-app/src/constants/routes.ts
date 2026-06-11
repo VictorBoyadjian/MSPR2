@@ -4,10 +4,10 @@ export const ROUTES = {
   REGISTER: '/(auth)/register',
 
   // Tabs
-  DASHBOARD: '/(tabs)/dashboard',
-  MEALS: '/(tabs)/meals',
-  WORKOUTS: '/(tabs)/workouts',
-  PLANNING: '/(tabs)/planning',
+  DASHBOARD: '/',
+  MEALS: '/meals',
+  WORKOUTS: '/workouts',
+  PLANNING: '/planning',
 
   // Meal
   MEAL_DETAIL: (id: string) => `/meal/${id}`,

@@ -21,14 +21,17 @@ export default function AppTabs() {
       <TabSlot style={{ height: '100%' }} />
       <TabList asChild>
         <CustomTabList>
-          <TabTrigger name="home" href="/" asChild>
+          <TabTrigger name="index" href="/" asChild>
             <TabButton>Home</TabButton>
           </TabTrigger>
-          <TabTrigger name="nutrition" href="/nutrition" asChild>
+          <TabTrigger name="meals" href="/meals" asChild>
             <TabButton>Nutrition</TabButton>
           </TabTrigger>
-                    <TabTrigger name="add-meal" href="/add-meal" asChild>
-            <TabButton>Ajouter un repas</TabButton>
+          <TabTrigger name="workouts" href="/workouts" asChild>
+            <TabButton>Sport</TabButton>
+          </TabTrigger>
+          <TabTrigger name="planning" href="/planning" asChild>
+            <TabButton>Planning</TabButton>
           </TabTrigger>
         </CustomTabList>
       </TabList>
@@ -58,7 +61,7 @@ export function CustomTabList(props: TabListProps) {
     <View {...props} style={styles.tabListContainer}>
       <ThemedView type="backgroundElement" style={styles.innerContainer}>
         <ThemedText type="smallBold" style={styles.brandText}>
-          Expo Starter
+          HealthAI
         </ThemedText>
 
         {props.children}
