@@ -13,5 +13,7 @@ CREATE TABLE metrics (
     workout_type         VARCHAR(50),
     workout_frequency    INT,
     water_intake_l       FLOAT,
-    experience_level     INT
+    experience_level     INT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 );
