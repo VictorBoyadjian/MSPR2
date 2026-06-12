@@ -5,8 +5,8 @@ ENV PGDATA=/var/lib/postgresql/data/pgdata
 # Accept remote connections
 RUN echo "host all all 0.0.0.0/0 scram-sha-256" >> /usr/share/postgresql/pg_hba.conf.sample
 
-# Copy the binary dump and the restore init script
-COPY init.sql /tmp/init.dump
+# Copy the migration files and the init script that runs them one by one
+COPY migrations/migrations /migrations
 COPY restore.sh /docker-entrypoint-initdb.d/00_restore.sh
 RUN chmod +x /docker-entrypoint-initdb.d/00_restore.sh
 
