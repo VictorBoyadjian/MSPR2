@@ -25,7 +25,7 @@ echo "[init] Running migrations one by one..."
 # because search_path is forced to "Data" for the migration sessions.
 for file in $(ls "$MIGRATIONS_DIR"/V*.sql | sort -V); do
     echo "[init] Applying $(basename "$file")..."
-    PGOPTIONS="--search_path=Data" psql -v ON_ERROR_STOP=1 \
+    PGOPTIONS='-c search_path="Data"' psql -v ON_ERROR_STOP=1 \
         --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" \
         -f "$file"
 done
