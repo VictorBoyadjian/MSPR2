@@ -1,6 +1,6 @@
 export const CONFIG = {
-  API_BASE_URL: process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8000/api',
-  IMAGE_ANALYSIS_URL: process.env.EXPO_PUBLIC_IMAGE_ANALYSIS_URL ?? 'http://localhost:8001',
-  API_TIMEOUT_MS: 10_000,
-  TOKEN_STORAGE_KEY: '@healthai/token',
+  API_BASE_URL:
+    process.env.EXPO_PUBLIC_API_URL ?? 'https://mspr2-api-production.up.railway.app/api',
+  API_TIMEOUT_MS: 15_000,
+  TOKEN_STORAGE_KEY: 'healthai_token',
 } as const;

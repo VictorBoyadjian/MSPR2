@@ -28,14 +28,14 @@ export default function AppTabs() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: 'Accueil',
           tabBarIcon: tabIcon(require('@/assets/images/tabIcons/home.png')),
         }}
       />
       <Tabs.Screen
         name="meals"
         options={{
-          title: 'Nutrition',
+          title: 'Repas',
           tabBarIcon: tabIcon(require('@/assets/images/tabIcons/nutrition.png')),
         }}
       />
@@ -43,13 +43,6 @@ export default function AppTabs() {
         name="workouts"
         options={{
           title: 'Sport',
-          tabBarIcon: tabIcon(require('@/assets/images/tabIcons/explore.png')),
-        }}
-      />
-      <Tabs.Screen
-        name="planning"
-        options={{
-          title: 'Planning',
           tabBarIcon: tabIcon(require('@/assets/images/tabIcons/explore.png')),
         }}
       />

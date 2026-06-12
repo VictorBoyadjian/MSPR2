@@ -1,11 +1,11 @@
-export function isValidEmail(_email: string): boolean {
-  return false;
+export function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 }
 
-export function isValidPassword(_password: string): boolean {
-  return false;
+export function isValidPassword(password: string): boolean {
+  return password.length >= 8;
 }
 
-export function isNotEmpty(_value: string): boolean {
-  return false;
+export function isNotEmpty(value: string): boolean {
+  return value.trim().length > 0;
 }

@@ -1,4 +1,4 @@
-const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8080/api';
+import { CONFIG } from '@/constants/config';
 
 let authToken: string | null = null;
 
@@ -10,7 +10,15 @@ export function getToken() {
   return authToken;
 }
 
-// --- Core request helper ---
+export class ApiError extends Error {
+  constructor(
+    public status: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
@@ -21,81 +29,91 @@ async function request<T>(method: HttpMethod, path: string, body?: unknown): Pro
   };
 
   if (authToken) {
-    headers['Authorization'] = `Bearer ${authToken}`;
+    headers.Authorization = `Bearer ${authToken}`;
   }
 
-  const response = await fetch(`${BASE_URL}${path}`, {
-    method,
-    headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), CONFIG.API_TIMEOUT_MS);
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: response.statusText }));
-    throw new ApiError(response.status, error?.message ?? response.statusText);
+  try {
+    const response = await fetch(`${CONFIG.API_BASE_URL}${path}`, {
+      method,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      throw new ApiError(response.status, extractMessage(payload, response.statusText));
+    }
+
+    if (response.status === 204) return undefined as T;
+    return (await response.json()) as T;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new ApiError(0, 'La requête a expiré.');
+    }
+    throw new ApiError(0, 'Impossible de joindre le serveur.');
+  } finally {
+    clearTimeout(timeout);
   }
-
-  if (response.status === 204) return undefined as T;
-  return response.json() as Promise<T>;
 }
 
-export class ApiError extends Error {
-  constructor(public status: number, message: string) {
-    super(message);
-    this.name = 'ApiError';
+function extractMessage(payload: unknown, fallback: string): string {
+  if (payload && typeof payload === 'object' && 'message' in payload) {
+    const message = (payload as { message: unknown }).message;
+    if (typeof message === 'string') return message;
   }
+  if (typeof payload === 'string') return payload;
+  return fallback;
 }
 
-// --- lomkit/rest resource helpers ---
-// Each resource exposes: search, details, mutate, delete
+export const sendRequest = request;
 
-type SearchPayload = {
+export type SearchQuery = {
   filters?: { field: string; operator?: string; value: unknown }[];
   sorts?: { field: string; direction?: 'asc' | 'desc' }[];
   includes?: { relation: string }[];
   page?: number;
-  limit?: number;
+  limit?: 10 | 25 | 50;
 };
 
-type SearchResponse<T> = {
+export type SearchResponse<T> = {
+  current_page: number;
   data: T[];
-  meta: { current_page: number; last_page: number; per_page: number; total: number };
+  last_page?: number;
+  total?: number;
 };
 
-type MutatePayload<T> = {
-  mutate: ({ operation: 'create' | 'update'; attributes: Partial<T>; key?: number | string } | { operation: 'detach'; key: number | string })[];
-};
+type PivotAttach = { operation: 'attach'; key: number; pivot?: Record<string, unknown> };
 
-type MutateResponse<T> = { created: T[]; updated: T[] };
+type MutateRelations = Record<string, PivotAttach[]>;
+
+type MutateOperation<T> =
+  | { operation: 'create'; attributes: Partial<T>; relations?: MutateRelations }
+  | { operation: 'update'; key: number; attributes: Partial<T>; relations?: MutateRelations };
+
+export type MutateResponse = { created: number[]; updated: number[] };
 
 function resource<T>(path: string) {
   return {
-    search: (payload: SearchPayload = {}) =>
-      request<SearchResponse<T>>('POST', `${path}/search`, payload),
+    search: (query: SearchQuery = {}) =>
+      request<SearchResponse<T>>('POST', `${path}/search`, { search: query }),
 
-    details: (id: number | string) =>
-      request<{ data: T }>('GET', `${path}/${id}`),
+    mutate: (operations: MutateOperation<T>[]) =>
+      request<MutateResponse>('POST', `${path}/mutate`, { mutate: operations }),
 
-    mutate: (payload: MutatePayload<T>) =>
-      request<MutateResponse<T>>('POST', `${path}/mutate`, payload),
-
-    delete: (ids: (number | string)[]) =>
-      request<{ data: T[] }>('DELETE', path, { resources: ids }),
+    delete: (ids: number[]) => request<{ data: T[] }>('DELETE', path, { resources: ids }),
   };
 }
 
-// --- Resources ---
-export const sendRequest = request;
-
-export const foods = resource<Food>('/foods');
-export const foodCategories = resource<FoodCategory>('/food-categories');
-export const mealLogs = resource<MealLog>('/meal-logs');
+export const dishes = resource<Dish>('/dishes');
 export const exercises = resource<Exercise>('/exercises');
+export const sportSessions = resource<SportSession>('/sport_sessions');
 export const metrics = resource<Metric>('/metrics');
-export const sessions = resource<Session>('/sessions');
-export const users = resource<User>('/users');
-
-// --- Types ---
+export const goals = resource<Goal>('/goals');
 
 export type User = {
   id: number;
@@ -104,52 +122,56 @@ export type User = {
   last_name: string;
   age?: number;
   gender?: string;
-  weight_kg?: number;
-  height_cm?: number;
+  weight_kg?: string | number;
+  height_cm?: string | number;
+  is_premium?: boolean;
+  is_active?: boolean;
 };
 
-export type Food = {
+export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
+
+export type Dish = {
   id: number;
   name: string;
-  calories_per_100g?: number;
-  protein_per_100g?: number;
-  carbs_per_100g?: number;
-  fat_per_100g?: number;
-  food_category_id?: number;
-};
-
-export type FoodCategory = {
-  id: number;
-  name: string;
-};
-
-export type MealLog = {
-  id: number;
-  user_id: number;
-  food_id: number;
-  quantity_g: number;
-  logged_at: string;
+  calories_kcal?: number;
+  proteins_g?: number;
+  carbs_g?: number;
+  fats_g?: number;
+  fiber_g?: number;
+  sugars_g?: number;
+  sodium_mg?: number;
+  cholesterol_mg?: number;
+  meal_type?: MealType;
+  is_scanned?: boolean;
+  user_id?: number;
 };
 
 export type Exercise = {
   id: number;
   name: string;
-  calories_per_hour?: number;
   category?: string;
+  body_part?: string;
+  equipment?: string;
+  difficulty?: string;
+  instructions?: string;
+  source?: string;
+  pivot?: { reps?: number; sets?: number; duration_min?: number };
+};
+
+export type SportSession = {
+  id: number;
+  duration_min: number;
+  exercises?: Exercise[];
 };
 
 export type Metric = {
   id: number;
   user_id: number;
-  weight_kg?: number;
-  height_cm?: number;
   recorded_at: string;
+  weight_kg?: number;
 };
 
-export type Session = {
+export type Goal = {
   id: number;
-  user_id: number;
-  exercise_id: number;
-  duration_min: number;
-  performed_at: string;
+  name: string;
 };
