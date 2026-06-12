@@ -4,7 +4,7 @@ namespace App\Rest\Resources;
 
 use App\Models\User;
 use App\Rest\Resources\Resource;
-use Lomkit\Rest\Relations\HasMany;
+use Lomkit\Rest\Relations\{BelongsToMany, HasMany};
 
 class UserResource extends Resource
 {
@@ -46,7 +46,8 @@ class UserResource extends Resource
     public function relations(\Lomkit\Rest\Http\Requests\RestRequest $request): array
     {
         return [
-            HasMany::make('sportSessions', SportSessionResource::class),
+            BelongsToMany::make('sportSessions', SportSessionResource::class)
+                ->withPivotFields(['performed_at']),
             HasMany::make('metrics', MetricResource::class),
         ];
     }

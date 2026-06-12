@@ -348,7 +348,7 @@ class ApiDocumentation
         path: "/api/sport_sessions/mutate",
         tags: ["Sport Sessions"],
         summary: "Créer / modifier des séances",
-        description: "Une séance se compose d'une durée et de relations attachées (exercices, utilisateurs, objectifs). Les relations many-to-many se manipulent via les opérations `attach`, `detach`, `toggle`, `sync`.",
+        description: "Une séance se compose d'une durée et de relations attachées (exercices, utilisateurs, objectifs). Les relations many-to-many se manipulent via les opérations `attach`, `detach`, `toggle`, `sync`. IMPORTANT : pour une relation, `attributes` est INTERDIT avec `attach`/`detach` ; les champs de table pivot se passent sous la clé `pivot`. Seule la relation `exercises` expose des champs pivot (reps, sets, duration_min) ; `users` et `goals` n'acceptent que `operation` + `key`.",
         security: [["sanctum" => []]],
         requestBody: new OA\RequestBody(
             required: true,
@@ -373,7 +373,7 @@ class ApiDocumentation
                                             properties: [
                                                 new OA\Property(property: "operation", type: "string", enum: ["attach", "detach", "toggle", "sync"], example: "attach"),
                                                 new OA\Property(property: "key", type: "integer", example: 1),
-                                                new OA\Property(property: "attributes", type: "object", description: "Champs pivot", properties: [
+                                                new OA\Property(property: "pivot", type: "object", description: "Champs de table pivot (clé `pivot`, pas `attributes`).", properties: [
                                                     new OA\Property(property: "reps", type: "integer", example: 10),
                                                     new OA\Property(property: "sets", type: "integer", example: 3),
                                                     new OA\Property(property: "duration_min", type: "integer", example: 15),
@@ -381,12 +381,10 @@ class ApiDocumentation
                                             ]
                                         )),
                                         new OA\Property(property: "users", type: "array", items: new OA\Items(
+                                            description: "Aucun champ pivot exposé : fournir uniquement `operation` et `key`.",
                                             properties: [
                                                 new OA\Property(property: "operation", type: "string", enum: ["attach", "detach", "toggle", "sync"], example: "attach"),
                                                 new OA\Property(property: "key", type: "integer", example: 1),
-                                                new OA\Property(property: "attributes", type: "object", properties: [
-                                                    new OA\Property(property: "performed_at", type: "string", format: "date-time", example: "2024-01-15 09:00:00"),
-                                                ]),
                                             ]
                                         )),
                                         new OA\Property(property: "goals", type: "array", items: new OA\Items(
@@ -403,8 +401,8 @@ class ApiDocumentation
                             "operation" => "create",
                             "attributes" => ["duration_min" => 45],
                             "relations" => [
-                                "exercises" => [["operation" => "attach", "key" => 1, "attributes" => ["reps" => 10, "sets" => 3, "duration_min" => 15]]],
-                                "users" => [["operation" => "attach", "key" => 1, "attributes" => ["performed_at" => "2024-01-15 09:00:00"]]],
+                                "exercises" => [["operation" => "attach", "key" => 1, "pivot" => ["reps" => 10, "sets" => 3, "duration_min" => 15]]],
+                                "users" => [["operation" => "attach", "key" => 1]],
                                 "goals" => [["operation" => "attach", "key" => 1]],
                             ],
                         ]]

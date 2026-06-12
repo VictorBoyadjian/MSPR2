@@ -2,77 +2,58 @@
     "openapi": "3.0.0",
     "info": {
         "title": "MSPR1 API",
-        "description": "API for exercise, food, and meal tracking",
+        "description": "API de suivi sportif et nutritionnel (exercices, repas, séances, métriques).\n\n**Authentification** : Sanctum (Bearer token). Récupérez un token via `POST /api/login`,\npuis cliquez sur **Authorize** et saisissez le token (il sera envoyé en `Authorization: Bearer <token>`).\n\n**Ressources REST** : gérées par lomkit/laravel-rest-api. Les opérations de lecture\nse font via `POST /{ressource}/search`, les écritures via `POST /{ressource}/mutate`,\nles suppressions via `DELETE /{ressource}`.\n\n**Note filtres** : la base de données est en PostgreSQL. L'opérateur `like` y est\n**sensible à la casse** ; pensez à respecter la casse exacte du terme recherché.",
         "version": "1.0.0"
     },
     "servers": [
         {
             "url": "/",
-            "description": "MSPR1 API Server"
+            "description": "Serveur courant"
+        },
+        {
+            "url": "https://mspr2-api-production.up.railway.app",
+            "description": "Production (Railway)"
         },
         {
             "url": "/api"
         }
     ],
     "paths": {
-        "/api/login": {
-            "post": {
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Connexion utilisateur",
-                "operationId": "1fe1a561a165b943dbaa719736e16340",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "email": {
-                                        "type": "string",
-                                        "example": "user@example.com"
-                                    },
-                                    "password": {
-                                        "type": "string",
-                                        "example": "password"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "User logged in"
-                    }
-                }
-            }
-        },
         "/api/register": {
             "post": {
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Inscription utilisateur",
+                "summary": "Inscription d'un nouvel utilisateur",
+                "description": "Crée un compte et lui assigne le rôle `Administrator`. Ne renvoie pas de token : utilisez ensuite `/api/login`.",
                 "operationId": "e64b3947841dfeae7e8b6764cb035333",
                 "requestBody": {
+                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
                                 "properties": {
                                     "email": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
                                     },
                                     "password": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
                                     },
                                     "first_name": {
                                         "type": "string",
-                                        "example": "Admin"
+                                        "example": "Jean"
                                     },
                                     "last_name": {
                                         "type": "string",
-                                        "example": "User"
+                                        "example": "Dupont"
                                     },
                                     "age": {
                                         "type": "integer",
@@ -80,14 +61,21 @@
                                     },
                                     "gender": {
                                         "type": "string",
-                                        "example": "male"
+                                        "example": "male",
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "other"
+                                        ]
                                     },
                                     "weight_kg": {
-                                        "type": "integer",
+                                        "type": "number",
+                                        "format": "float",
                                         "example": 80
                                     },
                                     "height_cm": {
-                                        "type": "integer",
+                                        "type": "number",
+                                        "format": "float",
                                         "example": 180
                                     }
                                 },
@@ -98,7 +86,85 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "User registered"
+                        "description": "Utilisateur créé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "ok"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Connexion utilisateur",
+                "description": "Renvoie un token Bearer Sanctum à utiliser pour les requêtes authentifiées.",
+                "operationId": "1fe1a561a165b943dbaa719736e16340",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Connexion réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "bearer_token": {
+                                            "type": "string",
+                                            "example": "1|abcdef0123456789..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Identifiants invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                },
+                                "example": "Invalid credentials"
+                            }
+                        }
                     }
                 }
             }
@@ -109,10 +175,259 @@
                     "Auth"
                 ],
                 "summary": "Déconnexion",
+                "description": "Révoque le token courant.",
                 "operationId": "26df96a30ef9f7a5d74ecbc59a80dae2",
                 "responses": {
                     "200": {
-                        "description": "Logged out"
+                        "description": "Déconnecté",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logged out"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Profil de l'utilisateur connecté",
+                "operationId": "1d08668dafc5402c3446b0682c77d4f1",
+                "responses": {
+                    "200": {
+                        "description": "Utilisateur courant",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/dishes": {
+            "get": {
+                "tags": [
+                    "Dishes"
+                ],
+                "summary": "Détails de la ressource Dishes",
+                "description": "Renvoie la description Lomkit de la ressource (champs, relations, scopes, limites disponibles).",
+                "operationId": "1b10c7a8f30c676ff22a9a32b9bd2385",
+                "responses": {
+                    "200": {
+                        "description": "Description de la ressource"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Dishes"
+                ],
+                "summary": "Supprimer des repas",
+                "operationId": "07b21c81dce5466dfd1b4f096dc2bd80",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeletePayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Repas supprimés"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/dishes/search": {
+            "post": {
+                "tags": [
+                    "Dishes"
+                ],
+                "summary": "Rechercher des repas",
+                "description": "Champs filtrables/triables : id, name, calories_kcal, proteins_g, carbs_g, fats_g, fiber_g, sugars_g, sodium_mg, cholesterol_mg, meal_type, is_scanned, user_id, created_at, updated_at. Relation incluable : `user`.",
+                "operationId": "c91be149c969f34ed212976df471922d",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SearchPayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Repas paginés",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Pagination"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Dish"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/dishes/mutate": {
+            "post": {
+                "tags": [
+                    "Dishes"
+                ],
+                "summary": "Créer / modifier des repas",
+                "operationId": "815395dfc3202cb683a1711d22bca41a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "mutate"
+                                ],
+                                "properties": {
+                                    "mutate": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "operation"
+                                            ],
+                                            "properties": {
+                                                "operation": {
+                                                    "type": "string",
+                                                    "example": "create",
+                                                    "enum": [
+                                                        "create",
+                                                        "update"
+                                                    ]
+                                                },
+                                                "key": {
+                                                    "description": "ID ciblé. Requis pour `update`.",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "attributes": {
+                                                    "$ref": "#/components/schemas/DishInput"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/MutateResponse"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/exercises": {
+            "get": {
+                "tags": [
+                    "Exercises"
+                ],
+                "summary": "Détails de la ressource Exercises",
+                "operationId": "e5ba9ea4addb4e58f57eb93579abe55b",
+                "responses": {
+                    "200": {
+                        "description": "Description de la ressource"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Exercises"
+                ],
+                "summary": "Supprimer des exercices",
+                "operationId": "b53ced622476faaef89a54475c7c7fd6",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeletePayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Exercices supprimés"
                     }
                 },
                 "security": [
@@ -128,10 +443,42 @@
                     "Exercises"
                 ],
                 "summary": "Rechercher des exercices",
+                "description": "Champs filtrables/triables : id, name, category, body_part, equipment, difficulty, instructions, source. Relation incluable : `sportSessions` (pivot reps, sets, duration_min).",
                 "operationId": "4a2b824b8f54b5a52e0281c16e136894",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SearchPayload"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
-                        "description": "List exercises"
+                        "description": "Exercices paginés",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Pagination"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Exercise"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -153,785 +500,278 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "properties": {
-                                    "mutate": {
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "operation": {
-                                                    "type": "string",
-                                                    "example": "create",
-                                                    "enum": [
-                                                        "create",
-                                                        "update",
-                                                        "delete"
-                                                    ]
-                                                },
-                                                "key": {
-                                                    "description": "Requis pour update/delete",
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "attributes": {
-                                                    "properties": {
-                                                        "name": {
-                                                            "type": "string",
-                                                            "example": "Squat"
-                                                        },
-                                                        "category": {
-                                                            "type": "string",
-                                                            "example": "strength"
-                                                        },
-                                                        "body_part": {
-                                                            "type": "string",
-                                                            "example": "legs"
-                                                        },
-                                                        "equipment": {
-                                                            "type": "string",
-                                                            "example": "barbell"
-                                                        },
-                                                        "difficulty": {
-                                                            "type": "string",
-                                                            "example": "intermediaire"
-                                                        },
-                                                        "instructions": {
-                                                            "type": "string",
-                                                            "example": "Descendre en gardant le dos droit"
-                                                        },
-                                                        "source": {
-                                                            "type": "string",
-                                                            "example": "https://example.com"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "example": [
-                                            {
-                                                "operation": "create",
-                                                "attributes": {
-                                                    "name": "Squat",
-                                                    "category": "strength",
-                                                    "body_part": "legs",
-                                                    "equipment": "barbell",
-                                                    "difficulty": "intermediaire",
-                                                    "instructions": "Descendre en gardant le dos droit",
-                                                    "source": "https://example.com"
-                                                }
-                                            }
-                                        ]
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Exercises mutated"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/exercises": {
-            "delete": {
-                "tags": [
-                    "Exercises"
-                ],
-                "summary": "Supprimer un exercice",
-                "operationId": "b53ced622476faaef89a54475c7c7fd6",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
                                 "required": [
-                                    "resources"
+                                    "mutate"
                                 ],
                                 "properties": {
-                                    "resources": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "integer"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Exercise deleted"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/food-categories/search": {
-            "post": {
-                "tags": [
-                    "Food Categories"
-                ],
-                "summary": "Rechercher des catégories",
-                "operationId": "2d079dcdfd50ab1fc77af47aa60bbf2b",
-                "responses": {
-                    "200": {
-                        "description": "List food categories"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/food-categories/mutate": {
-            "post": {
-                "tags": [
-                    "Food Categories"
-                ],
-                "summary": "Créer / modifier des catégories",
-                "operationId": "7ae09703660fd16fac44a48d896ac5a0",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
                                     "mutate": {
                                         "type": "array",
                                         "items": {
+                                            "required": [
+                                                "operation"
+                                            ],
                                             "properties": {
                                                 "operation": {
                                                     "type": "string",
                                                     "example": "create",
                                                     "enum": [
                                                         "create",
-                                                        "update",
-                                                        "delete"
-                                                    ]
-                                                },
-                                                "key": {
-                                                    "description": "Requis pour update/delete",
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "attributes": {
-                                                    "properties": {
-                                                        "name": {
-                                                            "type": "string",
-                                                            "example": "Légumes"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "example": [
-                                            {
-                                                "operation": "create",
-                                                "attributes": {
-                                                    "name": "proteins"
-                                                }
-                                            }
-                                        ]
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Food categories mutated"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/foods/search": {
-            "post": {
-                "tags": [
-                    "Foods"
-                ],
-                "summary": "Rechercher des aliments",
-                "operationId": "2ba416a0df3015800c97a303454cb8e7",
-                "responses": {
-                    "200": {
-                        "description": "List foods"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/foods/mutate": {
-            "post": {
-                "tags": [
-                    "Foods"
-                ],
-                "summary": "Créer / modifier des aliments",
-                "operationId": "a14fe7218ce8b8d92acc974aa1b3f0c1",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "mutate": {
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "operation": {
-                                                    "type": "string",
-                                                    "example": "create",
-                                                    "enum": [
-                                                        "create",
-                                                        "update",
-                                                        "delete"
-                                                    ]
-                                                },
-                                                "key": {
-                                                    "description": "Requis pour update/delete",
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "attributes": {
-                                                    "properties": {
-                                                        "name": {
-                                                            "type": "string",
-                                                            "example": "Poulet grillé"
-                                                        },
-                                                        "food_category_id": {
-                                                            "type": "number",
-                                                            "example": 0
-                                                        },
-                                                        "calories_kcal": {
-                                                            "type": "number",
-                                                            "example": 165
-                                                        },
-                                                        "proteins_g": {
-                                                            "type": "number",
-                                                            "example": 31
-                                                        },
-                                                        "carbs_g": {
-                                                            "type": "number",
-                                                            "example": 0
-                                                        },
-                                                        "fats_g": {
-                                                            "type": "number",
-                                                            "example": 3.6
-                                                        },
-                                                        "fiber_g": {
-                                                            "type": "number",
-                                                            "example": 0
-                                                        },
-                                                        "sugars_g": {
-                                                            "type": "number",
-                                                            "example": 0
-                                                        },
-                                                        "sodium_mg": {
-                                                            "type": "number",
-                                                            "example": 0.07
-                                                        },
-                                                        "cholesterol_mg": {
-                                                            "type": "number",
-                                                            "example": 85
-                                                        },
-                                                        "meal_type": {
-                                                            "type": "string",
-                                                            "example": "lunch"
-                                                        },
-                                                        "water_intake_ml": {
-                                                            "type": "number",
-                                                            "example": 0
-                                                        },
-                                                        "source": {
-                                                            "type": "string",
-                                                            "example": "https://example.com"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "example": [
-                                            {
-                                                "operation": "create",
-                                                "attributes": {
-                                                    "name": "Poulet grillé",
-                                                    "food_category_id": 0,
-                                                    "calories_kcal": 165,
-                                                    "proteins_g": 31,
-                                                    "carbs_g": 0,
-                                                    "fats_g": 3.6,
-                                                    "fiber_g": 0,
-                                                    "sugars_g": 0,
-                                                    "sodium_mg": 0.07,
-                                                    "cholesterol_mg": 85,
-                                                    "meal_type": "lunch",
-                                                    "water_intake_ml": 0,
-                                                    "source": "https://example.com"
-                                                }
-                                            }
-                                        ]
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Foods mutated"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/foods": {
-            "delete": {
-                "tags": [
-                    "Foods"
-                ],
-                "summary": "Supprimer un aliment",
-                "operationId": "4adcd0ed6478723690b678b3868cd479",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "resources"
-                                ],
-                                "properties": {
-                                    "resources": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "integer"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Food deleted"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/meal-logs/search": {
-            "post": {
-                "tags": [
-                    "Meal Logs"
-                ],
-                "summary": "Rechercher des logs de repas",
-                "operationId": "378ac82949229ae9d438796c7de9b6e6",
-                "responses": {
-                    "200": {
-                        "description": "List meal logs"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/meal-logs/mutate": {
-            "post": {
-                "tags": [
-                    "Meal Logs"
-                ],
-                "summary": "Créer / modifier des logs de repas",
-                "operationId": "1e25211f39abb5c71c6b4e4f3ba95edc",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "mutate": {
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "operation": {
-                                                    "type": "string",
-                                                    "example": "create",
-                                                    "enum": [
-                                                        "create",
-                                                        "update",
-                                                        "delete"
-                                                    ]
-                                                },
-                                                "key": {
-                                                    "description": "Requis pour update/delete",
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "attributes": {
-                                                    "properties": {
-                                                        "user_id": {
-                                                            "type": "integer",
-                                                            "example": 1
-                                                        },
-                                                        "food_id": {
-                                                            "type": "integer",
-                                                            "example": 1
-                                                        },
-                                                        "meal_type": {
-                                                            "type": "string",
-                                                            "example": "lunch"
-                                                        },
-                                                        "quantity_g": {
-                                                            "type": "number",
-                                                            "example": 150
-                                                        },
-                                                        "logged_at": {
-                                                            "type": "string",
-                                                            "example": "2024-01-15 12:00:00"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "example": [
-                                            {
-                                                "operation": "create",
-                                                "attributes": {
-                                                    "user_id": 1,
-                                                    "food_id": 1,
-                                                    "meal_type": "lunch",
-                                                    "quantity_g": 150,
-                                                    "logged_at": "2024-01-15 12:00:00"
-                                                }
-                                            }
-                                        ]
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Meal logs mutated"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/meal-logs": {
-            "delete": {
-                "tags": [
-                    "Meal Logs"
-                ],
-                "summary": "Supprimer un log de repas",
-                "operationId": "eb0a50e36266324f26e7680a33ebf0bb",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "resources"
-                                ],
-                                "properties": {
-                                    "resources": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "integer"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Meal log deleted"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/sessions/search": {
-            "post": {
-                "tags": [
-                    "Sessions"
-                ],
-                "summary": "Rechercher des sessions",
-                "operationId": "585d59bfbc6ce34acb817d5d5a2cc328",
-                "responses": {
-                    "200": {
-                        "description": "List sessions"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/sessions/mutate": {
-            "post": {
-                "tags": [
-                    "Sessions"
-                ],
-                "summary": "Créer / modifier des sessions",
-                "operationId": "c60cab12d72bb0bebc2f5cd19e0fd182",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "mutate": {
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "operation": {
-                                                    "type": "string",
-                                                    "example": "create",
-                                                    "enum": [
-                                                        "create",
-                                                        "update",
-                                                        "delete"
-                                                    ]
-                                                },
-                                                "key": {
-                                                    "description": "Requis pour update/delete",
-                                                    "type": "integer",
-                                                    "example": 1
-                                                },
-                                                "attributes": {
-                                                    "properties": {
-                                                        "user_id": {
-                                                            "type": "integer",
-                                                            "example": 1
-                                                        },
-                                                        "duration_min": {
-                                                            "type": "integer",
-                                                            "example": 45
-                                                        },
-                                                        "performed_at": {
-                                                            "type": "string",
-                                                            "example": "2024-01-15 09:00:00"
-                                                        }
-                                                    },
-                                                    "type": "object"
-                                                }
-                                            },
-                                            "type": "object"
-                                        },
-                                        "example": [
-                                            {
-                                                "operation": "create",
-                                                "attributes": {
-                                                    "user_id": 1,
-                                                    "duration_min": 45,
-                                                    "performed_at": "2024-01-15 09:00:00"
-                                                }
-                                            }
-                                        ]
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Sessions mutated"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/sessions": {
-            "delete": {
-                "tags": [
-                    "Sessions"
-                ],
-                "summary": "Supprimer une session",
-                "operationId": "cd86d94d3828f2c21fddd9ac95ece896",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "resources"
-                                ],
-                                "properties": {
-                                    "resources": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "integer"
-                                        }
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Session deleted"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/users/search": {
-            "post": {
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Rechercher des utilisateurs",
-                "operationId": "ce29cb87b6498e0a2ab6f422e93da794",
-                "responses": {
-                    "200": {
-                        "description": "List users"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/users/mutate": {
-            "post": {
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Modifier un utilisateur",
-                "operationId": "b9cfce456ea7d75c3985d7551cee8052",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "mutate": {
-                                        "type": "array",
-                                        "items": {
-                                            "properties": {
-                                                "operation": {
-                                                    "type": "string",
-                                                    "example": "update",
-                                                    "enum": [
                                                         "update"
                                                     ]
                                                 },
                                                 "key": {
-                                                    "description": "ID de l'utilisateur à modifier",
+                                                    "description": "ID ciblé. Requis pour `update`.",
                                                     "type": "integer",
                                                     "example": 1
                                                 },
                                                 "attributes": {
+                                                    "$ref": "#/components/schemas/ExerciseInput"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/MutateResponse"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/sport_sessions": {
+            "get": {
+                "tags": [
+                    "Sport Sessions"
+                ],
+                "summary": "Détails de la ressource Sport Sessions",
+                "operationId": "f411228ca5231a5834d153d16c64359e",
+                "responses": {
+                    "200": {
+                        "description": "Description de la ressource"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Sport Sessions"
+                ],
+                "summary": "Supprimer des séances",
+                "operationId": "0c64461b7c689955ae34bfc67210d810",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeletePayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Séances supprimées"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/sport_sessions/search": {
+            "post": {
+                "tags": [
+                    "Sport Sessions"
+                ],
+                "summary": "Rechercher des séances",
+                "description": "Champs filtrables/triables : id, duration_min. Relations incluables : `users` (pivot performed_at), `exercises` (pivot reps, sets, duration_min), `goals`.",
+                "operationId": "a2bd501e9cdf18bca4b3688125daac21",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SearchPayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Séances paginées",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Pagination"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/SportSession"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/sport_sessions/mutate": {
+            "post": {
+                "tags": [
+                    "Sport Sessions"
+                ],
+                "summary": "Créer / modifier des séances",
+                "description": "Une séance se compose d'une durée et de relations attachées (exercices, utilisateurs, objectifs). Les relations many-to-many se manipulent via les opérations `attach`, `detach`, `toggle`, `sync`. IMPORTANT : pour une relation, `attributes` est INTERDIT avec `attach`/`detach` ; les champs de table pivot se passent sous la clé `pivot`. Seule la relation `exercises` expose des champs pivot (reps, sets, duration_min) ; `users` et `goals` n'acceptent que `operation` + `key`.",
+                "operationId": "3f9db2ae8bdcdf262952187e8dc04117",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "mutate"
+                                ],
+                                "properties": {
+                                    "mutate": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "operation"
+                                            ],
+                                            "properties": {
+                                                "operation": {
+                                                    "type": "string",
+                                                    "example": "create",
+                                                    "enum": [
+                                                        "create",
+                                                        "update"
+                                                    ]
+                                                },
+                                                "key": {
+                                                    "description": "ID ciblé. Requis pour `update`.",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "attributes": {
+                                                    "$ref": "#/components/schemas/SportSessionInput"
+                                                },
+                                                "relations": {
+                                                    "description": "Relations à attacher/synchroniser.",
                                                     "properties": {
-                                                        "email": {
-                                                            "type": "string",
-                                                            "example": "user@example.com"
+                                                        "exercises": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "operation": {
+                                                                        "type": "string",
+                                                                        "example": "attach",
+                                                                        "enum": [
+                                                                            "attach",
+                                                                            "detach",
+                                                                            "toggle",
+                                                                            "sync"
+                                                                        ]
+                                                                    },
+                                                                    "key": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    },
+                                                                    "pivot": {
+                                                                        "description": "Champs de table pivot (clé `pivot`, pas `attributes`).",
+                                                                        "properties": {
+                                                                            "reps": {
+                                                                                "type": "integer",
+                                                                                "example": 10
+                                                                            },
+                                                                            "sets": {
+                                                                                "type": "integer",
+                                                                                "example": 3
+                                                                            },
+                                                                            "duration_min": {
+                                                                                "type": "integer",
+                                                                                "example": 15
+                                                                            }
+                                                                        },
+                                                                        "type": "object"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
                                                         },
-                                                        "first_name": {
-                                                            "type": "string",
-                                                            "example": "Jean"
+                                                        "users": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "description": "Aucun champ pivot exposé : fournir uniquement `operation` et `key`.",
+                                                                "properties": {
+                                                                    "operation": {
+                                                                        "type": "string",
+                                                                        "example": "attach",
+                                                                        "enum": [
+                                                                            "attach",
+                                                                            "detach",
+                                                                            "toggle",
+                                                                            "sync"
+                                                                        ]
+                                                                    },
+                                                                    "key": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
                                                         },
-                                                        "last_name": {
-                                                            "type": "string",
-                                                            "example": "Dupont"
-                                                        },
-                                                        "age": {
-                                                            "type": "integer",
-                                                            "example": 30
-                                                        },
-                                                        "gender": {
-                                                            "type": "string",
-                                                            "example": "male"
-                                                        },
-                                                        "weight_kg": {
-                                                            "type": "number",
-                                                            "example": 80
-                                                        },
-                                                        "height_cm": {
-                                                            "type": "number",
-                                                            "example": 180
-                                                        },
-                                                        "is_premium": {
-                                                            "type": "boolean",
-                                                            "example": false
-                                                        },
-                                                        "is_active": {
-                                                            "type": "boolean",
-                                                            "example": true
+                                                        "goals": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "operation": {
+                                                                        "type": "string",
+                                                                        "example": "attach",
+                                                                        "enum": [
+                                                                            "attach",
+                                                                            "detach",
+                                                                            "toggle",
+                                                                            "sync"
+                                                                        ]
+                                                                    },
+                                                                    "key": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
                                                         }
                                                     },
                                                     "type": "object"
@@ -941,10 +781,34 @@
                                         },
                                         "example": [
                                             {
-                                                "operation": "update",
-                                                "key": 1,
+                                                "operation": "create",
                                                 "attributes": {
-                                                    "first_name": "Jean"
+                                                    "duration_min": 45
+                                                },
+                                                "relations": {
+                                                    "exercises": [
+                                                        {
+                                                            "operation": "attach",
+                                                            "key": 1,
+                                                            "pivot": {
+                                                                "reps": 10,
+                                                                "sets": 3,
+                                                                "duration_min": 15
+                                                            }
+                                                        }
+                                                    ],
+                                                    "users": [
+                                                        {
+                                                            "operation": "attach",
+                                                            "key": 1
+                                                        }
+                                                    ],
+                                                    "goals": [
+                                                        {
+                                                            "operation": "attach",
+                                                            "key": 1
+                                                        }
+                                                    ]
                                                 }
                                             }
                                         ]
@@ -957,7 +821,209 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "User mutated"
+                        "$ref": "#/components/responses/MutateResponse"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/goals": {
+            "get": {
+                "tags": [
+                    "Goals"
+                ],
+                "summary": "Détails de la ressource Goals",
+                "operationId": "4d0902783c5b90f2fb6577be146ec656",
+                "responses": {
+                    "200": {
+                        "description": "Description de la ressource"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Goals"
+                ],
+                "summary": "Supprimer des objectifs",
+                "operationId": "48b78ab59448c196d7c0de649ea77cea",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeletePayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Objectifs supprimés"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/goals/search": {
+            "post": {
+                "tags": [
+                    "Goals"
+                ],
+                "summary": "Rechercher des objectifs",
+                "description": "Champs filtrables/triables : id, name, created_at, updated_at. Relations incluables : `users`, `sportSessions`.",
+                "operationId": "494a65ad3be3e3338c3ee1f051fc5b62",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SearchPayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Objectifs paginés",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Pagination"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Goal"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/goals/mutate": {
+            "post": {
+                "tags": [
+                    "Goals"
+                ],
+                "summary": "Créer / modifier des objectifs",
+                "operationId": "39fe4befdce1e5b0db633f8d91ef7d8c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "mutate"
+                                ],
+                                "properties": {
+                                    "mutate": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "operation"
+                                            ],
+                                            "properties": {
+                                                "operation": {
+                                                    "type": "string",
+                                                    "example": "create",
+                                                    "enum": [
+                                                        "create",
+                                                        "update"
+                                                    ]
+                                                },
+                                                "key": {
+                                                    "description": "ID ciblé. Requis pour `update`.",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "attributes": {
+                                                    "$ref": "#/components/schemas/GoalInput"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/MutateResponse"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/metrics": {
+            "get": {
+                "tags": [
+                    "Metrics"
+                ],
+                "summary": "Détails de la ressource Metrics",
+                "operationId": "b862e348f965ad22cbbd49626a743a67",
+                "responses": {
+                    "200": {
+                        "description": "Description de la ressource"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Metrics"
+                ],
+                "summary": "Supprimer des métriques",
+                "operationId": "c9c299d6f5ed5e56e90dc5bb24029ce2",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeletePayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Métriques supprimées"
                     }
                 },
                 "security": [
@@ -973,10 +1039,42 @@
                     "Metrics"
                 ],
                 "summary": "Rechercher des métriques",
+                "description": "Champs filtrables/triables : id, user_id, recorded_at, weight_kg, bmi, body_fat_pct, heart_rate_avg, heart_rate_max, heart_rate_resting, calories_burned, session_duration_h, workout_type, workout_frequency, water_intake_l, experience_level. Relation incluable : `user`.",
                 "operationId": "0774e0743e47fbf445c619515c322902",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SearchPayload"
+                            }
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
-                        "description": "List metrics"
+                        "description": "Métriques paginées",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Pagination"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Metric"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -998,149 +1096,35 @@
                     "content": {
                         "application/json": {
                             "schema": {
+                                "required": [
+                                    "mutate"
+                                ],
                                 "properties": {
                                     "mutate": {
                                         "type": "array",
                                         "items": {
+                                            "required": [
+                                                "operation"
+                                            ],
                                             "properties": {
                                                 "operation": {
                                                     "type": "string",
                                                     "example": "create",
                                                     "enum": [
                                                         "create",
-                                                        "update",
-                                                        "delete"
+                                                        "update"
                                                     ]
                                                 },
                                                 "key": {
-                                                    "description": "Requis pour update/delete",
+                                                    "description": "ID ciblé. Requis pour `update`.",
                                                     "type": "integer",
                                                     "example": 1
                                                 },
                                                 "attributes": {
-                                                    "properties": {
-                                                        "user_id": {
-                                                            "type": "integer",
-                                                            "example": 1
-                                                        },
-                                                        "recorded_at": {
-                                                            "type": "string",
-                                                            "example": "2024-01-15 08:00:00"
-                                                        },
-                                                        "weight_kg": {
-                                                            "type": "number",
-                                                            "example": 80.5
-                                                        },
-                                                        "bmi": {
-                                                            "type": "number",
-                                                            "example": 24.8
-                                                        },
-                                                        "body_fat_pct": {
-                                                            "type": "number",
-                                                            "example": 18.5
-                                                        },
-                                                        "heart_rate_avg": {
-                                                            "type": "integer",
-                                                            "example": 72
-                                                        },
-                                                        "heart_rate_max": {
-                                                            "type": "integer",
-                                                            "example": 165
-                                                        },
-                                                        "heart_rate_resting": {
-                                                            "type": "integer",
-                                                            "example": 58
-                                                        },
-                                                        "calories_burned": {
-                                                            "type": "integer",
-                                                            "example": 450
-                                                        },
-                                                        "session_duration_h": {
-                                                            "type": "number",
-                                                            "example": 1.5
-                                                        },
-                                                        "workout_type": {
-                                                            "type": "string",
-                                                            "example": "strength"
-                                                        },
-                                                        "workout_frequency": {
-                                                            "type": "integer",
-                                                            "example": 4
-                                                        },
-                                                        "water_intake_l": {
-                                                            "type": "number",
-                                                            "example": 2.5
-                                                        },
-                                                        "experience_level": {
-                                                            "type": "integer",
-                                                            "example": 1
-                                                        }
-                                                    },
-                                                    "type": "object"
+                                                    "$ref": "#/components/schemas/MetricInput"
                                                 }
                                             },
                                             "type": "object"
-                                        },
-                                        "example": [
-                                            {
-                                                "operation": "create",
-                                                "attributes": {
-                                                    "user_id": 1,
-                                                    "recorded_at": "2024-01-15 08:00:00",
-                                                    "weight_kg": 80.5,
-                                                    "bmi": 24.8,
-                                                    "body_fat_pct": 18.5,
-                                                    "heart_rate_avg": 72,
-                                                    "heart_rate_max": 165,
-                                                    "heart_rate_resting": 58,
-                                                    "calories_burned": 450,
-                                                    "session_duration_h": 1.5,
-                                                    "workout_type": "strength",
-                                                    "workout_frequency": 4,
-                                                    "water_intake_l": 2.5,
-                                                    "experience_level": 1
-                                                }
-                                            }
-                                        ]
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Metrics mutated"
-                    }
-                },
-                "security": [
-                    {
-                        "sanctum": []
-                    }
-                ]
-            }
-        },
-        "/api/metrics": {
-            "delete": {
-                "tags": [
-                    "Metrics"
-                ],
-                "summary": "Supprimer des métriques",
-                "operationId": "c9c299d6f5ed5e56e90dc5bb24029ce2",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "resources"
-                                ],
-                                "properties": {
-                                    "resources": {
-                                        "type": "array",
-                                        "items": {
-                                            "type": "integer"
                                         }
                                     }
                                 },
@@ -1151,7 +1135,58 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Metrics deleted"
+                        "$ref": "#/components/responses/MutateResponse"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/users/search": {
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Rechercher des utilisateurs",
+                "description": "Seule l'opération `search` est exposée pour les utilisateurs. Champs filtrables/triables : id, email, first_name, last_name, age, gender, weight_kg, height_cm, is_premium, is_active. Relations incluables : `sportSessions`, `metrics`.",
+                "operationId": "ce29cb87b6498e0a2ab6f422e93da794",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SearchPayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Utilisateurs paginés",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Pagination"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/User"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -1163,9 +1198,771 @@
         }
     },
     "components": {
+        "schemas": {
+            "SearchFilter": {
+                "title": "Filtre de recherche",
+                "description": "Un filtre Lomkit. Soit `field`/`operator`/`value`, soit un groupe `nested` de sous-filtres.",
+                "properties": {
+                    "field": {
+                        "description": "Champ exposé par la ressource.",
+                        "type": "string",
+                        "example": "name"
+                    },
+                    "operator": {
+                        "description": "ATTENTION PostgreSQL : `like` est sensible à la casse.",
+                        "type": "string",
+                        "example": "like",
+                        "enum": [
+                            "=",
+                            "!=",
+                            ">",
+                            ">=",
+                            "<",
+                            "<=",
+                            "like",
+                            "not like",
+                            "in",
+                            "not in"
+                        ]
+                    },
+                    "value": {
+                        "description": "Valeur comparée (scalaire, ou tableau pour `in`/`not in`).",
+                        "example": "Squat"
+                    },
+                    "type": {
+                        "description": "Connecteur logique avec le filtre précédent.",
+                        "type": "string",
+                        "example": "and",
+                        "enum": [
+                            "and",
+                            "or"
+                        ]
+                    },
+                    "nested": {
+                        "description": "Groupe imbriqué de filtres (exclusif avec field/operator/value).",
+                        "type": "array",
+                        "items": {
+                            "type": "object"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "SearchSort": {
+                "title": "Tri",
+                "properties": {
+                    "field": {
+                        "type": "string",
+                        "example": "id"
+                    },
+                    "direction": {
+                        "type": "string",
+                        "example": "desc",
+                        "enum": [
+                            "asc",
+                            "desc"
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "SearchInclude": {
+                "title": "Relation à inclure",
+                "description": "Charge une relation. Peut elle-même contenir filtres/tris/limites imbriqués.",
+                "properties": {
+                    "relation": {
+                        "type": "string",
+                        "example": "user"
+                    },
+                    "filters": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SearchFilter"
+                        }
+                    },
+                    "sorts": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SearchSort"
+                        }
+                    },
+                    "limit": {
+                        "type": "integer",
+                        "example": 25
+                    }
+                },
+                "type": "object"
+            },
+            "SearchPayload": {
+                "title": "Corps de recherche Lomkit",
+                "description": "Toutes les clés sont optionnelles. `limit` doit valoir une des valeurs autorisées par la ressource (10, 25 ou 50).",
+                "properties": {
+                    "search": {
+                        "properties": {
+                            "filters": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/SearchFilter"
+                                }
+                            },
+                            "sorts": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/SearchSort"
+                                }
+                            },
+                            "includes": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/SearchInclude"
+                                }
+                            },
+                            "scopes": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object"
+                                }
+                            },
+                            "aggregates": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object"
+                                }
+                            },
+                            "instructions": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object"
+                                }
+                            },
+                            "gates": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "enum": [
+                                        "viewAny",
+                                        "view",
+                                        "create",
+                                        "update",
+                                        "delete",
+                                        "restore",
+                                        "forceDelete"
+                                    ]
+                                }
+                            },
+                            "page": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "limit": {
+                                "type": "integer",
+                                "example": 25,
+                                "enum": [
+                                    10,
+                                    25,
+                                    50
+                                ]
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object",
+                "example": {
+                    "search": {
+                        "filters": [
+                            {
+                                "field": "name",
+                                "operator": "like",
+                                "value": "Squat"
+                            }
+                        ],
+                        "sorts": [
+                            {
+                                "field": "id",
+                                "direction": "desc"
+                            }
+                        ],
+                        "includes": [
+                            {
+                                "relation": "user"
+                            }
+                        ],
+                        "page": 1,
+                        "limit": 25
+                    }
+                }
+            },
+            "DeletePayload": {
+                "title": "Corps de suppression Lomkit",
+                "required": [
+                    "resources"
+                ],
+                "properties": {
+                    "resources": {
+                        "description": "Liste des ids à supprimer.",
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "example": [
+                            1,
+                            2,
+                            3
+                        ]
+                    }
+                },
+                "type": "object"
+            },
+            "Pagination": {
+                "title": "Réponse paginée (format plat Laravel)",
+                "description": "La réponse de recherche est une pagination Laravel à plat (le tableau `data` contient les enregistrements).",
+                "properties": {
+                    "current_page": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "from": {
+                        "type": "integer",
+                        "example": 1,
+                        "nullable": true
+                    },
+                    "to": {
+                        "type": "integer",
+                        "example": 25,
+                        "nullable": true
+                    },
+                    "per_page": {
+                        "type": "integer",
+                        "example": 25
+                    },
+                    "last_page": {
+                        "type": "integer",
+                        "example": 4
+                    },
+                    "total": {
+                        "type": "integer",
+                        "example": 92
+                    },
+                    "first_page_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "last_page_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "next_page_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "prev_page_url": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "path": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "Dish": {
+                "title": "Repas",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Poulet grillé"
+                    },
+                    "calories_kcal": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 165
+                    },
+                    "proteins_g": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 31
+                    },
+                    "carbs_g": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 0
+                    },
+                    "fats_g": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 3.6
+                    },
+                    "fiber_g": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 0
+                    },
+                    "sugars_g": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 0
+                    },
+                    "sodium_mg": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 70
+                    },
+                    "cholesterol_mg": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 85
+                    },
+                    "meal_type": {
+                        "description": "ex: breakfast, lunch, dinner, snack",
+                        "type": "string",
+                        "example": "lunch"
+                    },
+                    "is_scanned": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "DishInput": {
+                "title": "Attributs d'un repas (mutation)",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Poulet grillé"
+                    },
+                    "calories_kcal": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 165
+                    },
+                    "proteins_g": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 31
+                    },
+                    "carbs_g": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 0
+                    },
+                    "fats_g": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 3.6
+                    },
+                    "fiber_g": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 0
+                    },
+                    "sugars_g": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 0
+                    },
+                    "sodium_mg": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 70
+                    },
+                    "cholesterol_mg": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 85
+                    },
+                    "meal_type": {
+                        "type": "string",
+                        "example": "lunch"
+                    },
+                    "is_scanned": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "Exercise": {
+                "title": "Exercice",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Squat"
+                    },
+                    "category": {
+                        "type": "string",
+                        "example": "strength"
+                    },
+                    "body_part": {
+                        "type": "string",
+                        "example": "legs"
+                    },
+                    "equipment": {
+                        "type": "string",
+                        "example": "barbell"
+                    },
+                    "difficulty": {
+                        "type": "string",
+                        "example": "intermediaire"
+                    },
+                    "instructions": {
+                        "type": "string",
+                        "example": "Descendre en gardant le dos droit"
+                    },
+                    "source": {
+                        "type": "string",
+                        "example": "https://example.com"
+                    }
+                },
+                "type": "object"
+            },
+            "ExerciseInput": {
+                "title": "Attributs d'un exercice (mutation)",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Squat"
+                    },
+                    "category": {
+                        "type": "string",
+                        "example": "strength"
+                    },
+                    "body_part": {
+                        "type": "string",
+                        "example": "legs"
+                    },
+                    "equipment": {
+                        "type": "string",
+                        "example": "barbell"
+                    },
+                    "difficulty": {
+                        "type": "string",
+                        "example": "intermediaire"
+                    },
+                    "instructions": {
+                        "type": "string",
+                        "example": "Descendre en gardant le dos droit"
+                    },
+                    "source": {
+                        "type": "string",
+                        "example": "https://example.com"
+                    }
+                },
+                "type": "object"
+            },
+            "SportSession": {
+                "title": "Séance de sport",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "duration_min": {
+                        "type": "integer",
+                        "example": 45
+                    }
+                },
+                "type": "object"
+            },
+            "SportSessionInput": {
+                "title": "Attributs d'une séance (mutation)",
+                "properties": {
+                    "duration_min": {
+                        "type": "integer",
+                        "example": 45
+                    }
+                },
+                "type": "object"
+            },
+            "Goal": {
+                "title": "Objectif",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Perte de poids"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "GoalInput": {
+                "title": "Attributs d'un objectif (mutation)",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Perte de poids"
+                    }
+                },
+                "type": "object"
+            },
+            "Metric": {
+                "title": "Métrique",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "recorded_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15 08:00:00"
+                    },
+                    "weight_kg": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 80.5
+                    },
+                    "bmi": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 24.8
+                    },
+                    "body_fat_pct": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 18.5
+                    },
+                    "heart_rate_avg": {
+                        "type": "integer",
+                        "example": 72
+                    },
+                    "heart_rate_max": {
+                        "type": "integer",
+                        "example": 165
+                    },
+                    "heart_rate_resting": {
+                        "type": "integer",
+                        "example": 58
+                    },
+                    "calories_burned": {
+                        "type": "integer",
+                        "example": 450
+                    },
+                    "session_duration_h": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1.5
+                    },
+                    "workout_type": {
+                        "type": "string",
+                        "example": "strength"
+                    },
+                    "workout_frequency": {
+                        "type": "integer",
+                        "example": 4
+                    },
+                    "water_intake_l": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 2.5
+                    },
+                    "experience_level": {
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "MetricInput": {
+                "title": "Attributs d'une métrique (mutation)",
+                "properties": {
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "recorded_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15 08:00:00"
+                    },
+                    "weight_kg": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 80.5
+                    },
+                    "bmi": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 24.8
+                    },
+                    "body_fat_pct": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 18.5
+                    },
+                    "heart_rate_avg": {
+                        "type": "integer",
+                        "example": 72
+                    },
+                    "heart_rate_max": {
+                        "type": "integer",
+                        "example": 165
+                    },
+                    "heart_rate_resting": {
+                        "type": "integer",
+                        "example": 58
+                    },
+                    "calories_burned": {
+                        "type": "integer",
+                        "example": 450
+                    },
+                    "session_duration_h": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1.5
+                    },
+                    "workout_type": {
+                        "type": "string",
+                        "example": "strength"
+                    },
+                    "workout_frequency": {
+                        "type": "integer",
+                        "example": 4
+                    },
+                    "water_intake_l": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 2.5
+                    },
+                    "experience_level": {
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "title": "Utilisateur",
+                "description": "Les champs `password` et `remember_token` ne sont jamais renvoyés (masqués par le modèle).",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "user@example.com"
+                    },
+                    "first_name": {
+                        "type": "string",
+                        "example": "Jean"
+                    },
+                    "last_name": {
+                        "type": "string",
+                        "example": "Dupont"
+                    },
+                    "age": {
+                        "type": "integer",
+                        "example": 30
+                    },
+                    "gender": {
+                        "type": "string",
+                        "example": "male",
+                        "enum": [
+                            "male",
+                            "female",
+                            "other"
+                        ]
+                    },
+                    "weight_kg": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 80
+                    },
+                    "height_cm": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 180
+                    },
+                    "is_premium": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "is_active": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "responses": {
+            "MutateResponse": {
+                "description": "Mutation appliquée. Renvoie les clés (ids) des enregistrements créés ou modifiés.",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "properties": {
+                                "created": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "integer"
+                                    },
+                                    "example": [
+                                        12
+                                    ]
+                                },
+                                "updated": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "integer"
+                                    },
+                                    "example": []
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
         "securitySchemes": {
             "sanctum": {
                 "type": "http",
+                "description": "Token personnel Sanctum renvoyé par /api/login",
+                "bearerFormat": "Sanctum",
                 "scheme": "bearer"
             }
         }
@@ -1173,35 +1970,31 @@
     "tags": [
         {
             "name": "Auth",
-            "description": "Auth"
+            "description": "Inscription, connexion, déconnexion, profil courant"
+        },
+        {
+            "name": "Dishes",
+            "description": "Repas / aliments enregistrés (table dishes)"
         },
         {
             "name": "Exercises",
-            "description": "Exercises"
+            "description": "Catalogue d'exercices"
         },
         {
-            "name": "Food Categories",
-            "description": "Food Categories"
+            "name": "Sport Sessions",
+            "description": "Séances de sport (liées aux exercices, utilisateurs et objectifs)"
         },
         {
-            "name": "Foods",
-            "description": "Foods"
-        },
-        {
-            "name": "Meal Logs",
-            "description": "Meal Logs"
-        },
-        {
-            "name": "Sessions",
-            "description": "Sessions"
-        },
-        {
-            "name": "Users",
-            "description": "Users"
+            "name": "Goals",
+            "description": "Objectifs"
         },
         {
             "name": "Metrics",
-            "description": "Metrics"
+            "description": "Mesures physiologiques d'un utilisateur"
+        },
+        {
+            "name": "Users",
+            "description": "Utilisateurs (recherche uniquement)"
         }
     ]
 }
