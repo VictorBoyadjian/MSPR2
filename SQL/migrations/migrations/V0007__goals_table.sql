@@ -8,7 +8,7 @@ CREATE TABLE "goals" (
 ALTER TABLE users
 ADD COLUMN goal_id INT REFERENCES goals(id) ON DELETE SET NULL;
 
-CREATE TABLE "sport_session_goals" (
+CREATE TABLE "session_goals" (
   "sport_session_id" INT REFERENCES sport_sessions(id) ON DELETE CASCADE,
   "goal_id" INT REFERENCES goals(id) ON DELETE CASCADE
 );

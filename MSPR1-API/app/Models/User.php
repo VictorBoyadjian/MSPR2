@@ -46,7 +46,7 @@ class User extends Authenticatable
 
     public function sportSessions(): BelongsToMany
     {
-        return $this->belongsToMany(SportSession::class, 'user_sport_sessions')
+        return $this->belongsToMany(SportSession::class, 'user_sessions')
             ->withPivot(['performed_at']);
     }
 

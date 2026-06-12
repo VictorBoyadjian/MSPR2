@@ -26,7 +26,7 @@ class SportSession extends Model
 
     public function exercises() : BelongsToMany
     {
-        return $this->belongsToMany(Exercise::class, 'sessions_exercises')
+        return $this->belongsToMany(Exercise::class, 'session_exercises')
             ->withPivot(['reps', 'sets', 'duration_min']);
     }
 
@@ -38,6 +38,6 @@ class SportSession extends Model
 
     public function goals() : BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'session_goals');
+        return $this->belongsToMany(Goal::class, 'session_goals');
     }
 }

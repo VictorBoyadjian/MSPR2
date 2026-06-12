@@ -31,6 +31,6 @@ class Goal extends Model
 
         public function sportSessions() : BelongsToMany
     {
-        return $this->belongsToMany(SportSession::class, 'sport_session_goals');
+        return $this->belongsToMany(SportSession::class, 'session_goals');
     }
 }

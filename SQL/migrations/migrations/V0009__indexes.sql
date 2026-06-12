@@ -28,22 +28,22 @@ CREATE INDEX idx_sport_sessions_created_at ON sport_sessions(created_at);
 
 
 /* ---------- USER_SESSIONS (many-to-many) ---------- */
-CREATE INDEX idx_user_sport_sessions_user_id ON user_sport_sessions(user_id);
-CREATE INDEX idx_user_sport_sessions_sport_session_id ON user_sport_sessions(sport_session_id);
-CREATE INDEX idx_user_sport_sessions_performed_at ON user_sport_sessions(performed_at);
+CREATE INDEX idx_user_sessions_user_id ON user_sessions(user_id);
+CREATE INDEX idx_user_sessions_sport_session_id ON user_sessions(sport_session_id);
+CREATE INDEX idx_user_sessions_performed_at ON user_sessions(performed_at);
 
 
-/* ---------- SESSIONS_EXERCISES ---------- */
-CREATE INDEX idx_sport_sessions_exercises_sport_session_id ON sport_session_exercises(sport_session_id);
-CREATE INDEX idx_sessions_exercises_exercise_id ON sport_session_exercises(exercise_id);
+/* ---------- SESSION_EXERCISES ---------- */
+CREATE INDEX idx_session_exercises_sport_session_id ON session_exercises(sport_session_id);
+CREATE INDEX idx_session_exercises_exercise_id ON session_exercises(exercise_id);
 
 /* ---------- GOALS ---------- */
 CREATE INDEX idx_goals_name ON goals(name);
 
 
 /* ---------- SESSION_GOALS ---------- */
-CREATE INDEX idx_sport_session_goals_sport_session_id ON sport_session_goals(sport_session_id);
-CREATE INDEX idx_sport_session_goals_goal_id ON sport_session_goals(goal_id);
+CREATE INDEX idx_session_goals_sport_session_id ON session_goals(sport_session_id);
+CREATE INDEX idx_session_goals_goal_id ON session_goals(goal_id);
 
 
 /* ---------- DISHES ---------- */
