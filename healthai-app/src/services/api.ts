@@ -4,6 +4,7 @@ import { Exercise } from '@/types/exercises.type';
 import { Goal } from '@/types/goals.type';
 import { Metric } from '@/types/metrics.type';
 import { SportSession } from '@/types/sport-sessions.type';
+import { User } from '@/types/users.type';
 
 let authToken: string | null = null;
 
@@ -119,7 +120,8 @@ export const exercises = resource<Exercise>('/exercises');
 export const sportSessions = resource<SportSession>('/sport_sessions');
 export const metrics = resource<Metric>('/metrics');
 export const goals = resource<Goal>('/goals');
+export const users = resource<User>('/users');
 
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
-export { Dish };
+export { Dish, User };

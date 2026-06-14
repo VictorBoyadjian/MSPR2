@@ -98,7 +98,7 @@ Use exactly this schema:
     }
   ]
 }""",
-                        'image' : data.base64_image
+                        'images' : [data.base64_image]
                     }
                 ],
                 options={

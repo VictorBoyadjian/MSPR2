@@ -1,4 +1,4 @@
-import { sendRequest } from '@/services/api';
+import { sendRequest, users } from '@/services/api';
 import { User } from '@/types/users.type';
 
 export type RegisterPayload = {
@@ -22,4 +22,6 @@ export const authService = {
   logout: () => sendRequest<{ message: string }>('POST', '/logout'),
 
   me: () => sendRequest<User>('GET', '/me'),
+
+  deleteAccount: (id: string) => users.delete([id]),
 };

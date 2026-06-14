@@ -1,6 +1,8 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
+import { SymbolView } from 'expo-symbols';
 import { useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,9 +13,8 @@ import Button from '@/components/ui/Button';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { scanDishService } from '@/services/scanDishService';
-import { ScanDishResponse } from '@/types/san-dish-response.type';
 
-type Phase = 'camera' | 'preview' | 'loading' | 'result';
+type Phase = 'camera' | 'preview' | 'loading';
 
 export default function ScanDishPage() {
   const router = useRouter();
@@ -24,7 +25,6 @@ export default function ScanDishPage() {
   const [phase, setPhase] = useState<Phase>('camera');
   const [cameraReady, setCameraReady] = useState(false);
   const [photoUri, setPhotoUri] = useState<string | null>(null);
-  const [result, setResult] = useState<ScanDishResponse | null>(null);
   const [error, setError] = useState('');
 
   const takePhoto = async () => {
@@ -37,6 +37,22 @@ export default function ScanDishPage() {
       }
     } catch {
       setError("Impossible de prendre la photo");
+    }
+  };
+
+  const pickFromGallery = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        quality: 0.9,
+      });
+      if (!result.canceled && result.assets[0]?.uri) {
+        setPhotoUri(result.assets[0].uri);
+        setError('');
+        setPhase('preview');
+      }
+    } catch {
+      setError("Impossible d'ouvrir la galerie");
     }
   };
 
@@ -53,8 +69,10 @@ export default function ScanDishPage() {
     try {
       const response = await scanDishService.scan(photoUri);
       console.log("ScanDishPage: response from scanDishService.scan:", response);
-      setResult(response);
-      setPhase('result');
+      router.replace({
+        pathname: '/meal/add-form',
+        params: { aliments: JSON.stringify(response.aliments) },
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Échec de l'analyse");
       setPhase('preview');
@@ -122,6 +140,16 @@ export default function ScanDishPage() {
           {phase === 'camera' && (
             <View style={styles.captureRow}>
               <Pressable
+                onPress={pickFromGallery}
+                style={[styles.galleryButton, { borderColor: theme.text }]}>
+                <SymbolView
+                  name={{ ios: 'photo.on.rectangle', android: 'photo_library', web: 'photo_library' }}
+                  size={26}
+                  tintColor={theme.text}
+                />
+              </Pressable>
+
+              <Pressable
                 onPress={takePhoto}
                 disabled={!cameraReady}
                 style={[styles.shutterOuter, { borderColor: theme.text, opacity: cameraReady ? 1 : 0.4 }]}>
@@ -134,33 +162,6 @@ export default function ScanDishPage() {
             <View style={styles.actions}>
               <Button label="Valider" onPress={confirm} />
               <Button label="Reprendre" variant="secondary" onPress={retake} />
-            </View>
-          )}
-
-          {phase === 'result' && result && (
-            <View style={styles.results}>
-              <ThemedText type="smallBold">Résultat de l&apos;analyse</ThemedText>
-              {Object.keys(result.aliments).length === 0 ? (
-                <ThemedText type="small">Aucun aliment détecté.</ThemedText>
-              ) : (
-                Object.entries(result.aliments).map(([name, food]) => (
-                  <View
-                    key={name}
-                    style={[styles.card, { backgroundColor: theme.backgroundElement }]}>
-                    <ThemedText type="smallBold">{name}</ThemedText>
-                    <ThemedText type="small">Quantité : {food.quantity_g} g</ThemedText>
-                    <ThemedText type="small">Calories : {food.calories_kcal} kcal</ThemedText>
-                    <ThemedText type="small">Protéines : {food.proteins_g} g</ThemedText>
-                    <ThemedText type="small">Glucides : {food.carbs_g} g</ThemedText>
-                    <ThemedText type="small">Lipides : {food.fats_g} g</ThemedText>
-                    <ThemedText type="small">Fibres : {food.fiber_g} g</ThemedText>
-                    <ThemedText type="small">
-                      Précision : {Math.round(food.accuracy * 100)} %
-                    </ThemedText>
-                  </View>
-                ))
-              )}
-              <Button label="Scanner un autre plat" onPress={retake} />
             </View>
           )}
 
@@ -196,7 +197,15 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   overlayText: { color: '#fff' },
-  captureRow: { alignItems: 'center' },
+  captureRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.four },
+  galleryButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   shutterOuter: {
     width: 76,
     height: 76,
@@ -207,7 +216,5 @@ const styles = StyleSheet.create({
   },
   shutterInner: { width: 56, height: 56, borderRadius: 28 },
   actions: { gap: Spacing.two },
-  results: { gap: Spacing.three },
-  card: { padding: Spacing.three, borderRadius: Spacing.three, gap: Spacing.one },
   error: { color: '#e5484d' },
 });

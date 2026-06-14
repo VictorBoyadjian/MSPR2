@@ -31,7 +31,7 @@ export default function MealsScreen() {
 
   return (
     <ThemedView style={styles.root}>
-      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
         <ThemedView style={styles.header}>
           <ThemedText type="subtitle">Mes repas</ThemedText>
           <Button label="+ Ajouter" onPress={() => router.push('/meal/add')} />

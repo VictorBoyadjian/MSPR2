@@ -7,11 +7,13 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
+import DateTimeField from '@/components/ui/DateTimeField';
 import Input from '@/components/ui/Input';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { ApiError } from '@/services/api';
 import { workoutService } from '@/services/sessionService';
+import { useAuthStore } from '@/stores/authStore';
 import { Exercise } from '@/types/exercises.type';
 
 type Selected = {
@@ -25,8 +27,10 @@ type Selected = {
 export default function AddWorkoutScreen() {
   const router = useRouter();
   const theme = useTheme();
+  const authStore = useAuthStore();
 
   const [duration, setDuration] = useState('');
+  const [performedAt, setPerformedAt] = useState(() => new Date());
   const [term, setTerm] = useState('');
   const [results, setResults] = useState<Exercise[]>([]);
   const [searching, setSearching] = useState(false);
@@ -84,11 +88,17 @@ export default function AddWorkoutScreen() {
       setError('Ajoutez au moins un exercice.');
       return;
     }
+    if (!authStore.user?.id) {
+      setError('Vous devez être connecté.');
+      return;
+    }
     setError('');
     setLoading(true);
     try {
       await workoutService.create({
         duration_min: minutes,
+        performed_at: performedAt.toISOString(),
+        userId: authStore.user.id,
         exercises: selected.map(({ exerciseId, sets, reps }) => ({ exerciseId, sets, reps })),
       });
       // L'ordre des exercices correspond à leur position dans `selected`.
@@ -108,6 +118,10 @@ export default function AddWorkoutScreen() {
           style={styles.flex}>
           <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
             <ThemedText type="subtitle">Nouvelle séance</ThemedText>
+
+            <ThemedView style={styles.dateField}>
+              <DateTimeField value={performedAt} onChange={setPerformedAt} />
+            </ThemedView>
 
             <Input
               label="Durée (min)"
@@ -227,6 +241,7 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   flex: { flex: 1 },
   form: { padding: Spacing.four, gap: Spacing.three },
+  dateField: { width: '50%', alignItems: 'flex-start' },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   titleRow: { flexDirection: 'row', alignItems: 'center', flex: 1, gap: Spacing.one },
   order: { minWidth: 20 },

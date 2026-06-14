@@ -12,17 +12,26 @@ export type SessionExerciseInput = {
 
 export type CreateSessionInput = {
   duration_min: number;
+  performed_at: string;
+  userId: string;
   exercises: SessionExerciseInput[];
 };
 
 export const workoutService = {
-  list: async (): Promise<SportSession[]> => {
+  list: async (userId: string): Promise<SportSession[]> => {
     const response = await sportSessions.search({
       sorts: [{ field: 'id', direction: 'desc' }],
-      includes: [{ relation: 'exercises' }],
+      includes: [{ relation: 'exercises' }, { relation: 'users' }],
       limit: 50,
     });
-    return response.data;
+    // performed_at vit dans le pivot user_sessions : on l'extrait pour l'utilisateur courant
+    // et on ne garde que les séances qui lui appartiennent.
+    return response.data
+      .map((session) => {
+        const me = session.users?.find((u) => String(u.id) === String(userId));
+        return { ...session, performed_at: me?.pivot?.performed_at };
+      })
+      .filter((session) => !!session.performed_at);
   },
 
   searchExercises: async (term: string): Promise<Exercise[]> => {
@@ -40,6 +49,13 @@ export const workoutService = {
         operation: 'create',
         attributes: { duration_min: input.duration_min },
         relations: {
+          users: [
+            {
+              operation: 'attach',
+              key: input.userId,
+              pivot: { performed_at: input.performed_at },
+            },
+          ],
           exercises: input.exercises.map((e, index) => ({
             operation: 'attach',
             key: e.exerciseId,
