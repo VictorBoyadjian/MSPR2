@@ -28,5 +28,5 @@ detectRenames = "identical-only"
 ignoreNewlinesInTextObjects = "off"
 
 [environments.MSPR1]
-url = "jdbc:postgresql://metro.proxy.rlwy.net:23387/healthai"
+url = "jdbc:postgresql://thomas.proxy.rlwy.net:14269/healthai"
 schemas = [ "Data" ]
