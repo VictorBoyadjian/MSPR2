@@ -4,17 +4,11 @@ export const ROUTES = {
   REGISTER: '/(auth)/register',
 
   // Tabs
-  DASHBOARD: '/',
-  MEALS: '/meals',
-  WORKOUTS: '/workouts',
-  PLANNING: '/planning',
+  DISHES: '/dishes',
 
-  // Meal
-  MEAL_DETAIL: (id: string) => `/meal/${id}`,
-  MEAL_ADD: '/meal/add',
-
-  // Workout
-  WORKOUT_DETAIL: (id: string) => `/workout/${id}`,
-  WORKOUT_ADD: '/workout/add',
-  WORKOUT_HISTORY: '/workout/history',
+  EXERCICES: '/exercises',
+  SPORT_SESSIONS: '/sport-sessions',
+  METRICS: '/metrics',
+  GOALS: '/goals',
+  
 } as const;

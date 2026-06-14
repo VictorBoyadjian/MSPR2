@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { SportSession } from '@/services/api';
-import { workoutService } from '@/services/workoutService';
+import { workoutService } from '@/services/sessionService';
 
 export function useWorkouts() {
   const [sessions, setSessions] = useState<SportSession[]>([]);

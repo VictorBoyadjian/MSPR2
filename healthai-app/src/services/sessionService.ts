@@ -1,10 +1,13 @@
-import { Exercise, exercises, SportSession, sportSessions } from '@/services/api';
+import { exercises, sportSessions } from '@/services/api';
+import { Exercise } from '@/types/exercises.type';
+import { SportSession } from '@/types/sport-sessions.type';
 
 export type SessionExerciseInput = {
-  exerciseId: number;
+  exerciseId: string;
   sets?: number;
   reps?: number;
   duration_min?: number;
+  order?: number;
 };
 
 export type CreateSessionInput = {
@@ -37,14 +40,14 @@ export const workoutService = {
         operation: 'create',
         attributes: { duration_min: input.duration_min },
         relations: {
-          exercises: input.exercises.map((e) => ({
+          exercises: input.exercises.map((e, index) => ({
             operation: 'attach',
             key: e.exerciseId,
-            pivot: { sets: e.sets, reps: e.reps, duration_min: e.duration_min },
+            pivot: { sets: e.sets, reps: e.reps, duration_min: e.duration_min, order: e.order ?? index },
           })),
         },
       },
     ]),
 
-  remove: (id: number) => sportSessions.delete([id]),
+  remove: (id: string) => sportSessions.delete([id]),
 };

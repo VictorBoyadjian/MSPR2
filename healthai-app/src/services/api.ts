@@ -1,4 +1,9 @@
 import { CONFIG } from '@/constants/config';
+import { Dish } from '@/types/dishes.type';
+import { Exercise } from '@/types/exercises.type';
+import { Goal } from '@/types/goals.type';
+import { Metric } from '@/types/metrics.type';
+import { SportSession } from '@/types/sport-sessions.type';
 
 let authToken: string | null = null;
 
@@ -87,15 +92,15 @@ export type SearchResponse<T> = {
   total?: number;
 };
 
-type PivotAttach = { operation: 'attach'; key: number; pivot?: Record<string, unknown> };
+type PivotAttach = { operation: 'attach'; key: string; pivot?: Record<string, unknown> };
 
 type MutateRelations = Record<string, PivotAttach[]>;
 
 type MutateOperation<T> =
   | { operation: 'create'; attributes: Partial<T>; relations?: MutateRelations }
-  | { operation: 'update'; key: number; attributes: Partial<T>; relations?: MutateRelations };
+  | { operation: 'update'; key: string; attributes: Partial<T>; relations?: MutateRelations };
 
-export type MutateResponse = { created: number[]; updated: number[] };
+export type MutateResponse = { created: string[]; updated: string[] };
 
 function resource<T>(path: string) {
   return {
@@ -105,7 +110,7 @@ function resource<T>(path: string) {
     mutate: (operations: MutateOperation<T>[]) =>
       request<MutateResponse>('POST', `${path}/mutate`, { mutate: operations }),
 
-    delete: (ids: number[]) => request<{ data: T[] }>('DELETE', path, { resources: ids }),
+    delete: (ids: string[]) => request<{ data: T[] }>('DELETE', path, { resources: ids }),
   };
 }
 
@@ -115,63 +120,6 @@ export const sportSessions = resource<SportSession>('/sport_sessions');
 export const metrics = resource<Metric>('/metrics');
 export const goals = resource<Goal>('/goals');
 
-export type User = {
-  id: number;
-  email: string;
-  first_name: string;
-  last_name: string;
-  age?: number;
-  gender?: string;
-  weight_kg?: string | number;
-  height_cm?: string | number;
-  is_premium?: boolean;
-  is_active?: boolean;
-};
-
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 
-export type Dish = {
-  id: number;
-  name: string;
-  calories_kcal?: number;
-  proteins_g?: number;
-  carbs_g?: number;
-  fats_g?: number;
-  fiber_g?: number;
-  sugars_g?: number;
-  sodium_mg?: number;
-  cholesterol_mg?: number;
-  meal_type?: MealType;
-  is_scanned?: boolean;
-  user_id?: number;
-};
-
-export type Exercise = {
-  id: number;
-  name: string;
-  category?: string;
-  body_part?: string;
-  equipment?: string;
-  difficulty?: string;
-  instructions?: string;
-  source?: string;
-  pivot?: { reps?: number; sets?: number; duration_min?: number };
-};
-
-export type SportSession = {
-  id: number;
-  duration_min: number;
-  exercises?: Exercise[];
-};
-
-export type Metric = {
-  id: number;
-  user_id: number;
-  recorded_at: string;
-  weight_kg?: number;
-};
-
-export type Goal = {
-  id: number;
-  name: string;
-};
+export { Dish };

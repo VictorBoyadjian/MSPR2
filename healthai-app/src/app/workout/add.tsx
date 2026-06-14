@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -10,10 +10,17 @@ import Card from '@/components/ui/Card';
 import Input from '@/components/ui/Input';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { ApiError, Exercise } from '@/services/api';
-import { SessionExerciseInput, workoutService } from '@/services/workoutService';
+import { ApiError } from '@/services/api';
+import { workoutService } from '@/services/sessionService';
+import { Exercise } from '@/types/exercises.type';
 
-type Selected = SessionExerciseInput & { name: string };
+type Selected = {
+  uid: string;
+  exerciseId: string;
+  name: string;
+  sets?: number;
+  reps?: number;
+};
 
 export default function AddWorkoutScreen() {
   const router = useRouter();
@@ -26,6 +33,7 @@ export default function AddWorkoutScreen() {
   const [selected, setSelected] = useState<Selected[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const uidRef = useRef(0);
 
   const onSearch = async () => {
     setSearching(true);
@@ -39,17 +47,31 @@ export default function AddWorkoutScreen() {
   };
 
   const addExercise = (exercise: Exercise) => {
-    if (selected.some((s) => s.exerciseId === exercise.id)) return;
-    setSelected((prev) => [...prev, { exerciseId: exercise.id, name: exercise.name, sets: 3, reps: 10 }]);
+    const uid = String(uidRef.current++);
+    setSelected((prev) => [
+      ...prev,
+      { uid, exerciseId: exercise.id, name: exercise.name, sets: 3, reps: 10 },
+    ]);
   };
 
-  const updateField = (id: number, field: 'sets' | 'reps', value: string) => {
+  const updateField = (uid: string, field: 'sets' | 'reps', value: string) => {
     const n = value ? Number(value) : undefined;
-    setSelected((prev) => prev.map((s) => (s.exerciseId === id ? { ...s, [field]: n } : s)));
+    setSelected((prev) => prev.map((s) => (s.uid === uid ? { ...s, [field]: n } : s)));
   };
 
-  const removeExercise = (id: number) => {
-    setSelected((prev) => prev.filter((s) => s.exerciseId !== id));
+  const removeExercise = (uid: string) => {
+    setSelected((prev) => prev.filter((s) => s.uid !== uid));
+  };
+
+  const moveExercise = (uid: string, direction: -1 | 1) => {
+    setSelected((prev) => {
+      const index = prev.findIndex((s) => s.uid === uid);
+      const target = index + direction;
+      if (index === -1 || target < 0 || target >= prev.length) return prev;
+      const next = [...prev];
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
   };
 
   const onSubmit = async () => {
@@ -69,6 +91,7 @@ export default function AddWorkoutScreen() {
         duration_min: minutes,
         exercises: selected.map(({ exerciseId, sets, reps }) => ({ exerciseId, sets, reps })),
       });
+      // L'ordre des exercices correspond à leur position dans `selected`.
       router.back();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'Une erreur est survenue.');
@@ -102,30 +125,55 @@ export default function AddWorkoutScreen() {
                 Aucun exercice. Recherchez-en ci-dessous.
               </ThemedText>
             ) : (
-              selected.map((s) => (
-                <Card key={s.exerciseId}>
+              selected.map((s, index) => (
+                <Card key={s.uid}>
                   <ThemedView style={styles.rowBetween}>
-                    <ThemedText type="smallBold" style={styles.flexText}>
-                      {s.name}
-                    </ThemedText>
-                    <Pressable onPress={() => removeExercise(s.exerciseId)}>
-                      <ThemedText type="small" style={styles.remove}>
-                        Retirer
+                    <ThemedView style={styles.titleRow}>
+                      <ThemedText type="smallBold" themeColor="textSecondary" style={styles.order}>
+                        {index + 1}.
                       </ThemedText>
-                    </Pressable>
+                      <ThemedText type="smallBold" style={styles.flexText}>
+                        {s.name}
+                      </ThemedText>
+                    </ThemedView>
+                    <ThemedView style={styles.actions}>
+                      <Pressable
+                        onPress={() => moveExercise(s.uid, -1)}
+                        disabled={index === 0}
+                        hitSlop={8}>
+                        <ThemedText type="small" style={index === 0 ? styles.arrowDisabled : styles.arrow}>
+                          ↑
+                        </ThemedText>
+                      </Pressable>
+                      <Pressable
+                        onPress={() => moveExercise(s.uid, 1)}
+                        disabled={index === selected.length - 1}
+                        hitSlop={8}>
+                        <ThemedText
+                          type="small"
+                          style={index === selected.length - 1 ? styles.arrowDisabled : styles.arrow}>
+                          ↓
+                        </ThemedText>
+                      </Pressable>
+                      <Pressable onPress={() => removeExercise(s.uid)} hitSlop={8}>
+                        <ThemedText type="small" style={styles.remove}>
+                          Retirer
+                        </ThemedText>
+                      </Pressable>
+                    </ThemedView>
                   </ThemedView>
                   <ThemedView style={styles.macros}>
                     <Input
                       label="Séries"
                       value={s.sets ? String(s.sets) : ''}
-                      onChangeText={(v) => updateField(s.exerciseId, 'sets', v)}
+                      onChangeText={(v) => updateField(s.uid, 'sets', v)}
                       keyboardType="numeric"
                       style={styles.macroInput}
                     />
                     <Input
                       label="Reps"
                       value={s.reps ? String(s.reps) : ''}
-                      onChangeText={(v) => updateField(s.exerciseId, 'reps', v)}
+                      onChangeText={(v) => updateField(s.uid, 'reps', v)}
                       keyboardType="numeric"
                       style={styles.macroInput}
                     />
@@ -180,6 +228,11 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   form: { padding: Spacing.four, gap: Spacing.three },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  titleRow: { flexDirection: 'row', alignItems: 'center', flex: 1, gap: Spacing.one },
+  order: { minWidth: 20 },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three },
+  arrow: { fontSize: 18 },
+  arrowDisabled: { fontSize: 18, opacity: 0.3 },
   flexText: { flex: 1 },
   remove: { color: '#e5484d' },
   macros: { flexDirection: 'row', gap: Spacing.two },

@@ -10,7 +10,7 @@ import Card from '@/components/ui/Card';
 import Loader from '@/components/ui/Loader';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useWorkouts } from '@/hooks/useWorkouts';
-import { SportSession } from '@/services/api';
+import { SportSession } from '@/types/sport-sessions.type';
 import { formatDuration } from '@/utils/formatDate';
 
 function SessionRow({ session }: { session: SportSession }) {
@@ -19,7 +19,7 @@ function SessionRow({ session }: { session: SportSession }) {
     <Card>
       <ThemedView style={styles.row}>
         <ThemedText type="smallBold">Séance #{session.id}</ThemedText>
-        <ThemedText themeColor="textSecondary">{formatDuration(session.duration_min)}</ThemedText>
+        <ThemedText themeColor="textSecondary">{formatDuration(Number(session.duration_min))}</ThemedText>
       </ThemedView>
       <ThemedText type="small" themeColor="textSecondary">
         {exercises.length

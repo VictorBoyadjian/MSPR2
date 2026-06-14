@@ -1,139 +1,54 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { ApiError, MealType } from '@/services/api';
-import { mealService } from '@/services/mealService';
-import { isNotEmpty } from '@/utils/validators';
-
-const MEAL_TYPES: { value: MealType; label: string }[] = [
-  { value: 'breakfast', label: 'Petit déj' },
-  { value: 'lunch', label: 'Déjeuner' },
-  { value: 'dinner', label: 'Dîner' },
-  { value: 'snack', label: 'Collation' },
-];
 
 export default function AddMealScreen() {
   const router = useRouter();
   const theme = useTheme();
 
-  const [name, setName] = useState('');
-  const [mealType, setMealType] = useState<MealType>('lunch');
-  const [calories, setCalories] = useState('');
-  const [proteins, setProteins] = useState('');
-  const [carbs, setCarbs] = useState('');
-  const [fats, setFats] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const num = (v: string) => (v ? Number(v.replace(',', '.')) : undefined);
-
-  const onSubmit = async () => {
-    if (!isNotEmpty(name)) {
-      setError('Donnez un nom à votre repas.');
-      return;
-    }
-    setError('');
-    setLoading(true);
-    try {
-      await mealService.create({
-        name: name.trim(),
-        meal_type: mealType,
-        calories_kcal: num(calories),
-        proteins_g: num(proteins),
-        carbs_g: num(carbs),
-        fats_g: num(fats),
-      });
-      router.back();
-    } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Une erreur est survenue.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <ThemedView style={styles.root}>
       <SafeAreaView style={styles.safeArea}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          style={styles.flex}>
-          <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
-            <ThemedText type="subtitle">Enregistrer un repas</ThemedText>
+        <View style={styles.content}>
+          <ThemedText type="subtitle">Ajouter un repas</ThemedText>
+          <ThemedText type="small">Comment souhaitez-vous l&apos;enregistrer ?</ThemedText>
 
-            <Input label="Nom du plat" value={name} onChangeText={setName} placeholder="Poulet riz" />
-
-            <ThemedText type="smallBold" themeColor="textSecondary">
-              Type de repas
-            </ThemedText>
-            <ThemedView style={styles.chips}>
-              {MEAL_TYPES.map((t) => {
-                const active = t.value === mealType;
-                return (
-                  <Pressable
-                    key={t.value}
-                    onPress={() => setMealType(t.value)}
-                    style={[
-                      styles.chip,
-                      { backgroundColor: active ? theme.text : theme.backgroundElement },
-                    ]}>
-                    <ThemedText
-                      type="small"
-                      style={{ color: active ? theme.background : theme.text }}>
-                      {t.label}
-                    </ThemedText>
-                  </Pressable>
-                );
-              })}
-            </ThemedView>
-
-            <Input
-              label="Calories (kcal)"
-              value={calories}
-              onChangeText={setCalories}
-              keyboardType="numeric"
-            />
-            <ThemedView style={styles.macros}>
-              <Input
-                label="Protéines (g)"
-                value={proteins}
-                onChangeText={setProteins}
-                keyboardType="numeric"
-                style={styles.macroInput}
-              />
-              <Input
-                label="Glucides (g)"
-                value={carbs}
-                onChangeText={setCarbs}
-                keyboardType="numeric"
-                style={styles.macroInput}
-              />
-              <Input
-                label="Lipides (g)"
-                value={fats}
-                onChangeText={setFats}
-                keyboardType="numeric"
-                style={styles.macroInput}
-              />
-            </ThemedView>
-
-            {error ? (
-              <ThemedText type="small" style={styles.error}>
-                {error}
+          <View style={styles.options}>
+            <Pressable
+              onPress={() => router.push('/meal/scanDishPage')}
+              style={({ pressed }) => [
+                styles.card,
+                { backgroundColor: theme.backgroundElement, opacity: pressed ? 0.8 : 1 },
+              ]}>
+              <ThemedText type="title">📷</ThemedText>
+              <ThemedText type="smallBold">Scanner mon repas</ThemedText>
+              <ThemedText type="small" style={styles.cardHint}>
+                Prenez une photo, l&apos;analyse est automatique.
               </ThemedText>
-            ) : null}
+            </Pressable>
 
-            <Button label="Enregistrer" onPress={onSubmit} loading={loading} />
-            <Button label="Annuler" variant="secondary" onPress={() => router.back()} />
-          </ScrollView>
-        </KeyboardAvoidingView>
+            <Pressable
+              onPress={() => router.push('/meal/add-form')}
+              style={({ pressed }) => [
+                styles.card,
+                { backgroundColor: theme.backgroundElement, opacity: pressed ? 0.8 : 1 },
+              ]}>
+              <ThemedText type="title">✏️</ThemedText>
+              <ThemedText type="smallBold">Enregistrer à la main</ThemedText>
+              <ThemedText type="small" style={styles.cardHint}>
+                Saisissez vous-même les informations du repas.
+              </ThemedText>
+            </Pressable>
+          </View>
+
+          <Button label="Annuler" variant="secondary" onPress={() => router.back()} />
+        </View>
       </SafeAreaView>
     </ThemedView>
   );
@@ -142,15 +57,13 @@ export default function AddMealScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1 },
   safeArea: { flex: 1 },
-  flex: { flex: 1 },
-  form: { padding: Spacing.four, gap: Spacing.three },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
-  chip: {
-    paddingVertical: Spacing.two,
-    paddingHorizontal: Spacing.three,
-    borderRadius: Spacing.five,
+  content: { flex: 1, padding: Spacing.four, gap: Spacing.three },
+  options: { flex: 1, gap: Spacing.three, justifyContent: 'center' },
+  card: {
+    padding: Spacing.four,
+    borderRadius: Spacing.three,
+    gap: Spacing.two,
+    alignItems: 'center',
   },
-  macros: { flexDirection: 'row', gap: Spacing.two },
-  macroInput: { flex: 1, minWidth: 0 },
-  error: { color: '#e5484d' },
+  cardHint: { textAlign: 'center', opacity: 0.7 },
 });

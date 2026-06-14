@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 
-import { User } from '@/services/api';
+import { User } from '@/types/users.type';
 import { RegisterPayload } from '@/services/authService';
 
 export type AuthState = {

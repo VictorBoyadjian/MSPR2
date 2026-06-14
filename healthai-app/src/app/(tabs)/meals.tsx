@@ -1,47 +1,32 @@
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback } from 'react';
-import { FlatList, StyleSheet } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import DayNavigator from '@/components/meal/DayNavigator';
+import MealList from '@/components/meal/MealList';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
 import Loader from '@/components/ui/Loader';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-import { useMeals } from '@/hooks/useMeals';
-import { Dish, MealType } from '@/services/api';
-
-const MEAL_LABELS: Record<MealType, string> = {
-  breakfast: 'Petit déjeuner',
-  lunch: 'Déjeuner',
-  dinner: 'Dîner',
-  snack: 'Collation',
-};
-
-function MealRow({ dish }: { dish: Dish }) {
-  return (
-    <Card>
-      <ThemedView style={styles.row}>
-        <ThemedText type="smallBold">{dish.name}</ThemedText>
-        <ThemedText themeColor="textSecondary">{dish.calories_kcal ?? 0} kcal</ThemedText>
-      </ThemedView>
-      <ThemedText type="small" themeColor="textSecondary">
-        {dish.meal_type ? MEAL_LABELS[dish.meal_type] : 'Repas'} · P {dish.proteins_g ?? 0}g · G{' '}
-        {dish.carbs_g ?? 0}g · L {dish.fats_g ?? 0}g
-      </ThemedText>
-    </Card>
-  );
-}
+import { useDishes } from '@/hooks/useDishes';
+import { isSameDay, startOfDay } from '@/utils/day';
 
 export default function MealsScreen() {
-  const { meals, loading, error, refresh } = useMeals();
+  const { dishes, loading, error, refresh } = useDishes();
   const router = useRouter();
+  const [day, setDay] = useState(() => startOfDay(new Date()));
 
   useFocusEffect(
     useCallback(() => {
       refresh();
     }, [refresh]),
+  );
+
+  const dayDishes = useMemo(
+    () => dishes.filter((dish) => isSameDay(new Date(dish.eated_at ?? dish.created_at), day)),
+    [dishes, day],
   );
 
   return (
@@ -52,21 +37,22 @@ export default function MealsScreen() {
           <Button label="+ Ajouter" onPress={() => router.push('/meal/add')} />
         </ThemedView>
 
-        {loading ? (
-          <Loader />
-        ) : (
-          <FlatList
-            data={meals}
-            keyExtractor={(item) => String(item.id)}
-            renderItem={({ item }) => <MealRow dish={item} />}
-            contentContainerStyle={styles.list}
-            ListEmptyComponent={
-              <ThemedText themeColor="textSecondary" style={styles.empty}>
-                {error || 'Aucun repas enregistré pour le moment.'}
-              </ThemedText>
-            }
-          />
-        )}
+        <ThemedView style={styles.panel}>
+          <DayNavigator value={day} onChange={setDay} />
+
+          {loading ? (
+            <Loader />
+          ) : (
+            <ScrollView contentContainerStyle={styles.list}>
+              <MealList dishes={dayDishes} />
+              {dayDishes.length === 0 ? (
+                <ThemedText themeColor="textSecondary" style={styles.empty}>
+                  {error || 'Aucun repas ce jour-là.'}
+                </ThemedText>
+              ) : null}
+            </ScrollView>
+          )}
+        </ThemedView>
       </SafeAreaView>
     </ThemedView>
   );
@@ -88,7 +74,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: Spacing.three,
   },
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  list: { gap: Spacing.three, paddingBottom: BottomTabInset + Spacing.four },
+  panel: {
+    height: '52%',
+    backgroundColor: 'transparent',
+    borderRadius: Spacing.three,
+  },
+  list: { gap: Spacing.three, paddingVertical: Spacing.three, paddingBottom: BottomTabInset + Spacing.four },
   empty: { textAlign: 'center', marginTop: Spacing.six },
 });

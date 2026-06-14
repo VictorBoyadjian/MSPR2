@@ -1,5 +1,5 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -22,12 +22,11 @@ const MEAL_TYPES: { value: MealType; label: string }[] = [
   { value: 'snack', label: 'Collation' },
 ];
 
-export default function MealDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+export default function AddMealScreen() {
   const router = useRouter();
   const theme = useTheme();
   const authStore = useAuthStore();
-  
+
   const [name, setName] = useState('');
   const [mealType, setMealType] = useState<MealType>('lunch');
   const [calories, setCalories] = useState('');
@@ -40,25 +39,6 @@ export default function MealDetailScreen() {
 
   const num = (v: string) => (v ? Number(v.replace(',', '.')) : undefined);
 
-  useEffect(() => {
-    const fetchMeal = async () => {
-      try {
-        const meal = await dishService.getById(id);
-        setName(meal.name);
-        setMealType(meal.meal_type as MealType);
-        setCalories(meal.calories_kcal?.toString() || '');
-        setProteins(meal.proteins_g?.toString() || '');
-        setCarbs(meal.carbs_g?.toString() || '');
-        setFats(meal.fats_g?.toString() || '');
-        setEatedAt(new Date(meal.eated_at ?? meal.created_at));
-      } catch (e) {
-        setError(e instanceof ApiError ? e.message : 'Une erreur est survenue.');
-      }
-    };
-
-    fetchMeal();
-  }, [id]);
-
   const onSubmit = async () => {
     if (!isNotEmpty(name)) {
       setError('Donnez un nom à votre repas.');
@@ -67,7 +47,7 @@ export default function MealDetailScreen() {
     setError('');
     setLoading(true);
     try {
-      await dishService.update(id, {
+      await dishService.create({
         name: name.trim(),
         meal_type: mealType,
         calories_kcal: num(calories),
@@ -92,7 +72,7 @@ export default function MealDetailScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           style={styles.flex}>
           <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
-            <ThemedText type="subtitle">Modifier mon repas</ThemedText>
+            <ThemedText type="subtitle">Enregistrer mon repas</ThemedText>
 
             <ThemedView style={styles.dateField}>
               <DateTimeField value={eatedAt} onChange={setEatedAt} />
