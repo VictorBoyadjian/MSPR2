@@ -1,0 +1,25 @@
+# Environnement virtuel
+.venv/
+
+# Variables d'environnement (contient les credentials)
+.env
+
+# Modèles entraines
+ml/models/*.pkl
+
+# Donnees generees
+ml/data/processed/
+
+# MLflow
+mlruns/
+mlartifacts/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/

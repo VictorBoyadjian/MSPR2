@@ -103,7 +103,7 @@ Use exactly this schema:
                 ],
                 options={
                     "temperature": 0.4,
-                    "num_predict" : 1500
+                    "num_predict" : 800
                 }
             )
 

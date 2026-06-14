@@ -3,7 +3,7 @@ import { ScanDishResponse } from "@/types/san-dish-response.type";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import { getToken } from "./api";
 
-const MAX_SIZE_BYTES = 500 * 1024; // 500 Ko
+const MAX_SIZE_BYTES = 512 * 1024; // 512 Ko
 
 const base64ByteSize = (base64: string): number =>
   Math.floor((base64.length * 3) / 4);
