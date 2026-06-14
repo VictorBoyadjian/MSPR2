@@ -73,48 +73,37 @@ class OllamaService:
                     {
                         'role' : 'user',
                         'content' : """
-                            You are a professional nutritionist. Look carefully at this specific meal photo and identify ONLY what you actually see in the image.
+You are a professional nutritionist. Look carefully at this specific meal photo and identify ONLY the foods you actually see in the image.
 
-                            Return a JSON object based solely on what you described.
-                            
-                            Rules:
-                                - Return ONLY a valid JSON object.
-                                - Do NOT return explanations.
-                                - Do NOT return descriptions.
-                                - Do NOT return markdown.
-                                - Do NOT return code blocks.
-                                - Do NOT write "Step 1", "Step 2" or any text outside the JSON.
-                                - Do NOT guess foods that are not clearly visible.
-                                - If uncertain, use a lower accuracy score.
-                                - Accuracy must be a float between 0 and 1.
-                                - Quantity must be an integer estimate.
-                                - List ONLY foods you can actually see in this photo
-                                - Do NOT use placeholder or example foods
-                                - Estimate quantities from visual portion size
+Rules:
+- List ONLY foods you can actually see in this photo.
+- Do NOT use placeholder or example foods.
+- Estimate quantity from the visual portion size.
+- quantity_g = estimated total weight in grams (integer).
+- confidence = "high" if clearly visible, "medium" if partially visible, "low" if uncertain.
+- Respond with ONLY a valid JSON object. No text, no markdown, no explanation before or after.
 
-                                Expected format:
-
-                                {
-                                    "<food_name>": {
-                                        "quantity": <integer>,
-                                        "quantity_g": <integer estimate>,
-                                        "calories_kcal": <integer>,
-                                        "proteins_g": <float>,
-                                        "carbs_g": <float>,
-                                        "fats_g": <float>,
-                                        "fiber_g": <float>,
-                                        "accuracy": <float>
-                                    }
-                                }
-
-                                Your entire response must be valid JSON and nothing else.
-                            """,
+Use exactly this schema:
+{
+  "foods": [
+    {
+      "name_fr": "<french name of food you see>",
+      "quantity_g": <integer>,
+      "calories_kcal": <integer>,
+      "proteins_g": <float>,
+      "carbs_g": <float>,
+      "fats_g": <float>,
+      "fiber_g": <float>,
+      "confidence": "<high|medium|low>"
+    }
+  ]
+}""",
                         'image' : data.base64_image
                     }
                 ],
                 options={
                     "temperature": 0.4,
-                    "num_predict" : 800
+                    "num_predict" : 1500
                 }
             )
 

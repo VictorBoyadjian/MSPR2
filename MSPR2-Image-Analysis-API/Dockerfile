@@ -6,6 +6,6 @@ COPY . /app
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 1506
+EXPOSE 2021
 
 CMD ["python", "api/api.py"]

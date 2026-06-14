@@ -5,8 +5,12 @@ load_dotenv('.env')
 class Authorization():    
     @staticmethod
     def verify_token(token : str) -> bool:
+        host = os.getenv('LARAVEL_HOST')
+        if not host.startswith(('http://', 'https://')):
+            host = 'http://' + host
+
         response = requests.get(
-            os.getenv('LARAVEL_HOST') + ':' + os.getenv('LARAVEL_PORT') + os.getenv('LARAVEL_ME_URL'),
+            host + ':' + os.getenv('LARAVEL_PORT') + os.getenv('LARAVEL_ME_URL'),
             headers = {
                 "Authorization": "Bearer " + token
             }
