@@ -1,6 +1,7 @@
 import { CONFIG } from "@/constants/config";
 import { ScanDishResponse } from "@/types/san-dish-response.type";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
+import { getToken } from "./api";
 
 const MAX_SIZE_BYTES = 500 * 1024; // 500 Ko
 
@@ -8,10 +9,10 @@ const base64ByteSize = (base64: string): number =>
   Math.floor((base64.length * 3) / 4);
 
 export const compressAndConvertImageToBase64 = async (
-  uri: string
+  uri: string,
 ): Promise<string> => {
-  let width = 1280; 
-  let compress = 0.8; 
+  let width = 1280;
+  let compress = 0.8;
 
   for (let attempt = 0; attempt < 6; attempt++) {
     const context = ImageManipulator.manipulate(uri);
@@ -44,18 +45,41 @@ export const compressAndConvertImageToBase64 = async (
 
 export const scanDishService = {
   scan: async (uri: string): Promise<ScanDishResponse> => {
-    const image = await compressAndConvertImageToBase64(uri);
+    const token = getToken();
+    if (!token) {
+      throw new Error("Vous devez être connecté pour analyser un plat");
+    }
 
-    const response = await fetch(`${CONFIG.IMAGE_API_URL}/analyse`, {
+    const image = await compressAndConvertImageToBase64(uri);
+    console.log("sending at:", CONFIG.IMAGE_API_URL);
+    const response = await fetch(`${CONFIG.IMAGE_API_URL}/analyze/`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({ base64_image: image }),
     });
 
     if (!response.ok) {
-      throw new Error(`Erreur lors de l'analyse de l'image (${response.status})`);
+        console.log('réponse erreir: ')
+        console.log(response)
+      throw new Error(
+        `Erreur lors de l'analyse de l'image (${response.status})`,
+      );
     }
+    const castResponse = (await response.json()) as ScanDishResponse;
+    console.log("success:");
+    console.log(castResponse    );
 
-    return (await response.json()) as ScanDishResponse;
+    if (!castResponse.aliments) {
+        console.log('réponse erreir: ')
+        console.log(castResponse)
+      throw new Error(
+        `Erreur lors de l'analyse de l'image (${response.status})`,
+      );
+    }
+    return castResponse;
   },
 };

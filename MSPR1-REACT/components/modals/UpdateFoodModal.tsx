@@ -1,11 +1,11 @@
 "use client";
 
 import { fetchFoodCategories, updateFood } from "@/lib/api";
-import { Food, FoodCategory } from "@/types/foods.type";
+import { Dish, FoodCategory } from "@/types/dishes.type";
 import { useEffect, useState } from "react";
 
 type Props = {
-    food: Food;
+    food: Dish;
     onClose: () => void;
     onSuccess: () => void;
 };

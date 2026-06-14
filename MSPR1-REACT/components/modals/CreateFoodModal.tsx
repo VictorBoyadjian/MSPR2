@@ -1,7 +1,7 @@
 "use client";
 
 import { createFood, fetchFoodCategories } from "@/lib/api";
-import { FoodCategory } from "@/types/foods.type";
+import { FoodCategory } from "@/types/dishes.type";
 import { useEffect, useState } from "react";
 
 type Props = {

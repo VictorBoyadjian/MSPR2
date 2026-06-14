@@ -1,14 +1,24 @@
 from fastapi import APIRouter, FastAPI, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 import uvicorn
 from typing import Union
 
 from ollama_schemas import UploadDish, OutputResponse
-from ollama_service import OllamaService 
+from ollama_service import OllamaService
 from color_enum import ColorEnum
 from authorization import Authorization
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 

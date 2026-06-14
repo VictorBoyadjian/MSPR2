@@ -10,5 +10,5 @@ export type food = {
 };
 
 export type ScanDishResponse = {
-  aliments: food[];
+  aliments: Record<string, food>;
 };

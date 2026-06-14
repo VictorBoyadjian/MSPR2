@@ -74,6 +74,7 @@ CMD ["sh", "-c", \
     "if [ -z \"$APP_KEY\" ]; then echo 'ERROR: APP_KEY is not set.'; exit 1; fi && \
     export PORT=${PORT:-80} && \
     envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && \
+    php artisan key:generate && \
     php artisan migrate --force || true && \
     php artisan l5-swagger:generate || true && \
     php artisan config:cache || true && \

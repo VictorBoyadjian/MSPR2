@@ -52,6 +52,7 @@ export default function ScanDishPage() {
     setPhase('loading');
     try {
       const response = await scanDishService.scan(photoUri);
+      console.log("ScanDishPage: response from scanDishService.scan:", response);
       setResult(response);
       setPhase('result');
     } catch (e) {
@@ -139,13 +140,14 @@ export default function ScanDishPage() {
           {phase === 'result' && result && (
             <View style={styles.results}>
               <ThemedText type="smallBold">Résultat de l&apos;analyse</ThemedText>
-              {result.aliments.length === 0 ? (
+              {Object.keys(result.aliments).length === 0 ? (
                 <ThemedText type="small">Aucun aliment détecté.</ThemedText>
               ) : (
-                result.aliments.map((food, index) => (
+                Object.entries(result.aliments).map(([name, food]) => (
                   <View
-                    key={index}
+                    key={name}
                     style={[styles.card, { backgroundColor: theme.backgroundElement }]}>
+                    <ThemedText type="smallBold">{name}</ThemedText>
                     <ThemedText type="small">Quantité : {food.quantity_g} g</ThemedText>
                     <ThemedText type="small">Calories : {food.calories_kcal} kcal</ThemedText>
                     <ThemedText type="small">Protéines : {food.proteins_g} g</ThemedText>

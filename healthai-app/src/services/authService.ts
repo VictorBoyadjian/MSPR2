@@ -1,4 +1,5 @@
-import { sendRequest, User } from '@/services/api';
+import { sendRequest } from '@/services/api';
+import { User } from '@/types/users.type';
 
 export type RegisterPayload = {
   email: string;

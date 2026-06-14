@@ -1,4 +1,4 @@
-export type DifficultyEnum = "debutant" | "intermediaire" | "avance";
+export type DifficultyEnum = "beginner" | "intermediate" | "advanced";
 
 export type Exercise = {
   id: string;
@@ -10,4 +10,5 @@ export type Exercise = {
   instructions: string | null;
   source: string | null;
   created_at: Date | null;
+  updated_at: Date | null;
 };

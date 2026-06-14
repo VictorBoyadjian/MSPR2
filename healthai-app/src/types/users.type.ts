@@ -11,6 +11,7 @@ export type User = {
   height_cm: number | null;
   is_premium: boolean;
   is_active: boolean;
+  remember_token?: string | null;
   created_at: string;
   updated_at: string;
 };

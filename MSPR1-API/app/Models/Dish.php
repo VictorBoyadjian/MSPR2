@@ -25,6 +25,7 @@ class Dish extends Model
         'cholesterol_mg',
         'meal_type',
         'is_scanned',
+        'eated_at',
         'created_at',
         'updated_at'
     ];

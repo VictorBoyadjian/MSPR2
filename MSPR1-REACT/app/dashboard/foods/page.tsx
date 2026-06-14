@@ -7,26 +7,26 @@ import UpdateFoodModal from "@/components/modals/UpdateFoodModal";
 import { useAuth } from "@/hooks/useAuth";
 import { deleteItem, fetchFoods } from "@/lib/api";
 import { ApiResponse } from "@/types/api.type";
-import { Food } from "@/types/foods.type";
+import { Dish } from "@/types/dishes.type";
 import { useEffect, useState } from "react";
 
 export default function Foods() {
     useAuth();
-    const [foods, setFoods] = useState<Food[]>([]);
+    const [foods, setFoods] = useState<Dish[]>([]);
     const [search, setSearch] = useState("");
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-    const [paginated, setPaginated] = useState<Food[]>([]);
+    const [paginated, setPaginated] = useState<Dish[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [showEtlModal, setShowEtlModal] = useState(false);
-    const [editFood, setEditFood] = useState<Food | null>(null);
+    const [editFood, setEditFood] = useState<Dish | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     const loadFoods = async (p: number, search: string) => {
         setLoading(true);
         try {
-            const response: ApiResponse<Food> = await fetchFoods(p, search);
+            const response: ApiResponse<Dish> = await fetchFoods(p, search);
             setFoods(response.data);
             setTotalPages(response.last_page);
             setPaginated(response.data);

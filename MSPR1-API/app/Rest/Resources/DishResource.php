@@ -37,6 +37,7 @@ class DishResource extends Resource
             'meal_type',
             'is_scanned',
             'user_id',
+            'eated_at',
             'created_at',
             'updated_at'
         ];

@@ -1,6 +1,6 @@
 import type { ApiOptions, ApiResponse } from "@/types/api.type";
 import { Exercise } from "@/types/exercises.type";
-import { Food, FoodCategory } from "@/types/foods.type";
+import { Dish, FoodCategory } from "@/types/dishes.type";
 import { User } from "@/types/users.type";
 import { getToken } from "./auth";
 
@@ -93,8 +93,8 @@ export const fetchExercices = async (
 
 export const updateFood = async (
   id: string,
-  data: Omit<Food, "id" | "created_at" | "food_category">,
-): Promise<Food> => {
+  data: Omit<Dish, "id" | "created_at" | "food_category">,
+): Promise<Dish> => {
   const { category_id, ...foodData } = data;
   return apiFetch("/foods/mutate", {
     method: "POST",
@@ -119,8 +119,8 @@ export const updateFood = async (
 };
 
 export const createFood = async (
-  data: Omit<Food, "id" | "created_at" | "food_category">,
-): Promise<Food> => {
+  data: Omit<Dish, "id" | "created_at" | "food_category">,
+): Promise<Dish> => {
   const { category_id, ...foodData } = data;
   return apiFetch("/foods/mutate", {
     method: "POST",
@@ -146,7 +146,7 @@ export const createFood = async (
 export const fetchFoods = async (
   page: number = 1,
   search: string = "",
-): Promise<ApiResponse<Food>> => {
+): Promise<ApiResponse<Dish>> => {
   const foods = await apiFetch("/foods/search", {
     method: "POST",
     body: JSON.stringify({

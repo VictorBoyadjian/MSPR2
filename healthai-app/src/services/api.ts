@@ -60,7 +60,7 @@ async function request<T>(method: HttpMethod, path: string, body?: unknown): Pro
     if (error instanceof Error && error.name === 'AbortError') {
       throw new ApiError(0, 'La requête a expiré.');
     }
-    throw new ApiError(0, 'Impossible de joindre le serveur.');
+    throw new ApiError(0, `Impossible de joindre le serveur. ${error}`);
   } finally {
     clearTimeout(timeout);
   }

@@ -43,7 +43,7 @@ class ExerciseResource extends Resource
     {
         return [
             BelongsToMany::make('sportSessions', SportSessionResource::class)
-                ->withPivotFields(['reps', 'sets', 'duration_min'])
+                ->withPivotFields(['reps', 'sets', 'duration_min', 'order'])
         ];
     }
 
