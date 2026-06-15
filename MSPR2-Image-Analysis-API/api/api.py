@@ -32,14 +32,14 @@ bearer_scheme = HTTPBearer()
 async def health():
     return 'ok'
 
-@router.post('/analyze/', response_model=Union[OutputResponse, dict])
+@router.post('/analyze', response_model=Union[OutputResponse, dict])
 async def upload_dish(data : UploadDish, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
     if Authorization.verify_token(credentials.credentials):
         return OllamaService.generate(data)
     else:
         raise HTTPException(status_code=401, detail="Invalid token")
     
-@router.post('/analyze-by-mistral/', response_model=Union[OutputResponse, dict])
+@router.post('/analyze-by-mistral', response_model=Union[OutputResponse, dict])
 async def upload_dish_mistral(data : UploadDish, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
     if Authorization.verify_token(credentials.credentials):
         return MistralVisionService.generate(data)
