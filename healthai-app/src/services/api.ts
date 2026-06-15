@@ -1,6 +1,7 @@
 import { CONFIG } from '@/constants/config';
 import { Allergy } from '@/types/allergies.type';
 import { Dish } from '@/types/dishes.type';
+import { Handicap } from '@/types/handicaps.type';
 import { Exercise } from '@/types/exercises.type';
 import { Goal } from '@/types/goals.type';
 import { Metric } from '@/types/metrics.type';
@@ -127,6 +128,7 @@ export const metrics = resource<Metric>('/metrics');
 export const goals = resource<Goal>('/goals');
 export const users = resource<User>('/users');
 export const allergies = resource<Allergy>('/allergies');
+export const handicaps = resource<Handicap>('/handicaps');
 
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 

@@ -31,18 +31,24 @@ class ProfileController {
             'sport_per_week' => ['sometimes', 'nullable', 'numeric'],
             'allergies'      => ['sometimes', 'array'],
             'allergies.*'    => ['integer', 'exists:allergies,id'],
+            'handicaps'      => ['sometimes', 'array'],
+            'handicaps.*'    => ['integer', 'exists:handicaps,id'],
         ]);
 
-        $user->fill(collect($validated)->except('allergies')->all());
+        $user->fill(collect($validated)->except(['allergies', 'handicaps'])->all());
         $user->save();
 
         if ($request->has('allergies')) {
             $user->allergies()->sync($validated['allergies'] ?? []);
         }
 
+        if ($request->has('handicaps')) {
+            $user->handicaps()->sync($validated['handicaps'] ?? []);
+        }
+
         return response()->json([
             'message' => 'ok',
-            'user'    => $user->load('allergies'),
+            'user'    => $user->load(['allergies', 'handicaps']),
         ]);
     }
 

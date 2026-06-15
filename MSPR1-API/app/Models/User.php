@@ -62,4 +62,9 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Allergy::class, 'user_allergies');
     }
+
+    public function handicaps(): BelongsToMany
+    {
+        return $this->belongsToMany(Handicap::class, 'user_handicaps');
+    }
 }

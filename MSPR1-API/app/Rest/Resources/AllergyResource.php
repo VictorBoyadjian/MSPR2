@@ -25,6 +25,7 @@ class AllergyResource extends Resource
         return [
             'id',
             'name',
+            'label',
         ];
     }
 

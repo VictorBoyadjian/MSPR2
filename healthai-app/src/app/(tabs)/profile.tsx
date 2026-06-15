@@ -8,6 +8,7 @@ import ProfileForm, { ProfileFormValues } from '@/components/profile/ProfileForm
 import Loader from '@/components/ui/Loader';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAllergies } from '@/hooks/useAllergies';
+import { useHandicaps } from '@/hooks/useHandicaps';
 import { useAuth } from '@/hooks/useAuth';
 import { ApiError } from '@/services/api';
 import { userService } from '@/services/userService';
@@ -32,9 +33,11 @@ const emptyValues: ProfileFormValues = {
 export default function ProfileScreen() {
   const { user, refreshUser } = useAuth();
   const { items: allergies, loading: allergiesLoading, error: allergiesError } = useAllergies();
+  const { items: handicaps, loading: handicapsLoading, error: handicapsError } = useHandicaps();
 
   const [values, setValues] = useState<ProfileFormValues>(emptyValues);
   const [selectedAllergies, setSelectedAllergies] = useState<string[]>([]);
+  const [selectedHandicaps, setSelectedHandicaps] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -54,12 +57,15 @@ export default function ProfileScreen() {
     });
   }, [user]);
 
-  // Charge les allergies actuelles (le endpoint /me ne renvoie pas les relations).
+  // Charge les relations actuelles (le endpoint /me ne renvoie pas les relations).
   useEffect(() => {
     if (!user?.id) return;
     userService
-      .getWithAllergies(user.id)
-      .then((u) => setSelectedAllergies(u?.allergies?.map((a) => a.id) ?? []))
+      .getWithRelations(user.id)
+      .then((u) => {
+        setSelectedAllergies(u?.allergies?.map((a) => a.id) ?? []);
+        setSelectedHandicaps(u?.handicaps?.map((h) => h.id) ?? []);
+      })
       .catch(() => {});
   }, [user?.id]);
 
@@ -71,6 +77,11 @@ export default function ProfileScreen() {
   const onToggleAllergy = useCallback((id: string) => {
     setSuccess(false);
     setSelectedAllergies((ids) => (ids.includes(id) ? ids.filter((a) => a !== id) : [...ids, id]));
+  }, []);
+
+  const onToggleHandicap = useCallback((id: string) => {
+    setSuccess(false);
+    setSelectedHandicaps((ids) => (ids.includes(id) ? ids.filter((h) => h !== id) : [...ids, id]));
   }, []);
 
   const onSave = useCallback(async () => {
@@ -91,6 +102,7 @@ export default function ProfileScreen() {
           rest_bpm: toNum(values.rest_bpm),
         },
         selectedAllergies,
+        selectedHandicaps,
       );
       await refreshUser();
       setSuccess(true);
@@ -99,7 +111,7 @@ export default function ProfileScreen() {
     } finally {
       setSaving(false);
     }
-  }, [user?.id, values, selectedAllergies, refreshUser]);
+  }, [user?.id, values, selectedAllergies, selectedHandicaps, refreshUser]);
 
   if (!user) return <Loader />;
 
@@ -120,6 +132,11 @@ export default function ProfileScreen() {
             onToggleAllergy={onToggleAllergy}
             allergiesLoading={allergiesLoading}
             allergiesError={allergiesError}
+            handicaps={handicaps}
+            selectedHandicaps={selectedHandicaps}
+            onToggleHandicap={onToggleHandicap}
+            handicapsLoading={handicapsLoading}
+            handicapsError={handicapsError}
             onSave={onSave}
             saving={saving}
             error={error}

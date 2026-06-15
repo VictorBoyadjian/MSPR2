@@ -14,11 +14,11 @@ export type UpdateUserAttributes = Partial<{
 }>;
 
 export const userService = {
-  /** Récupère l'utilisateur avec ses allergies (le endpoint /me ne charge pas les relations). */
-  getWithAllergies: async (id: string): Promise<User | undefined> => {
+  /** Récupère l'utilisateur avec ses relations (le endpoint /me ne charge pas les relations). */
+  getWithRelations: async (id: string): Promise<User | undefined> => {
     const res = await users.search({
       filters: [{ field: 'id', operator: 'like', value: id }],
-      includes: [{ relation: 'allergies' }],
+      includes: [{ relation: 'allergies' }, { relation: 'handicaps' }],
       limit: 10,
     });
     return res.data[0];
@@ -26,8 +26,12 @@ export const userService = {
 
   /**
    * Met à jour le profil de l'utilisateur courant via PATCH /me.
-   * `allergies` est un tableau d'ids qui remplace l'ensemble des allergies.
+   * `allergies` et `handicaps` sont des tableaux d'ids qui remplacent l'ensemble correspondant.
    */
-  update: (attributes: UpdateUserAttributes, allergyIds: string[]) =>
-    sendRequest<User>('PATCH', '/me', { ...attributes, allergies: allergyIds.map(Number) }),
+  update: (attributes: UpdateUserAttributes, allergyIds: string[], handicapIds: string[]) =>
+    sendRequest<User>('PATCH', '/me', {
+      ...attributes,
+      allergies: allergyIds.map(Number),
+      handicaps: handicapIds.map(Number),
+    }),
 };

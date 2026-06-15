@@ -1,25 +1,25 @@
-// Étape allergies : liste depuis l'API, sélection multiple.
+// Étape handicaps : liste depuis l'API, sélection multiple.
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { useAllergies } from '@/hooks/useAllergies';
+import { useHandicaps } from '@/hooks/useHandicaps';
 
 import StepHeader from '../components/StepHeader';
 import { accent, accentA, colors } from '../theme';
 
-type AllergiesStepProps = {
+type HandicapsStepProps = {
   selected: string[];
   onToggle: (id: string) => void;
 };
 
-export default function AllergiesStep({ selected, onToggle }: AllergiesStepProps) {
-  const { items, loading, error, refresh } = useAllergies();
+export default function HandicapsStep({ selected, onToggle }: HandicapsStepProps) {
+  const { items, loading, error, refresh } = useHandicaps();
 
   return (
     <View>
       <StepHeader
-        eyebrow="ÉTAPE 7"
-        title="Des allergies ?"
-        sub="Sélectionne celles qui te concernent. Tu peux ne rien cocher."
+        eyebrow="ÉTAPE 8"
+        title="Des handicaps ?"
+        sub="Sélectionne les zones concernées. Tu peux ne rien cocher."
       />
 
       {loading ? (
@@ -34,18 +34,18 @@ export default function AllergiesStep({ selected, onToggle }: AllergiesStepProps
           </Pressable>
         </View>
       ) : items.length === 0 ? (
-        <Text style={styles.empty}>Aucune allergie disponible.</Text>
+        <Text style={styles.empty}>Aucun handicap disponible.</Text>
       ) : (
         <View style={styles.grid}>
-          {items.map((allergy) => {
-            const isSelected = selected.includes(allergy.id);
+          {items.map((handicap) => {
+            const isSelected = selected.includes(handicap.id);
             return (
               <Pressable
-                key={allergy.id}
-                onPress={() => onToggle(allergy.id)}
+                key={handicap.id}
+                onPress={() => onToggle(handicap.id)}
                 style={[styles.chip, isSelected && styles.chipSel]}>
                 <Text style={[styles.chipTx, isSelected && styles.chipTxSel]}>
-                  {allergy.label ?? allergy.name ?? 'Sans nom'}
+                  {handicap.label ?? handicap.name ?? 'Sans nom'}
                 </Text>
               </Pressable>
             );

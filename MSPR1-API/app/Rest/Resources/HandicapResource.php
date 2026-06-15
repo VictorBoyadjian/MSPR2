@@ -2,18 +2,18 @@
 
 namespace App\Rest\Resources;
 
-use App\Models\User;
+use App\Models\Handicap;
 use App\Rest\Resources\Resource;
-use Lomkit\Rest\Relations\{BelongsToMany, HasMany};
+use Lomkit\Rest\Relations\BelongsToMany;
 
-class UserResource extends Resource
+class HandicapResource extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var class-string<\Illuminate\Database\Eloquent\Model>
      */
-    public static $model = User::class;
+    public static $model = Handicap::class;
 
     /**
      * The exposed fields that could be provided
@@ -24,20 +24,8 @@ class UserResource extends Resource
     {
         return [
             'id',
-            'email',
-            'first_name',
-            'last_name',
-            'age',
-            'gender',
-            'weight_kg',
-            'height_cm',
-            'is_premium',
-            'is_active',
-            'remember_token',
-            'password',
-            'bodyfat',
-            'rest_bpm',
-            'sport_per_week',
+            'name',
+            'label',
         ];
     }
 
@@ -49,11 +37,7 @@ class UserResource extends Resource
     public function relations(\Lomkit\Rest\Http\Requests\RestRequest $request): array
     {
         return [
-            BelongsToMany::make('sportSessions', SportSessionResource::class)
-                ->withPivotFields(['performed_at']),
-            HasMany::make('metrics', MetricResource::class),
-            BelongsToMany::make('allergies', AllergyResource::class),
-            BelongsToMany::make('handicaps', HandicapResource::class),
+            BelongsToMany::make('users', UserResource::class),
         ];
     }
 

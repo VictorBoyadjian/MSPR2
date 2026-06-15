@@ -1,4 +1,5 @@
 import { Allergy } from '@/types/allergies.type';
+import { Handicap } from '@/types/handicaps.type';
 
 export type GenderEnum = "male" | "female" | "other";
 
@@ -20,4 +21,5 @@ export type User = {
   created_at: string;
   updated_at: string;
   allergies?: Allergy[];
+  handicaps?: Handicap[];
 };

@@ -7,6 +7,7 @@ use App\Rest\Controllers\AllergyController;
 use App\Rest\Controllers\DishController;
 use App\Rest\Controllers\ExerciceController;
 use App\Rest\Controllers\GoalController;
+use App\Rest\Controllers\HandicapController;
 use App\Rest\Controllers\MetricController;
 use App\Rest\Controllers\SportSessionController;
 use App\Rest\Controllers\UserController;
@@ -18,6 +19,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Rest::resource('dishes', DishController::class);
     Rest::resource('exercises', ExerciceController::class);
     Rest::resource('goals', GoalController::class);
+    Rest::resource('handicaps', HandicapController::class);
     Rest::resource('metrics', MetricController::class);
     Rest::resource('sport_sessions', SportSessionController::class);
     Rest::resource('users', UserController::class)->only('search');

@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Lomkit\Access\Controls\HasControl;
 
-class Allergy extends Model
+class Handicap extends Model
 {
     use HasControl;
 
-    protected $table = "allergies";
+    protected $table = "handicaps";
 
     public $timestamps = false;
 
@@ -22,6 +22,6 @@ class Allergy extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'user_allergies');
+        return $this->belongsToMany(User::class, 'user_handicaps');
     }
 }

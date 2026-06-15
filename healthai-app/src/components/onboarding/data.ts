@@ -10,6 +10,7 @@ export type OnboardingData = {
   bodyFat: number | null; // index dans BODY_FAT_OPTIONS
   beats: number; // battements comptés sur 30 s
   allergies: string[]; // ids des allergies sélectionnées
+  handicaps: string[]; // ids des handicaps sélectionnés
 };
 
 export const DEFAULT_ONBOARDING_DATA: OnboardingData = {
@@ -20,6 +21,7 @@ export const DEFAULT_ONBOARDING_DATA: OnboardingData = {
   bodyFat: null,
   beats: 35,
   allergies: [],
+  handicaps: [],
 };
 
 /** Tranches de masse grasse présentées via les silhouettes (label + % médian envoyé à l'API). */

@@ -7,6 +7,7 @@ import Input from '@/components/ui/Input';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { Allergy } from '@/types/allergies.type';
+import { Handicap } from '@/types/handicaps.type';
 
 export type ProfileFormValues = {
   first_name: string;
@@ -27,6 +28,11 @@ type Props = {
   onToggleAllergy: (id: string) => void;
   allergiesLoading: boolean;
   allergiesError: string;
+  handicaps: Handicap[];
+  selectedHandicaps: string[];
+  onToggleHandicap: (id: string) => void;
+  handicapsLoading: boolean;
+  handicapsError: string;
   onSave: () => void;
   saving: boolean;
   error?: string;
@@ -41,6 +47,11 @@ export default function ProfileForm({
   onToggleAllergy,
   allergiesLoading,
   allergiesError,
+  handicaps,
+  selectedHandicaps,
+  onToggleHandicap,
+  handicapsLoading,
+  handicapsError,
   onSave,
   saving,
   error,
@@ -75,11 +86,32 @@ export default function ProfileForm({
         ) : (
           <View style={styles.chips}>
             {allergies.map((allergy) => (
-              <AllergyChip
+              <Chip
                 key={allergy.id}
-                label={allergy.name ?? 'Sans nom'}
+                label={allergy.label ?? allergy.name ?? 'Sans nom'}
                 selected={selectedAllergies.includes(allergy.id)}
                 onPress={() => onToggleAllergy(allergy.id)}
+              />
+            ))}
+          </View>
+        )}
+      </Section>
+
+      <Section title="Handicaps">
+        {handicapsLoading ? (
+          <ActivityIndicator />
+        ) : handicapsError ? (
+          <ThemedText type="small" themeColor="textSecondary">{handicapsError}</ThemedText>
+        ) : handicaps.length === 0 ? (
+          <ThemedText type="small" themeColor="textSecondary">Aucun handicap disponible.</ThemedText>
+        ) : (
+          <View style={styles.chips}>
+            {handicaps.map((handicap) => (
+              <Chip
+                key={handicap.id}
+                label={handicap.label ?? handicap.name ?? 'Sans nom'}
+                selected={selectedHandicaps.includes(handicap.id)}
+                onPress={() => onToggleHandicap(handicap.id)}
               />
             ))}
           </View>
@@ -106,7 +138,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function AllergyChip({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
+function Chip({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
   const theme = useTheme();
   return (
     <Pressable

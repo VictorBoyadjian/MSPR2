@@ -22,6 +22,7 @@ import { buildOnboardingUpdate, DEFAULT_ONBOARDING_DATA, OnboardingData } from '
 import AllergiesStep from './steps/AllergiesStep';
 import BodyFatStep from './steps/BodyFatStep';
 import { BpmCount, BpmCountdown, BpmIntro, BpmMeasure } from './steps/BpmSteps';
+import HandicapsStep from './steps/HandicapsStep';
 import RulerStep from './steps/RulerStep';
 import SummaryStep from './steps/SummaryStep';
 import WelcomeStep from './steps/WelcomeStep';
@@ -39,6 +40,7 @@ type StepId =
   | 'measure'
   | 'bpmcount'
   | 'allergies'
+  | 'handicaps'
   | 'summary';
 
 type StepConfig = {
@@ -61,7 +63,8 @@ const STEPS: StepConfig[] = [
   { id: 'countdown', chrome: false, takeover: true },
   { id: 'measure', chrome: false, takeover: true },
   { id: 'bpmcount', prog: 0.8, footer: 'Continuer' },
-  { id: 'allergies', prog: 0.9, footer: 'Continuer' },
+  { id: 'allergies', prog: 0.85, footer: 'Continuer' },
+  { id: 'handicaps', prog: 0.92, footer: 'Continuer' },
   { id: 'summary', prog: 1, footer: 'Créer mon compte' },
 ];
 
@@ -88,6 +91,17 @@ export default function OnboardingFlow() {
     [],
   );
 
+  const toggleHandicap = useCallback(
+    (id: string) =>
+      setData((d) => ({
+        ...d,
+        handicaps: d.handicaps.includes(id)
+          ? d.handicaps.filter((h) => h !== id)
+          : [...d.handicaps, id],
+      })),
+    [],
+  );
+
   const cur = STEPS[step];
   const valid = cur.valid ? cur.valid(data) : true;
 
@@ -104,7 +118,7 @@ export default function OnboardingFlow() {
     setError('');
     setLoading(true);
     try {
-      await userService.update(buildOnboardingUpdate(data), data.allergies);
+      await userService.update(buildOnboardingUpdate(data), data.allergies, data.handicaps);
       await refreshUser();
       // Fin de l'onboarding : le RootNavigator redirige vers l'espace connecté.
       completeOnboarding();
@@ -150,6 +164,8 @@ export default function OnboardingFlow() {
         return <BpmCount count={data.beats} setCount={(v) => patch({ beats: v })} />;
       case 'allergies':
         return <AllergiesStep selected={data.allergies} onToggle={toggleAllergy} />;
+      case 'handicaps':
+        return <HandicapsStep selected={data.handicaps} onToggle={toggleHandicap} />;
       case 'summary':
         return <SummaryStep data={data} firstName={firstName} />;
     }

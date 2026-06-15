@@ -25,6 +25,7 @@ class GoalResource extends Resource
         return [
             'id',
             'name',
+            'label',
             'created_at',
             'updated_at'
         ];
