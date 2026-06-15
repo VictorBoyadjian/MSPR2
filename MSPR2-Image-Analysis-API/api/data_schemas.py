@@ -31,5 +31,5 @@ class DishCalculateOutput(BaseModel):
     kcal : int = 400
     carbs_g : int = 20
     fats_g : int = 30
-    fiber_g : float = 10
+    fiber_g : float = 10.0
     proteins_g : int = 60
