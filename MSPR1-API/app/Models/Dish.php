@@ -35,6 +35,16 @@ class Dish extends Model
         'updated_at'
     ];
 
+    /**
+     * `eated_at` est une colonne timestamp custom : sans cast, Eloquent la renvoie
+     * en chaîne brute « Y-m-d H:i:s » (sans fuseau), que le front interprète comme
+     * heure locale → décalage UTC. Le cast datetime force une sérialisation ISO-8601
+     * UTC (« ...Z ») que `new Date()` parse sans ambiguïté. La base reste en UTC.
+     */
+    protected $casts = [
+        'eated_at' => 'datetime',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
