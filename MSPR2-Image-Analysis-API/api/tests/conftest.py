@@ -13,3 +13,5 @@ os.environ.setdefault("OLLAMA_PORT", "11434")
 os.environ.setdefault("LARAVEL_HOST", "http://localhost")
 os.environ.setdefault("LARAVEL_PORT", "8080")
 os.environ.setdefault("LARAVEL_ME_URL", "/api/me")
+
+os.environ.setdefault("MISTRAL_API_KEY", "test-mistral-key")

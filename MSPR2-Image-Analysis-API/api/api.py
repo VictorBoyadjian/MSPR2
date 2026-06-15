@@ -1,16 +1,15 @@
+#Libs
 from fastapi import APIRouter, FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 import uvicorn
 from typing import Union
 
-<<<<<<< Updated upstream
-from ollama_schemas import UploadDish, OutputResponse
+#Modules
+from data_schemas import UploadDish, OutputResponse
 from ollama_service import OllamaService
-=======
 from data_schemas import UploadDish, OutputResponse, DishCalculateInput, DishCalculateOutput
 from ollama_service import OllamaService 
->>>>>>> Stashed changes
 from color_enum import ColorEnum
 from authorization import Authorization
 from mistral_service import MistralService

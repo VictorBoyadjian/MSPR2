@@ -1,8 +1,10 @@
+#Libs
 from typing import Union
 from mistralai import Mistral
 from dotenv import load_dotenv
 import os
 
+#Modules
 from data_schemas import DishCalculateInput, DishCalculateOutput
 from data_parser import Parser
 from color_enum import ColorEnum

@@ -1,9 +1,11 @@
+#Libs
 from ollama import Client
 import os
 from typing import Union
 import ast
 from dotenv import load_dotenv
 
+#Modules
 from data_schemas import UploadDish, OutputResponse
 from color_enum import ColorEnum
 from message_renderer import MessageRenderer
@@ -73,31 +75,31 @@ class OllamaService:
                     {
                         'role' : 'user',
                         'content' : """
-You are a professional nutritionist. Look carefully at this specific meal photo and identify ONLY the foods you actually see in the image.
+                            You are a professional nutritionist. Look carefully at this specific meal photo and identify ONLY the foods you actually see in the image.
 
-Rules:
-- List ONLY foods you can actually see in this photo.
-- Do NOT use placeholder or example foods.
-- Estimate quantity from the visual portion size.
-- quantity_g = estimated total weight in grams (integer).
-- confidence = "high" if clearly visible, "medium" if partially visible, "low" if uncertain.
-- Respond with ONLY a valid JSON object. No text, no markdown, no explanation before or after.
+                            Rules:
+                            - List ONLY foods you can actually see in this photo.
+                            - Do NOT use placeholder or example foods.
+                            - Estimate quantity from the visual portion size.
+                            - quantity_g = estimated total weight in grams (integer).
+                            - confidence = "high" if clearly visible, "medium" if partially visible, "low" if uncertain.
+                            - Respond with ONLY a valid JSON object. No text, no markdown, no explanation before or after.
 
-Use exactly this schema:
-{
-  "foods": [
-    {
-      "name_fr": "<french name of food you see>",
-      "quantity_g": <integer>,
-      "calories_kcal": <integer>,
-      "proteins_g": <float>,
-      "carbs_g": <float>,
-      "fats_g": <float>,
-      "fiber_g": <float>,
-      "confidence": "<high|medium|low>"
-    }
-  ]
-}""",
+                            Use exactly this schema:
+                            {
+                            "foods": [
+                                {
+                                "name_fr": "<french name of food you see>",
+                                "quantity_g": <integer>,
+                                "calories_kcal": <integer>,
+                                "proteins_g": <float>,
+                                "carbs_g": <float>,
+                                "fats_g": <float>,
+                                "fiber_g": <float>,
+                                "confidence": "<high|medium|low>"
+                                }
+                            ]
+                            }""",
                         'images' : [data.base64_image]
                     }
                 ],
