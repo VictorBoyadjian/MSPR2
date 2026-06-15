@@ -2,8 +2,8 @@
 
 from ollama import ChatResponse, Message
 
-from ollama_parser import Parser
-from ollama_schemas import Food, OutputResponse
+from api.data_parser import Parser
+from api.data_schemas import Food, OutputResponse
 
 
 def _response(content: str) -> ChatResponse:

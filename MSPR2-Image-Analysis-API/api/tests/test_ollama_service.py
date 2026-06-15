@@ -9,7 +9,7 @@ from types import SimpleNamespace
 from ollama import ChatResponse, Message
 
 import ollama_service
-from ollama_schemas import OutputResponse, UploadDish
+from api.data_schemas import OutputResponse, UploadDish
 from ollama_service import OllamaService
 
 

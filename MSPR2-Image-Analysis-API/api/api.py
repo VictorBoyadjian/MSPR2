@@ -4,10 +4,16 @@ from fastapi.security import OAuth2PasswordBearer
 import uvicorn
 from typing import Union
 
+<<<<<<< Updated upstream
 from ollama_schemas import UploadDish, OutputResponse
 from ollama_service import OllamaService
+=======
+from data_schemas import UploadDish, OutputResponse, DishCalculateInput, DishCalculateOutput
+from ollama_service import OllamaService 
+>>>>>>> Stashed changes
 from color_enum import ColorEnum
 from authorization import Authorization
+from mistral_service import MistralService
 
 app = FastAPI()
 
@@ -30,6 +36,13 @@ async def health():
 async def upload_dish(data : UploadDish, token: str = Depends(oauth2_scheme)):
     if Authorization.verify_token(token):
         return OllamaService.generate(data)
+    else:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+@router.post('/dish-calculate', response_model=DishCalculateOutput)
+async def dish_calculate(data : DishCalculateInput, token: str = Depends(oauth2_scheme)):
+    if Authorization.verify_token(token):
+        return MistralService.generate(data)
     else:
         raise HTTPException(status_code=401, detail="Invalid token")
 
@@ -74,7 +87,5 @@ if __name__ == '__main__':
     else:
         models_len = len(models_list)
         print(f"\n{ColorEnum.INFO.format('[INFO]')} : All models are pulled {models_len}/{models_len} " + ColorEnum.CHECK_MARK.format('✔') * models_len + "\n")
-         
+        
     uvicorn.run('api:app', host='0.0.0.0', port=2021)
-            
-                

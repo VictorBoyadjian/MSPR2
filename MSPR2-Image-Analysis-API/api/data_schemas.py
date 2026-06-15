@@ -17,3 +17,14 @@ class OutputResponse(BaseModel):
     aliments : dict[str, Food] = {
         "bread" : Food()
     }
+    
+class DishCalculateInput(BaseModel):
+    aliments : dict[str, dict[str, int]]
+    
+class DishCalculateOutput(BaseModel):
+    dish_name : str
+    kcal : int
+    carbs_g : int
+    fats_g : int
+    fiber_g : float
+    proteins_g : int

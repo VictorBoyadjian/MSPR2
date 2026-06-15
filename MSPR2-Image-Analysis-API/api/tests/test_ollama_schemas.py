@@ -1,6 +1,6 @@
 """Unit tests for ollama_schemas (pydantic models)."""
 
-from ollama_schemas import Food, OutputResponse, UploadDish
+from api.data_schemas import Food, OutputResponse, UploadDish
 
 
 class TestUploadDish:

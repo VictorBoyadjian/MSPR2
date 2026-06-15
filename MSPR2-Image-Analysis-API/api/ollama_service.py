@@ -4,10 +4,10 @@ from typing import Union
 import ast
 from dotenv import load_dotenv
 
-from ollama_schemas import UploadDish, OutputResponse
+from data_schemas import UploadDish, OutputResponse
 from color_enum import ColorEnum
 from message_renderer import MessageRenderer
-from ollama_parser import Parser
+from data_parser import Parser
 
 load_dotenv('.env')
 
@@ -107,7 +107,7 @@ Use exactly this schema:
                 }
             )
 
-            output_data = Parser.parse(response)
+            output_data = Parser.ollama_reponse(response)
         
         if not output_data:
             print(f"{ColorEnum.WARNING.format('[Warning]')} : {cls._selected_model} has failed")
