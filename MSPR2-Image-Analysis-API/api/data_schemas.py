@@ -1,8 +1,14 @@
 #Libs
+from typing import Optional
 from pydantic import BaseModel
 
 class UploadDish(BaseModel):
     base64_image : str = ""
+
+class Usage(BaseModel):
+    prompt_tokens : int = 0
+    completion_tokens : int = 0
+    total_tokens : int = 0
 
 class CalculFood(BaseModel):
     quantity_g : int = 100
@@ -22,10 +28,17 @@ class Food(BaseModel):
     fiber_g : float = 5.6
     accuracy: float = 0.85
     
+
+class ScannedFood(BaseModel):
+    quantity : int = 1
+    quantity_g : int = 20
+    accuracy: float = 0.85
+
 class OutputResponse(BaseModel):
-    aliments : dict[str, Food] = {
-        "bread" : Food()
+    aliments : dict[str, ScannedFood] = {
+        "bread" : ScannedFood()
     }
+    usage : Optional[Usage] = None
     
 class DishCalculateInput(BaseModel):
     aliments : dict[str, dict[str, int]] = {

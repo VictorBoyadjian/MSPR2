@@ -1,33 +1,46 @@
 services:
-  postgres:
-    build: ./MSPR1-PostgreSQL
-    container_name: postgres
-    ports:
-      - "5433:5432"
-    env_file:
-      - ./MSPR1-PostgreSQL/.env
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - mspr-network
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+  # postgres:
+  #   build: ./MSPR1-PostgreSQL
+  #   container_name: postgres
+  #   ports:
+  #     - "5433:5432"
+  #   env_file:
+  #     - ./MSPR1-PostgreSQL/.env
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - mspr-network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U postgres"]
+  #     interval: 5s
+  #     timeout: 5s
+  #     retries: 10
 
-  laravel:
-    build: ./MSPR1-API
-    container_name: mspr1-api
+  # laravel:
+  #   build: ./MSPR1-API
+  #   container_name: mspr1-api
+  #   ports:
+  #     - "8080:80"
+  #   env_file:
+  #     - ./MSPR1-API/.env
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   volumes:
+  #     - app_storage:/var/www/html/storage
+  #   networks:
+  #     - mspr-network
+  #   restart: unless-stopped
+
+  api-image:
+    build: ./MSPR2-Image-Analysis-API
+    container_name: api-image
     ports:
-      - "8080:80"
+      - "2021:2021"
     env_file:
-      - ./MSPR1-API/.env
-    depends_on:
-      postgres:
-        condition: service_healthy
-    volumes:
-      - app_storage:/var/www/html/storage
+      - ./MSPR2-Image-Analysis-API/.env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - mspr-network
     restart: unless-stopped
@@ -48,21 +61,21 @@ services:
   #   networks:
   #     - mspr1-network
 
-  grafana:
-    build: ./MSPR1-Grafana
-    container_name: mspr1-grafana
-    ports:
-      - "1506:1506"
-    env_file:
-      - ./MSPR1-Grafana/.env
-    volumes:
-      - ./volumes/grafana:/var/lib/grafana
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - mspr-network
-    restart: unless-stopped
+  # grafana:
+  #   build: ./MSPR1-Grafana
+  #   container_name: mspr1-grafana
+  #   ports:
+  #     - "1506:1506"
+  #   env_file:
+  #     - ./MSPR1-Grafana/.env
+  #   volumes:
+  #     - ./volumes/grafana:/var/lib/grafana
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - mspr-network
+  #   restart: unless-stopped
 
   # react:
   #   build:

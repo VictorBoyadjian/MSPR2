@@ -45,4 +45,20 @@ class ProfileController {
             'user'    => $user->load('allergies'),
         ]);
     }
+
+    /**
+     * Supprime le compte de l'utilisateur connecté.
+     * Comme pour update(), on agit uniquement sur $request->user() :
+     * un utilisateur ne peut supprimer que son propre compte.
+     */
+    public function destroy(Request $request) : JsonResponse
+    {
+        $user = $request->user();
+
+        // On révoque les tokens avant de supprimer le compte.
+        $user->tokens()->delete();
+        $user->delete();
+
+        return response()->json(['message' => 'ok']);
+    }
 }

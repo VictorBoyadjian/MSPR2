@@ -52,7 +52,8 @@ export const scanDishService = {
 
     const image = await compressAndConvertImageToBase64(uri);
     console.log("sending at:", CONFIG.IMAGE_API_URL);
-    const response = await fetch(`${CONFIG.IMAGE_API_URL}/analyze/`, {
+    const response = await fetch(`${CONFIG.IMAGE_API_URL}/${
+      CONFIG.AI_IMAGE_SOURCE == 'MISTRAL' ? 'analyze-by-mistral' : 'analyze/'}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

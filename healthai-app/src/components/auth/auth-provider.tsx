@@ -8,6 +8,7 @@ import { AuthContext, AuthState } from '@/stores/authStore';
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [onboardingPending, setOnboardingPending] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -35,6 +36,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = useCallback(
     async (data: RegisterPayload) => {
       await authService.register(data);
+      // On marque l'onboarding requis AVANT le login pour éviter une redirection
+      // transitoire vers l'accueil au moment où l'utilisateur devient authentifié.
+      setOnboardingPending(true);
       await login(data.email, data.password);
     },
     [login],
@@ -43,6 +47,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshUser = useCallback(async () => {
     setUser(await authService.me());
   }, []);
+
+  const completeOnboarding = useCallback(() => setOnboardingPending(false), []);
 
   const logout = useCallback(async () => {
     try {
@@ -55,17 +61,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const deleteAccount = useCallback(async () => {
-    if (user) {
-      await authService.deleteAccount(user.id);
-    }
+    await authService.deleteAccount();
     setToken(null);
     await tokenStorage.clear();
     setUser(null);
-  }, [user]);
+  }, []);
 
   const value = useMemo<AuthState>(
-    () => ({ user, isLoading, isAuthenticated: !!user, login, register, logout, deleteAccount, refreshUser }),
-    [user, isLoading, login, register, logout, deleteAccount, refreshUser],
+    () => ({
+      user,
+      isLoading,
+      isAuthenticated: !!user,
+      onboardingPending,
+      login,
+      register,
+      logout,
+      deleteAccount,
+      refreshUser,
+      completeOnboarding,
+    }),
+    [user, isLoading, onboardingPending, login, register, logout, deleteAccount, refreshUser, completeOnboarding],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

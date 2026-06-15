@@ -13,6 +13,7 @@ from ollama_service import OllamaService
 from color_enum import ColorEnum
 from authorization import Authorization
 from mistral_service import MistralService
+from mistral_vision_service import MistralVisionService
 
 app = FastAPI()
 
@@ -38,6 +39,13 @@ async def upload_dish(data : UploadDish, credentials: HTTPAuthorizationCredentia
     else:
         raise HTTPException(status_code=401, detail="Invalid token")
     
+@router.post('/analyze-by-mistral/', response_model=Union[OutputResponse, dict])
+async def upload_dish_mistral(data : UploadDish, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
+    if Authorization.verify_token(credentials.credentials):
+        return MistralVisionService.generate(data)
+    else:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
 @router.post('/dish-calculate', response_model=DishCalculateOutput)
 async def dish_calculate(data : DishCalculateInput, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
     if Authorization.verify_token(credentials.credentials):

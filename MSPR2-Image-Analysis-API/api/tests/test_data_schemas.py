@@ -5,6 +5,7 @@ from data_schemas import (
     DishCalculateOutput,
     Food,
     OutputResponse,
+    ScannedFood,
     UploadDish,
 )
 
@@ -46,20 +47,23 @@ class TestOutputResponse:
     def test_default_contains_bread_example(self) -> None:
         response = OutputResponse()
         assert "bread" in response.aliments
-        assert isinstance(response.aliments["bread"], Food)
+        assert isinstance(response.aliments["bread"], ScannedFood)
 
-    def test_accepts_dict_of_food(self) -> None:
+    def test_usage_defaults_to_none(self) -> None:
+        assert OutputResponse().usage is None
+
+    def test_accepts_dict_of_scanned_food(self) -> None:
         response = OutputResponse(
-            aliments={"rice": Food(quantity_g=150, calories_kcal=200)}
+            aliments={"rice": ScannedFood(quantity_g=150, accuracy=0.7)}
         )
         assert "rice" in response.aliments
         assert response.aliments["rice"].quantity_g == 150
 
-    def test_builds_food_from_nested_dict(self) -> None:
-        # pydantic validates nested dicts into Food instances
-        response = OutputResponse(aliments={"apple": {"calories_kcal": 95}})
-        assert isinstance(response.aliments["apple"], Food)
-        assert response.aliments["apple"].calories_kcal == 95
+    def test_builds_scanned_food_from_nested_dict(self) -> None:
+        # pydantic validates nested dicts into ScannedFood instances
+        response = OutputResponse(aliments={"apple": {"quantity_g": 95}})
+        assert isinstance(response.aliments["apple"], ScannedFood)
+        assert response.aliments["apple"].quantity_g == 95
 
 
 class TestDishCalculateInput:

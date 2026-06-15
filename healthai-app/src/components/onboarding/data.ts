@@ -1,13 +1,5 @@
-// Modèle de données de l'onboarding + helpers de conversion vers /register.
-import type { RegisterPayload } from '@/services/authService';
-
-/** Identité saisie sur l'écran d'inscription, transmise à l'onboarding. */
-export type Credentials = {
-  first_name: string;
-  last_name: string;
-  email: string;
-  password: string;
-};
+// Modèle de données de l'onboarding + helper de conversion vers PATCH /me.
+import type { UpdateUserAttributes } from '@/services/userService';
 
 /** Données collectées au fil des étapes de l'onboarding. */
 export type OnboardingData = {
@@ -47,21 +39,14 @@ export const beatsToBpm = (beats: number) => beats * 2;
 export const computeBmi = (weightKg: number, heightCm: number) =>
   +(weightKg / Math.pow(heightCm / 100, 2)).toFixed(1);
 
-/** Construit le payload /register en fusionnant identité + données onboarding. */
-export function buildRegisterPayload(
-  credentials: Credentials,
-  data: OnboardingData,
-): RegisterPayload {
+/** Construit les attributs santé envoyés à PATCH /me à la fin de l'onboarding. */
+export function buildOnboardingUpdate(data: OnboardingData): UpdateUserAttributes {
   return {
-    ...credentials,
     age: data.age,
     height_cm: data.height,
     weight_kg: data.weight,
     sport_per_week: data.sport,
     bodyfat: data.bodyFat != null ? BODY_FAT_OPTIONS[data.bodyFat].value : undefined,
     rest_bpm: beatsToBpm(data.beats),
-    relations: data.allergies.length
-      ? { allergies: data.allergies.map((key) => ({ operation: 'attach' as const, key })) }
-      : undefined,
   };
 }

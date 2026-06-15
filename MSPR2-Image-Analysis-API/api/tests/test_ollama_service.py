@@ -99,7 +99,7 @@ class TestGenerate:
         chat_response = ChatResponse(
             message=Message(
                 role="assistant",
-                content='{"bread": {"quantity": 1, "calories_kcal": 100}}',
+                content='{"bread": {"quantity": 1, "quantity_g": 100}}',
             )
         )
         fake_client = SimpleNamespace(chat=lambda **kwargs: chat_response)
@@ -108,7 +108,7 @@ class TestGenerate:
         result = OllamaService.generate(UploadDish(base64_image="img"))
 
         assert isinstance(result, OutputResponse)
-        assert result.aliments["bread"].calories_kcal == 100
+        assert result.aliments["bread"].quantity_g == 100
 
     def test_returns_empty_when_model_unavailable_and_pull_fails(
         self, monkeypatch

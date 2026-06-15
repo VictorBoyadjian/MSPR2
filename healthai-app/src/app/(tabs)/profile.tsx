@@ -80,7 +80,6 @@ export default function ProfileScreen() {
     setSaving(true);
     try {
       await userService.update(
-        user.id,
         {
           first_name: values.first_name.trim(),
           last_name: values.last_name.trim(),

@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 
 import api
 
-from data_schemas import Food, OutputResponse
+from data_schemas import ScannedFood, OutputResponse
 
 client = TestClient(api.app)
 
@@ -19,7 +19,7 @@ class TestAnalyze:
         monkeypatch.setattr(
             api.OllamaService,
             "generate",
-            lambda data: OutputResponse(aliments={"bread": Food(calories_kcal=99)}),
+            lambda data: OutputResponse(aliments={"bread": ScannedFood(quantity_g=99)}),
         )
 
         response = client.post(
@@ -30,7 +30,7 @@ class TestAnalyze:
 
         assert response.status_code == 200
         body = response.json()
-        assert body["aliments"]["bread"]["calories_kcal"] == 99
+        assert body["aliments"]["bread"]["quantity_g"] == 99
 
     def test_invalid_token_returns_401(self, monkeypatch) -> None:
         monkeypatch.setattr(api.Authorization, "verify_token", lambda token: False)
@@ -65,3 +65,57 @@ class TestAnalyze:
         )
 
         assert seen["token"] == "my-secret-token"
+
+
+class TestAnalyzeByMistral:
+    def test_valid_token_returns_generated_payload(self, monkeypatch) -> None:
+        monkeypatch.setattr(api.Authorization, "verify_token", lambda token: True)
+        monkeypatch.setattr(
+            api.MistralVisionService,
+            "generate",
+            lambda data: OutputResponse(aliments={"bread": ScannedFood(quantity_g=77)}),
+        )
+
+        response = client.post(
+            "/analyze-by-mistral/",
+            json={"base64_image": "abc"},
+            headers={"Authorization": "Bearer valid"},
+        )
+
+        assert response.status_code == 200
+        body = response.json()
+        assert body["aliments"]["bread"]["quantity_g"] == 77
+
+    def test_invalid_token_returns_401(self, monkeypatch) -> None:
+        monkeypatch.setattr(api.Authorization, "verify_token", lambda token: False)
+
+        response = client.post(
+            "/analyze-by-mistral/",
+            json={"base64_image": "abc"},
+            headers={"Authorization": "Bearer bad"},
+        )
+
+        assert response.status_code == 401
+        assert response.json()["detail"] == "Invalid token"
+
+    def test_missing_authorization_header_is_rejected(self) -> None:
+        response = client.post("/analyze-by-mistral/", json={"base64_image": "abc"})
+        assert response.status_code == 401
+
+    def test_data_is_passed_through_to_service(self, monkeypatch) -> None:
+        seen: dict = {}
+
+        def fake_generate(data):
+            seen["base64_image"] = data.base64_image
+            return {}
+
+        monkeypatch.setattr(api.Authorization, "verify_token", lambda token: True)
+        monkeypatch.setattr(api.MistralVisionService, "generate", fake_generate)
+
+        client.post(
+            "/analyze-by-mistral/",
+            json={"base64_image": "my-image-data"},
+            headers={"Authorization": "Bearer valid"},
+        )
+
+        assert seen["base64_image"] == "my-image-data"

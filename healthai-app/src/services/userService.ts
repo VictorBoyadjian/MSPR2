@@ -1,4 +1,4 @@
-import { users } from '@/services/api';
+import { sendRequest, users } from '@/services/api';
 import { User } from '@/types/users.type';
 
 /** Champs profil éditables (issus de l'onboarding, colonnes table users). */
@@ -25,18 +25,9 @@ export const userService = {
   },
 
   /**
-   * Met à jour le profil. Les allergies sont synchronisées (sync) : la liste fournie
-   * remplace exactement l'ensemble des allergies de l'utilisateur.
+   * Met à jour le profil de l'utilisateur courant via PATCH /me.
+   * `allergies` est un tableau d'ids qui remplace l'ensemble des allergies.
    */
-  update: (id: string, attributes: UpdateUserAttributes, allergyIds: string[]) =>
-    users.mutate([
-      {
-        operation: 'update',
-        key: id,
-        attributes,
-        relations: {
-          allergies: allergyIds.map((key) => ({ operation: 'sync' as const, key })),
-        },
-      },
-    ]),
+  update: (attributes: UpdateUserAttributes, allergyIds: string[]) =>
+    sendRequest<User>('PATCH', '/me', { ...attributes, allergies: allergyIds.map(Number) }),
 };

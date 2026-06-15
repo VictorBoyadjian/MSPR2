@@ -1,4 +1,4 @@
-import { Link, useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,19 +8,22 @@ import { ThemedView } from '@/components/themed-view';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { Spacing } from '@/constants/theme';
+import { useAuth } from '@/hooks/useAuth';
+import { ApiError } from '@/services/api';
 import { isValidEmail, isValidPassword, isNotEmpty } from '@/utils/validators';
 
 export default function RegisterScreen() {
-  const router = useRouter();
+  const { register } = useAuth();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // L'identité est collectée ici ; les données santé le sont dans l'onboarding,
-  // qui finalise la création du compte (/register) avec l'ensemble des informations.
-  const onSubmit = () => {
+  // On crée et connecte le compte ici (token requis pour l'onboarding, ex. allergies).
+  // Le routeur redirige ensuite vers l'onboarding (onboardingPending).
+  const onSubmit = async () => {
     if (!isNotEmpty(firstName) || !isNotEmpty(lastName)) {
       setError('Indiquez votre prénom et votre nom.');
       return;
@@ -34,15 +37,18 @@ export default function RegisterScreen() {
       return;
     }
     setError('');
-    router.push({
-      pathname: '/(auth)/onboarding',
-      params: {
+    setLoading(true);
+    try {
+      await register({
         first_name: firstName.trim(),
         last_name: lastName.trim(),
         email: email.trim(),
         password,
-      },
-    });
+      });
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : 'Une erreur est survenue.');
+      setLoading(false);
+    }
   };
 
   return (
@@ -77,7 +83,7 @@ export default function RegisterScreen() {
               </ThemedText>
             ) : null}
 
-            <Button label="Continuer" onPress={onSubmit} />
+            <Button label="Continuer" onPress={onSubmit} loading={loading} />
 
             <Link href="/(auth)/login" style={styles.link}>
               <ThemedText type="linkPrimary">Déjà un compte ? Se connecter</ThemedText>

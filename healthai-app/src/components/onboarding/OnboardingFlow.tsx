@@ -14,10 +14,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuth } from '@/hooks/useAuth';
 import { ApiError } from '@/services/api';
+import { userService } from '@/services/userService';
 
 import PrimaryButton from './components/PrimaryButton';
 import ProgressBar from './components/ProgressBar';
-import { buildRegisterPayload, Credentials, DEFAULT_ONBOARDING_DATA, OnboardingData } from './data';
+import { buildOnboardingUpdate, DEFAULT_ONBOARDING_DATA, OnboardingData } from './data';
 import AllergiesStep from './steps/AllergiesStep';
 import BodyFatStep from './steps/BodyFatStep';
 import { BpmCount, BpmCountdown, BpmIntro, BpmMeasure } from './steps/BpmSteps';
@@ -66,8 +67,9 @@ const STEPS: StepConfig[] = [
 
 const INDEX = Object.fromEntries(STEPS.map((s, i) => [s.id, i])) as Record<StepId, number>;
 
-export default function OnboardingFlow({ credentials }: { credentials: Credentials }) {
-  const { register } = useAuth();
+export default function OnboardingFlow() {
+  const { user, refreshUser, completeOnboarding } = useAuth();
+  const firstName = user?.first_name ?? undefined;
   const [step, setStep] = useState(0);
   const [data, setData] = useState<OnboardingData>(DEFAULT_ONBOARDING_DATA);
   const [loading, setLoading] = useState(false);
@@ -102,13 +104,15 @@ export default function OnboardingFlow({ credentials }: { credentials: Credentia
     setError('');
     setLoading(true);
     try {
-      await register(buildRegisterPayload(credentials, data));
-      // Succès : le RootNavigator redirige automatiquement vers l'espace connecté.
+      await userService.update(buildOnboardingUpdate(data), data.allergies);
+      await refreshUser();
+      // Fin de l'onboarding : le RootNavigator redirige vers l'espace connecté.
+      completeOnboarding();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'Une erreur est survenue.');
       setLoading(false);
     }
-  }, [register, credentials, data]);
+  }, [data, refreshUser, completeOnboarding]);
 
   const next = useCallback(() => {
     if (cur.id === 'bpmintro') return go(INDEX.countdown);
@@ -125,7 +129,7 @@ export default function OnboardingFlow({ credentials }: { credentials: Credentia
   const renderStep = () => {
     switch (cur.id) {
       case 'welcome':
-        return <WelcomeStep firstName={credentials.first_name} />;
+        return <WelcomeStep firstName={firstName} />;
       case 'age':
         return <RulerStep eyebrow="ÉTAPE 1" title="Quel âge as-tu ?" min={13} max={100} majorStep={5} unit="ans" value={data.age} onChange={(v) => patch({ age: v })} />;
       case 'height':
@@ -147,7 +151,7 @@ export default function OnboardingFlow({ credentials }: { credentials: Credentia
       case 'allergies':
         return <AllergiesStep selected={data.allergies} onToggle={toggleAllergy} />;
       case 'summary':
-        return <SummaryStep data={data} firstName={credentials.first_name} />;
+        return <SummaryStep data={data} firstName={firstName} />;
     }
   };
 

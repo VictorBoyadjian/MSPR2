@@ -5,7 +5,7 @@ from types import SimpleNamespace
 from ollama import ChatResponse, Message
 
 from data_parser import Parser
-from data_schemas import DishCalculateOutput, Food, OutputResponse
+from data_schemas import DishCalculateOutput, Food, OutputResponse, ScannedFood
 
 
 def _ollama_response(content: str) -> ChatResponse:
@@ -142,5 +142,53 @@ class TestMistralResponseFailure:
 
     def test_failure_logs_error(self, capsys) -> None:
         Parser.mistral_reponse(_mistral_response("garbage {"))
+        captured = capsys.readouterr()
+        assert "[ERROR]" in captured.out
+
+
+class TestMistralVisionResponseSuccess:
+    def test_parses_foods_list_into_output_response(self) -> None:
+        raw = (
+            '{"foods": [{"name_fr": "pain", "quantity_g": 50, '
+            '"confidence": "high"}]}'
+        )
+        result = Parser.mistral_vision_reponse(_mistral_response(raw))
+
+        assert isinstance(result, OutputResponse)
+        pain = result.aliments["pain"]
+        assert isinstance(pain, ScannedFood)
+        assert pain.quantity_g == 50
+        assert pain.accuracy == 0.9  # "high" confidence
+
+    def test_strips_markdown_fences_before_parsing(self) -> None:
+        raw = '```json\n{"foods": [{"name_fr": "riz", "quantity_g": 150}]}\n```'
+        result = Parser.mistral_vision_reponse(_mistral_response(raw))
+
+        assert isinstance(result, OutputResponse)
+        assert result.aliments["riz"].quantity_g == 150
+
+    def test_aggregates_duplicate_food_entries(self) -> None:
+        raw = (
+            '{"foods": ['
+            '{"name_fr": "pain", "quantity_g": 30},'
+            '{"name_fr": "pain", "quantity_g": 20}'
+            "]}"
+        )
+        result = Parser.mistral_vision_reponse(_mistral_response(raw))
+
+        assert result.aliments["pain"].quantity_g == 50
+
+
+class TestMistralVisionResponseFailure:
+    def test_returns_empty_dict_on_invalid_content(self) -> None:
+        result = Parser.mistral_vision_reponse(_mistral_response("not json"))
+        assert result == {}
+
+    def test_returns_empty_dict_on_empty_content(self) -> None:
+        result = Parser.mistral_vision_reponse(_mistral_response(""))
+        assert result == {}
+
+    def test_failure_logs_error(self, capsys) -> None:
+        Parser.mistral_vision_reponse(_mistral_response(""))
         captured = capsys.readouterr()
         assert "[ERROR]" in captured.out

@@ -7,20 +7,23 @@ import Loader from '@/components/ui/Loader';
 import { useAuth } from '@/hooks/useAuth';
 
 function RootNavigator() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, onboardingPending } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
     if (isLoading) return;
     const inAuthGroup = segments[0] === '(auth)';
+    const onOnboarding = segments[0] === 'onboarding';
 
-    if (!isAuthenticated && !inAuthGroup) {
-      router.replace('/(auth)/login');
-    } else if (isAuthenticated && inAuthGroup) {
+    if (!isAuthenticated) {
+      if (!inAuthGroup) router.replace('/(auth)/login');
+    } else if (onboardingPending) {
+      if (!onOnboarding) router.replace('/onboarding');
+    } else if (inAuthGroup || onOnboarding) {
       router.replace('/');
     }
-  }, [isAuthenticated, isLoading, segments, router]);
+  }, [isAuthenticated, isLoading, onboardingPending, segments, router]);
 
   if (isLoading) return <Loader />;
 
@@ -28,6 +31,7 @@ function RootNavigator() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="(auth)" />
+      <Stack.Screen name="onboarding" />
       <Stack.Screen name="meal/[id]" options={{ presentation: 'modal' }} />
       <Stack.Screen name="meal/add" options={{ presentation: 'modal' }} />
       <Stack.Screen name="meal/add-form" options={{ presentation: 'modal' }} />

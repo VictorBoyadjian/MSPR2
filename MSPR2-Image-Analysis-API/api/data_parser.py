@@ -6,7 +6,7 @@ from mistralai import ChatCompletionResponse
 import re
 
 #Modules
-from data_schemas import OutputResponse, DishCalculateOutput, Food
+from data_schemas import OutputResponse, DishCalculateOutput, Food, ScannedFood
 from color_enum import ColorEnum
 
 class Parser():
@@ -79,25 +79,27 @@ class Parser():
         return entries
 
     @classmethod
-    def ollama_reponse(cls, response: ChatResponse) -> Union[OutputResponse, dict]:
+    def _foods_response(cls, content: str) -> Union[OutputResponse, dict]:
         try:
-            entries = cls._extract_entries(response.message.content)
+            entries = cls._extract_entries(content)
             if not entries:
                 raise ValueError("no food entries found in model response")
 
-            aliments: dict[str, Food] = {}
+            aliments: dict[str, ScannedFood] = {}
             for entry in entries:
                 name = entry.get("name_fr") or entry.get("name")
                 if not name:
                     continue
 
-                food = Food(
+                food = ScannedFood(
+                    quantity=cls._to_int(entry.get("quantity"), 1),
                     quantity_g=cls._to_int(entry.get("quantity_g"), 20),
                     accuracy=cls._accuracy(entry),
                 )
 
                 if name in aliments:
                     existing = aliments[name]
+                    existing.quantity += food.quantity
                     existing.quantity_g += food.quantity_g
                     existing.accuracy = max(existing.accuracy, food.accuracy)
                 else:
@@ -107,6 +109,19 @@ class Parser():
         except Exception as e:
             print(f"{ColorEnum.ERROR.format('[ERROR]')}: An error occurred while parsing the model response : {e}")
             return {}
+
+    @classmethod
+    def ollama_reponse(cls, response: ChatResponse) -> Union[OutputResponse, dict]:
+        return cls._foods_response(response.message.content)
+
+    @classmethod
+    def mistral_vision_reponse(cls, response: ChatCompletionResponse) -> Union[OutputResponse, dict]:
+        try:
+            content = response.choices[0].message.content
+        except Exception as e:
+            print(f"{ColorEnum.ERROR.format('[ERROR]')}: An error occurred while parsing the model response : {e}")
+            return {}
+        return cls._foods_response(content)
         
     @classmethod
     def mistral_reponse(cls, response : ChatCompletionResponse) -> Union[DishCalculateOutput, dict]:
