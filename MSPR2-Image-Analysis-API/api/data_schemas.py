@@ -20,12 +20,16 @@ class OutputResponse(BaseModel):
     }
     
 class DishCalculateInput(BaseModel):
-    aliments : dict[str, dict[str, int]]
+    aliments : dict[str, dict[str, int]] = {
+        'pizza' : {
+            'quantity_g' : 450
+        }
+    }
     
 class DishCalculateOutput(BaseModel):
-    dish_name : str
-    kcal : int
-    carbs_g : int
-    fats_g : int
-    fiber_g : float
-    proteins_g : int
+    dish_name : str = "Pizza"
+    kcal : int = 400
+    carbs_g : int = 20
+    fats_g : int = 30
+    fiber_g : float = 10
+    proteins_g : int = 60
