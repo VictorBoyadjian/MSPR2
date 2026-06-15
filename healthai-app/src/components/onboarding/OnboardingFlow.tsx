@@ -18,6 +18,7 @@ import { ApiError } from '@/services/api';
 import PrimaryButton from './components/PrimaryButton';
 import ProgressBar from './components/ProgressBar';
 import { buildRegisterPayload, Credentials, DEFAULT_ONBOARDING_DATA, OnboardingData } from './data';
+import AllergiesStep from './steps/AllergiesStep';
 import BodyFatStep from './steps/BodyFatStep';
 import { BpmCount, BpmCountdown, BpmIntro, BpmMeasure } from './steps/BpmSteps';
 import RulerStep from './steps/RulerStep';
@@ -36,6 +37,7 @@ type StepId =
   | 'countdown'
   | 'measure'
   | 'bpmcount'
+  | 'allergies'
   | 'summary';
 
 type StepConfig = {
@@ -49,15 +51,16 @@ type StepConfig = {
 
 const STEPS: StepConfig[] = [
   { id: 'welcome', chrome: false, footer: 'Commencer' },
-  { id: 'age', prog: 0.12, footer: 'Continuer' },
-  { id: 'height', prog: 0.27, footer: 'Continuer' },
-  { id: 'weight', prog: 0.42, footer: 'Continuer' },
-  { id: 'sport', prog: 0.56, footer: 'Continuer' },
-  { id: 'bodyfat', prog: 0.69, footer: 'Continuer', valid: (d) => d.bodyFat != null },
-  { id: 'bpmintro', prog: 0.81, footer: 'Je sens mon pouls' },
+  { id: 'age', prog: 0.1, footer: 'Continuer' },
+  { id: 'height', prog: 0.22, footer: 'Continuer' },
+  { id: 'weight', prog: 0.33, footer: 'Continuer' },
+  { id: 'sport', prog: 0.44, footer: 'Continuer' },
+  { id: 'bodyfat', prog: 0.55, footer: 'Continuer', valid: (d) => d.bodyFat != null },
+  { id: 'bpmintro', prog: 0.66, footer: 'Je sens mon pouls' },
   { id: 'countdown', chrome: false, takeover: true },
   { id: 'measure', chrome: false, takeover: true },
-  { id: 'bpmcount', prog: 0.94, footer: 'Continuer' },
+  { id: 'bpmcount', prog: 0.8, footer: 'Continuer' },
+  { id: 'allergies', prog: 0.9, footer: 'Continuer' },
   { id: 'summary', prog: 1, footer: 'Créer mon compte' },
 ];
 
@@ -71,6 +74,17 @@ export default function OnboardingFlow({ credentials }: { credentials: Credentia
   const [error, setError] = useState('');
 
   const patch = useCallback((p: Partial<OnboardingData>) => setData((d) => ({ ...d, ...p })), []);
+
+  const toggleAllergy = useCallback(
+    (id: string) =>
+      setData((d) => ({
+        ...d,
+        allergies: d.allergies.includes(id)
+          ? d.allergies.filter((a) => a !== id)
+          : [...d.allergies, id],
+      })),
+    [],
+  );
 
   const cur = STEPS[step];
   const valid = cur.valid ? cur.valid(data) : true;
@@ -130,6 +144,8 @@ export default function OnboardingFlow({ credentials }: { credentials: Credentia
         return <BpmMeasure onDone={() => go(INDEX.bpmcount)} />;
       case 'bpmcount':
         return <BpmCount count={data.beats} setCount={(v) => patch({ beats: v })} />;
+      case 'allergies':
+        return <AllergiesStep selected={data.allergies} onToggle={toggleAllergy} />;
       case 'summary':
         return <SummaryStep data={data} firstName={credentials.first_name} />;
     }

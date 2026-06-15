@@ -1,4 +1,5 @@
 import { CONFIG } from '@/constants/config';
+import { Allergy } from '@/types/allergies.type';
 import { Dish } from '@/types/dishes.type';
 import { Exercise } from '@/types/exercises.type';
 import { Goal } from '@/types/goals.type';
@@ -93,9 +94,13 @@ export type SearchResponse<T> = {
   total?: number;
 };
 
-type PivotAttach = { operation: 'attach'; key: string; pivot?: Record<string, unknown> };
+type RelationOperation = {
+  operation: 'attach' | 'detach' | 'sync' | 'toggle';
+  key: string;
+  pivot?: Record<string, unknown>;
+};
 
-type MutateRelations = Record<string, PivotAttach[]>;
+type MutateRelations = Record<string, RelationOperation[]>;
 
 type MutateOperation<T> =
   | { operation: 'create'; attributes: Partial<T>; relations?: MutateRelations }
@@ -121,6 +126,7 @@ export const sportSessions = resource<SportSession>('/sport_sessions');
 export const metrics = resource<Metric>('/metrics');
 export const goals = resource<Goal>('/goals');
 export const users = resource<User>('/users');
+export const allergies = resource<Allergy>('/allergies');
 
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 

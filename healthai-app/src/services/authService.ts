@@ -1,6 +1,9 @@
 import { sendRequest, users } from '@/services/api';
 import { User } from '@/types/users.type';
 
+/** Opération de relation pivot au format lomkit (table user_allergies). */
+export type AttachOperation = { operation: 'attach'; key: string };
+
 export type RegisterPayload = {
   email: string;
   password: string;
@@ -10,10 +13,14 @@ export type RegisterPayload = {
   gender?: string;
   weight_kg?: number;
   height_cm?: number;
-  // Données santé collectées pendant l'onboarding (table metrics côté API).
-  body_fat_pct?: number;
-  heart_rate_resting?: number;
-  session_duration_h?: number;
+  // Données santé collectées pendant l'onboarding (colonnes users, migration V0012).
+  bodyfat?: number;
+  rest_bpm?: number;
+  sport_per_week?: number;
+  // Relations many-to-many (attach) — ex. allergies.
+  relations?: {
+    allergies?: AttachOperation[];
+  };
 };
 
 export const authService = {

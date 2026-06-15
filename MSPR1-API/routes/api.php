@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegisterController;
 use App\Rest\Controllers\AllergyController;
 use App\Rest\Controllers\DishController;
@@ -22,6 +23,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Rest::resource('users', UserController::class)->only('search');
     
     Route::get('me', [UserController::class, 'me'])->name('me');
+    Route::patch('me', [ProfileController::class, 'update'])->name('me.update');
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });
 

@@ -17,6 +17,7 @@ export type OnboardingData = {
   sport: number; // heures / semaine
   bodyFat: number | null; // index dans BODY_FAT_OPTIONS
   beats: number; // battements comptés sur 30 s
+  allergies: string[]; // ids des allergies sélectionnées
 };
 
 export const DEFAULT_ONBOARDING_DATA: OnboardingData = {
@@ -26,6 +27,7 @@ export const DEFAULT_ONBOARDING_DATA: OnboardingData = {
   sport: 3,
   bodyFat: null,
   beats: 35,
+  allergies: [],
 };
 
 /** Tranches de masse grasse présentées via les silhouettes (label + % médian envoyé à l'API). */
@@ -55,8 +57,11 @@ export function buildRegisterPayload(
     age: data.age,
     height_cm: data.height,
     weight_kg: data.weight,
-    session_duration_h: data.sport,
-    body_fat_pct: data.bodyFat != null ? BODY_FAT_OPTIONS[data.bodyFat].value : undefined,
-    heart_rate_resting: beatsToBpm(data.beats),
+    sport_per_week: data.sport,
+    bodyfat: data.bodyFat != null ? BODY_FAT_OPTIONS[data.bodyFat].value : undefined,
+    rest_bpm: beatsToBpm(data.beats),
+    relations: data.allergies.length
+      ? { allergies: data.allergies.map((key) => ({ operation: 'attach' as const, key })) }
+      : undefined,
   };
 }

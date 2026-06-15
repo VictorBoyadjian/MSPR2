@@ -20,7 +20,7 @@ export function BpmIntro() {
   return (
     <View>
       <StepHeader
-        eyebrow="ÉTAPE 7"
+        eyebrow="ÉTAPE 6"
         title="Mesurons ton pouls"
         sub="Au repos, pour estimer ta fréquence cardiaque de base."
       />
@@ -147,7 +147,7 @@ export function BpmCount({ count, setCount }: { count: number; setCount: (value:
   return (
     <View>
       <StepHeader
-        eyebrow="ÉTAPE 7"
+        eyebrow="ÉTAPE 6"
         title="Combien de battements ?"
         sub="Saisis le nombre que tu as compté pendant les 30 secondes."
       />

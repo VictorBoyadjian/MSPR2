@@ -11,6 +11,7 @@ export type AuthState = {
   register: (data: RegisterPayload) => Promise<void>;
   logout: () => Promise<void>;
   deleteAccount: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthState | null>(null);

@@ -17,6 +17,7 @@ export default function SummaryStep({ data, firstName }: { data: OnboardingData;
     ['Sport', `${fmt(data.sport)} h / sem`],
     ['Masse grasse', data.bodyFat != null ? BODY_FAT_OPTIONS[data.bodyFat].label : '—'],
     ['IMC', `${computeBmi(data.weight, data.height)}`],
+    ['Allergies', data.allergies.length ? `${data.allergies.length} sélectionnée(s)` : 'Aucune'],
   ];
 
   return (
