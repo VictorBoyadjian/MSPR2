@@ -1,7 +1,7 @@
 #Libs
 from fastapi import APIRouter, FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import uvicorn
 from typing import Union
 
@@ -25,22 +25,22 @@ app.add_middleware(
 )
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+bearer_scheme = HTTPBearer()
 
 @router.get('/health/')
 async def health():
     return 'ok'
 
 @router.post('/analyze/', response_model=Union[OutputResponse, dict])
-async def upload_dish(data : UploadDish, token: str = Depends(oauth2_scheme)):
-    if Authorization.verify_token(token):
+async def upload_dish(data : UploadDish, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
+    if Authorization.verify_token(credentials.credentials):
         return OllamaService.generate(data)
     else:
         raise HTTPException(status_code=401, detail="Invalid token")
     
 @router.post('/dish-calculate', response_model=DishCalculateOutput)
-async def dish_calculate(data : DishCalculateInput, token: str = Depends(oauth2_scheme)):
-    if Authorization.verify_token(token):
+async def dish_calculate(data : DishCalculateInput, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
+    if Authorization.verify_token(credentials.credentials):
         return MistralService.generate(data)
     else:
         raise HTTPException(status_code=401, detail="Invalid token")
