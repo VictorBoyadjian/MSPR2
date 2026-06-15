@@ -1,5 +1,5 @@
 import { CONFIG } from "@/constants/config";
-import { ScanDishResponse } from "@/types/san-dish-response.type";
+import { splittedDish } from "@/types/splittedDish";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import { getToken } from "./api";
 
@@ -44,7 +44,7 @@ export const compressAndConvertImageToBase64 = async (
 };
 
 export const scanDishService = {
-  scan: async (uri: string): Promise<ScanDishResponse> => {
+  scan: async (uri: string): Promise<splittedDish> => {
     const token = getToken();
     if (!token) {
       throw new Error("Vous devez être connecté pour analyser un plat");
@@ -69,7 +69,7 @@ export const scanDishService = {
         `Erreur lors de l'analyse de l'image (${response.status})`,
       );
     }
-    const castResponse = (await response.json()) as ScanDishResponse;
+    const castResponse = (await response.json()) as splittedDish;
     console.log("success:");
     console.log(castResponse    );
 

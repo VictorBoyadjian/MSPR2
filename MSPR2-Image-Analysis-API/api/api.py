@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordBearer
 import uvicorn
 from typing import Union
 
-from ollama_schemas import UploadDish, OutputResponse
+from ollama_schemas import UploadDish, OutputResponse, CalculDish
 from ollama_service import OllamaService
 from color_enum import ColorEnum
 from authorization import Authorization
@@ -30,6 +30,13 @@ async def health():
 async def upload_dish(data : UploadDish, token: str = Depends(oauth2_scheme)):
     if Authorization.verify_token(token):
         return OllamaService.generate(data)
+    else:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+@router.post('/calcul/', response_model=Union[OutputResponse, dict])
+async def calcul_dish(data : CalculDish, token: str = Depends(oauth2_scheme)):
+    if Authorization.verify_token(token):
+        return OllamaService.calculate(data)
     else:
         raise HTTPException(status_code=401, detail="Invalid token")
 

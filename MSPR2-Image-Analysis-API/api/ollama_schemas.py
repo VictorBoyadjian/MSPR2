@@ -2,7 +2,15 @@ from pydantic import BaseModel
 
 class UploadDish(BaseModel):
     base64_image : str = ""
-    
+
+class CalculFood(BaseModel):
+    quantity_g : int = 100
+
+class CalculDish(BaseModel):
+    aliments : dict[str, CalculFood] = {
+        "bread" : CalculFood()
+    }
+
 class Food(BaseModel):
     quantity : int = 1
     quantity_g : int = 20

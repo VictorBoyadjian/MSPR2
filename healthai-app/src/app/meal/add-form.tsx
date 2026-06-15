@@ -1,6 +1,14 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
@@ -11,9 +19,10 @@ import Input from '@/components/ui/Input';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { ApiError, MealType } from '@/services/api';
+import { calculDishService } from '@/services/calculDishService';
 import { dishService } from '@/services/dishService';
 import { useAuthStore } from '@/stores/authStore';
-import { ScanDishResponse } from '@/types/san-dish-response.type';
+import { analyzedDish, splittedDish } from '@/types/splittedDish';
 
 const MEAL_TYPES: { value: MealType; label: string }[] = [
   { value: 'breakfast', label: 'Petit déj' },
@@ -26,11 +35,9 @@ type FoodItem = {
   id: string;
   name: string;
   quantity_g: string;
-  calories: string;
-  proteins: string;
-  carbs: string;
-  fats: string;
 };
+
+type Phase = 'form' | 'loading' | 'result';
 
 let idCounter = 0;
 const nextId = () => `${Date.now()}-${idCounter++}`;
@@ -39,10 +46,6 @@ const emptyFood = (): FoodItem => ({
   id: nextId(),
   name: '',
   quantity_g: '',
-  calories: '',
-  proteins: '',
-  carbs: '',
-  fats: '',
 });
 
 const num = (v: string) => (v ? Number(v.replace(',', '.')) || 0 : 0);
@@ -50,20 +53,28 @@ const num = (v: string) => (v ? Number(v.replace(',', '.')) || 0 : 0);
 function parseAliments(raw?: string): FoodItem[] {
   if (!raw) return [emptyFood()];
   try {
-    const aliments = (JSON.parse(raw) as ScanDishResponse['aliments']) ?? {};
+    const aliments = (JSON.parse(raw) as splittedDish['aliments']) ?? {};
     const items = Object.entries(aliments).map(([name, food]) => ({
       id: nextId(),
       name,
       quantity_g: food.quantity_g != null ? String(food.quantity_g) : '',
-      calories: food.calories_kcal != null ? String(food.calories_kcal) : '',
-      proteins: food.proteins_g != null ? String(food.proteins_g) : '',
-      carbs: food.carbs_g != null ? String(food.carbs_g) : '',
-      fats: food.fats_g != null ? String(food.fats_g) : '',
     }));
     return items.length ? items : [emptyFood()];
   } catch {
     return [emptyFood()];
   }
+}
+
+function totalsOf(analyzed: analyzedDish) {
+  return Object.values(analyzed.aliments).reduce(
+    (acc, f) => ({
+      calories: acc.calories + (f.calories_kcal || 0),
+      proteins: acc.proteins + (f.proteins_g || 0),
+      carbs: acc.carbs + (f.carbs_g || 0),
+      fats: acc.fats + (f.fats_g || 0),
+    }),
+    { calories: 0, proteins: 0, carbs: 0, fats: 0 },
+  );
 }
 
 export default function AddMealScreen() {
@@ -76,21 +87,8 @@ export default function AddMealScreen() {
   const [mealType, setMealType] = useState<MealType>('lunch');
   const [eatedAt, setEatedAt] = useState(() => new Date());
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const totals = useMemo(
-    () =>
-      foods.reduce(
-        (acc, f) => ({
-          calories: acc.calories + num(f.calories),
-          proteins: acc.proteins + num(f.proteins),
-          carbs: acc.carbs + num(f.carbs),
-          fats: acc.fats + num(f.fats),
-        }),
-        { calories: 0, proteins: 0, carbs: 0, fats: 0 },
-      ),
-    [foods],
-  );
+  const [phase, setPhase] = useState<Phase>('form');
+  const [analyzed, setAnalyzed] = useState<analyzedDish | null>(null);
 
   const updateFood = (id: string, key: keyof FoodItem, value: string) =>
     setFoods((prev) => prev.map((f) => (f.id === id ? { ...f, [key]: value } : f)));
@@ -99,33 +97,104 @@ export default function AddMealScreen() {
 
   const addFood = () => setFoods((prev) => [...prev, emptyFood()]);
 
+  const analyzedTotals = useMemo(
+    () => (analyzed ? totalsOf(analyzed) : null),
+    [analyzed],
+  );
+
   const onSubmit = async () => {
-    const named = foods.map((f) => f.name.trim()).filter(Boolean);
+    const named = foods.filter((f) => f.name.trim());
     if (named.length === 0) {
       setError('Ajoutez au moins un aliment avec un nom.');
       return;
     }
     setError('');
-    setLoading(true);
+    setPhase('loading');
+
     try {
+      const input: splittedDish = {
+        aliments: named.reduce<splittedDish['aliments']>((acc, f) => {
+          acc[f.name.trim()] = { quantity_g: num(f.quantity_g) };
+          return acc;
+        }, {}),
+      };
+
+      const result = await calculDishService.calculate(input);
+      const totals = totalsOf(result);
+
       await dishService.create({
-        name: named.join(', '),
+        name: Object.keys(result.aliments).join(', '),
         meal_type: mealType,
-        calories_kcal: totals.calories,
-        proteins_g: totals.proteins,
-        carbs_g: totals.carbs,
-        fats_g: totals.fats,
+        calories_kcal: Math.round(totals.calories),
+        proteins_g: Math.round(totals.proteins),
+        carbs_g: Math.round(totals.carbs),
+        fats_g: Math.round(totals.fats),
         eated_at: eatedAt.toISOString(),
         user_id: authStore.user?.id || '',
       });
-      router.back();
+
+      setAnalyzed(result);
+      setPhase('result');
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Une erreur est survenue.');
-    } finally {
-      setLoading(false);
+      setError(e instanceof ApiError ? e.message : e instanceof Error ? e.message : 'Une erreur est survenue.');
+      setPhase('form');
     }
   };
 
+  // --- Écran de chargement pendant l'analyse nutritionnelle ---
+  if (phase === 'loading') {
+    return (
+      <ThemedView style={styles.centered}>
+        <ActivityIndicator size="large" color={theme.text} />
+        <ThemedText type="small" themeColor="textSecondary">
+          Analyse de votre repas…
+        </ThemedText>
+      </ThemedView>
+    );
+  }
+
+  // --- Repas analysé : récapitulatif + bouton OK ---
+  if (phase === 'result' && analyzed && analyzedTotals) {
+    return (
+      <ThemedView style={styles.root}>
+        <SafeAreaView style={styles.safeArea}>
+          <ScrollView contentContainerStyle={styles.form}>
+            <ThemedText type="subtitle">Repas enregistré</ThemedText>
+
+            <ThemedView style={[styles.totals, { backgroundColor: theme.backgroundElement }]}>
+              <ThemedText type="smallBold">Total</ThemedText>
+              <ThemedText type="title">{Math.round(analyzedTotals.calories)} kcal</ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                P {Math.round(analyzedTotals.proteins)} g · G {Math.round(analyzedTotals.carbs)} g · L{' '}
+                {Math.round(analyzedTotals.fats)} g
+              </ThemedText>
+            </ThemedView>
+
+            {Object.entries(analyzed.aliments).map(([name, food]) => (
+              <ThemedView
+                key={name}
+                style={[styles.foodCard, { backgroundColor: theme.backgroundElement }]}>
+                <View style={styles.foodHeader}>
+                  <ThemedText type="smallBold">{name}</ThemedText>
+                  <ThemedText type="small" themeColor="textSecondary">
+                    {Math.round(food.quantity_g)} g
+                  </ThemedText>
+                </View>
+                <ThemedText type="small" themeColor="textSecondary">
+                  {Math.round(food.calories_kcal)} kcal · P {Math.round(food.proteins_g)} g · G{' '}
+                  {Math.round(food.carbs_g)} g · L {Math.round(food.fats_g)} g
+                </ThemedText>
+              </ThemedView>
+            ))}
+
+            <Button label="OK" onPress={() => router.back()} />
+          </ScrollView>
+        </SafeAreaView>
+      </ThemedView>
+    );
+  }
+
+  // --- Formulaire : nom + quantité uniquement ---
   return (
     <ThemedView style={styles.root}>
       <SafeAreaView style={styles.safeArea}>
@@ -166,6 +235,9 @@ export default function AddMealScreen() {
             <ThemedText type="smallBold" themeColor="textSecondary">
               Aliments
             </ThemedText>
+            <ThemedText type="small" themeColor="textSecondary">
+              Indiquez le nom et la quantité, les calories sont calculées automatiquement.
+            </ThemedText>
 
             {foods.map((food, index) => (
               <ThemedView
@@ -186,57 +258,16 @@ export default function AddMealScreen() {
                   onChangeText={(v) => updateFood(food.id, 'name', v)}
                   placeholder="Poulet"
                 />
-                <View style={styles.row}>
-                  <Input
-                    label="Quantité (g)"
-                    value={food.quantity_g}
-                    onChangeText={(v) => updateFood(food.id, 'quantity_g', v)}
-                    keyboardType="numeric"
-                    style={styles.rowInput}
-                  />
-                  <Input
-                    label="Calories (kcal)"
-                    value={food.calories}
-                    onChangeText={(v) => updateFood(food.id, 'calories', v)}
-                    keyboardType="numeric"
-                    style={styles.rowInput}
-                  />
-                </View>
-                <View style={styles.row}>
-                  <Input
-                    label="Protéines (g)"
-                    value={food.proteins}
-                    onChangeText={(v) => updateFood(food.id, 'proteins', v)}
-                    keyboardType="numeric"
-                    style={styles.rowInput}
-                  />
-                  <Input
-                    label="Glucides (g)"
-                    value={food.carbs}
-                    onChangeText={(v) => updateFood(food.id, 'carbs', v)}
-                    keyboardType="numeric"
-                    style={styles.rowInput}
-                  />
-                  <Input
-                    label="Lipides (g)"
-                    value={food.fats}
-                    onChangeText={(v) => updateFood(food.id, 'fats', v)}
-                    keyboardType="numeric"
-                    style={styles.rowInput}
-                  />
-                </View>
+                <Input
+                  label="Quantité (g)"
+                  value={food.quantity_g}
+                  onChangeText={(v) => updateFood(food.id, 'quantity_g', v)}
+                  keyboardType="numeric"
+                />
               </ThemedView>
             ))}
 
             <Button label="+ Ajouter un aliment" variant="secondary" onPress={addFood} />
-
-            <ThemedView style={[styles.totals, { backgroundColor: theme.backgroundElement }]}>
-              <ThemedText type="smallBold">Total</ThemedText>
-              <ThemedText type="small">
-                {Math.round(totals.calories)} kcal · P {Math.round(totals.proteins)} g · G{' '}
-                {Math.round(totals.carbs)} g · L {Math.round(totals.fats)} g
-              </ThemedText>
-            </ThemedView>
 
             {error ? (
               <ThemedText type="small" style={styles.error}>
@@ -244,7 +275,7 @@ export default function AddMealScreen() {
               </ThemedText>
             ) : null}
 
-            <Button label="Enregistrer" onPress={onSubmit} loading={loading} />
+            <Button label="Enregistrer" onPress={onSubmit} />
             <Button label="Annuler" variant="secondary" onPress={() => router.back()} />
           </ScrollView>
         </KeyboardAvoidingView>
@@ -257,6 +288,7 @@ const styles = StyleSheet.create({
   root: { flex: 1 },
   safeArea: { flex: 1 },
   flex: { flex: 1 },
+  centered: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: Spacing.three },
   form: { padding: Spacing.four, gap: Spacing.three },
   dateField: { width: '50%', alignItems: 'flex-start' },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
@@ -268,8 +300,6 @@ const styles = StyleSheet.create({
   foodCard: { padding: Spacing.three, borderRadius: Spacing.three, gap: Spacing.two },
   foodHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   remove: { color: '#e5484d' },
-  row: { flexDirection: 'row', gap: Spacing.two },
-  rowInput: { flex: 1, minWidth: 0 },
-  totals: { padding: Spacing.three, borderRadius: Spacing.three, gap: Spacing.one },
+  totals: { padding: Spacing.four, borderRadius: Spacing.three, gap: Spacing.one, alignItems: 'center' },
   error: { color: '#e5484d' },
 });

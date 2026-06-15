@@ -4,7 +4,7 @@ from typing import Union
 import ast
 from dotenv import load_dotenv
 
-from ollama_schemas import UploadDish, OutputResponse
+from ollama_schemas import UploadDish, OutputResponse, CalculDish
 from color_enum import ColorEnum
 from message_renderer import MessageRenderer
 from ollama_parser import Parser
@@ -108,10 +108,75 @@ Use exactly this schema:
             )
 
             output_data = Parser.parse(response)
-        
+
         if not output_data:
             print(f"{ColorEnum.WARNING.format('[Warning]')} : {cls._selected_model} has failed")
         else:
             print(f"{ColorEnum.INFO.format('[INFO]')} : {cls._selected_model} has finished")
-        
+
+        return output_data
+
+    @classmethod
+    def calculate(cls, data : CalculDish) -> Union[OutputResponse, dict]:
+        model_pass = True
+        output_data = {}
+
+        if not cls.check_model_availability():
+            print(f"{ColorEnum.WARNING.format('[WARNING]')} : {cls._selected_model} is not found")
+            model_pass = cls.pull_models()
+
+        if model_pass:
+            print(f"\n{ColorEnum.INFO.format('[INFO]')} : {cls._selected_model} is thinking ...")
+
+            foods_list = "\n".join(
+                f"- {name} : {food.quantity_g} g" for name, food in data.aliments.items()
+            )
+
+            response = cls._client.chat(
+                model=cls._selected_model,
+                messages=[
+                    {
+                        'role' : 'user',
+                        'content' : f"""
+You are a professional nutritionist. For each food listed below, estimate the nutritional values for the EXACT quantity in grams provided.
+
+Foods:
+{foods_list}
+
+Rules:
+- Keep the exact same food names that were provided.
+- Scale all values to the given quantity_g.
+- quantity_g and calories_kcal are integers; proteins_g, carbs_g, fats_g, fiber_g are floats.
+- Respond with ONLY a valid JSON object. No text, no markdown, no explanation before or after.
+
+Use exactly this schema:
+{{
+  "foods": [
+    {{
+      "name_fr": "<food name>",
+      "quantity_g": <integer>,
+      "calories_kcal": <integer>,
+      "proteins_g": <float>,
+      "carbs_g": <float>,
+      "fats_g": <float>,
+      "fiber_g": <float>,
+      "confidence": "high"
+    }}
+  ]
+}}"""
+                    }
+                ],
+                options={
+                    "temperature": 0.2,
+                    "num_predict" : 800
+                }
+            )
+
+            output_data = Parser.parse(response)
+
+        if not output_data:
+            print(f"{ColorEnum.WARNING.format('[Warning]')} : {cls._selected_model} has failed")
+        else:
+            print(f"{ColorEnum.INFO.format('[INFO]')} : {cls._selected_model} has finished")
+
         return output_data

@@ -84,7 +84,7 @@ export default function DashboardScreen() {
             />
           </ThemedView>
 
-          <Card>
+          <Card style={{ backgroundColor: 'transparent'}}>
             <ThemedText type="smallBold" themeColor="textSecondary">
               Macros du jour
             </ThemedText>
@@ -179,6 +179,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: Spacing.two,
     marginTop: Spacing.one,
+    backgroundColor: 'transparent',
   },
   macro: {
     flex: 1,

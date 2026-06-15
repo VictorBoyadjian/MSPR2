@@ -26,6 +26,6 @@ export default function MealCard({ dish }: { dish: Dish }) {
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  row: {backgroundColor: 'transparent', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   pressed: { opacity: 0.5 },
 });
