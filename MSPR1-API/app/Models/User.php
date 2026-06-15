@@ -27,6 +27,9 @@ class User extends Authenticatable
         'is_active',
         'remember_token',
         'password',
+        'bodyfat',
+        'rest_bpm',
+        'sport_per_week',
         'created_at',
         'updated_at',
     ];
@@ -53,5 +56,10 @@ class User extends Authenticatable
     public function metrics(): HasMany
     {
         return $this->hasMany(Metric::class);
+    }
+
+    public function allergies(): BelongsToMany
+    {
+        return $this->belongsToMany(Allergy::class, 'user_allergies');
     }
 }

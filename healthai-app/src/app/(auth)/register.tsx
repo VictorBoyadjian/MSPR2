@@ -1,4 +1,4 @@
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -8,20 +8,19 @@ import { ThemedView } from '@/components/themed-view';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { Spacing } from '@/constants/theme';
-import { useAuth } from '@/hooks/useAuth';
-import { ApiError } from '@/services/api';
 import { isValidEmail, isValidPassword, isNotEmpty } from '@/utils/validators';
 
 export default function RegisterScreen() {
-  const { register } = useAuth();
+  const router = useRouter();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  const onSubmit = async () => {
+  // L'identité est collectée ici ; les données santé le sont dans l'onboarding,
+  // qui finalise la création du compte (/register) avec l'ensemble des informations.
+  const onSubmit = () => {
     if (!isNotEmpty(firstName) || !isNotEmpty(lastName)) {
       setError('Indiquez votre prénom et votre nom.');
       return;
@@ -35,19 +34,15 @@ export default function RegisterScreen() {
       return;
     }
     setError('');
-    setLoading(true);
-    try {
-      await register({
+    router.push({
+      pathname: '/(auth)/onboarding',
+      params: {
         first_name: firstName.trim(),
         last_name: lastName.trim(),
         email: email.trim(),
         password,
-      });
-    } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Une erreur est survenue.');
-    } finally {
-      setLoading(false);
-    }
+      },
+    });
   };
 
   return (
@@ -82,7 +77,7 @@ export default function RegisterScreen() {
               </ThemedText>
             ) : null}
 
-            <Button label="S'inscrire" onPress={onSubmit} loading={loading} />
+            <Button label="Continuer" onPress={onSubmit} />
 
             <Link href="/(auth)/login" style={styles.link}>
               <ThemedText type="linkPrimary">Déjà un compte ? Se connecter</ThemedText>

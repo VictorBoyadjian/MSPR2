@@ -29,4 +29,6 @@ ignoreNewlinesInTextObjects = "off"
 
 [environments.MSPR1]
 url = "jdbc:postgresql://thomas.proxy.rlwy.net:14269/healthai"
+user = "postgres"
+password = "postgres"
 schemas = [ "Data" ]

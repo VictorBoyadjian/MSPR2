@@ -10,6 +10,10 @@ export type RegisterPayload = {
   gender?: string;
   weight_kg?: number;
   height_cm?: number;
+  // Données santé collectées pendant l'onboarding (table metrics côté API).
+  body_fat_pct?: number;
+  heart_rate_resting?: number;
+  session_duration_h?: number;
 };
 
 export const authService = {
