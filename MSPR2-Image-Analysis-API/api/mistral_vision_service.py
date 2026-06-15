@@ -45,25 +45,29 @@ class MistralVisionService():
         if not image.startswith(("data:image/", "http://", "https://")):
             image = f"data:image/jpeg;base64,{image}"
 
-        response = cls._client.chat.complete(
-            model=cls._model,
-            messages=[
-                {
-                    'role': 'user',
-                    'content': [
-                        {
-                            'type': 'text',
-                            'text': cls._PROMPT
-                        },
-                        {
-                            'type': 'image_url',
-                            'image_url': image
-                        }
-                    ]
-                }
-            ],
-            temperature=0.4,
-        )
+        try:
+            response = cls._client.chat.complete(
+                model=cls._model,
+                messages=[
+                    {
+                        'role': 'user',
+                        'content': [
+                            {
+                                'type': 'text',
+                                'text': cls._PROMPT
+                            },
+                            {
+                                'type': 'image_url',
+                                'image_url': image
+                            }
+                        ]
+                    }
+                ],
+                temperature=0.4,
+            )
+        except Exception as e:
+            print(f"{ColorEnum.ERROR.format('[ERROR]')} : Mistral Vision request failed : {e}")
+            return {}
 
         output_data = Parser.mistral_vision_reponse(response)
 

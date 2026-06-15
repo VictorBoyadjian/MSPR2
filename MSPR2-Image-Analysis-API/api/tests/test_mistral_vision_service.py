@@ -115,6 +115,20 @@ class TestGenerate:
 
         assert result == {}
 
+    def test_returns_empty_dict_when_request_raises(self, monkeypatch) -> None:
+        def boom(**kwargs):
+            raise RuntimeError("401 unauthorized")
+
+        monkeypatch.setattr(
+            MistralVisionService,
+            "_client",
+            SimpleNamespace(chat=SimpleNamespace(complete=boom)),
+        )
+
+        result = MistralVisionService.generate(_input())
+
+        assert result == {}
+
     def test_logs_failure_when_output_empty(self, monkeypatch, capsys) -> None:
         monkeypatch.setattr(
             MistralVisionService, "_client", _fake_client({}, "not json")
