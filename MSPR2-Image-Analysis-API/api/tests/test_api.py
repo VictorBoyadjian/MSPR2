@@ -23,7 +23,7 @@ class TestAnalyze:
         )
 
         response = client.post(
-            "/analyze/",
+            "/analyze",
             json={"base64_image": "abc"},
             headers={"Authorization": "Bearer valid"},
         )
@@ -36,7 +36,7 @@ class TestAnalyze:
         monkeypatch.setattr(api.Authorization, "verify_token", lambda token: False)
 
         response = client.post(
-            "/analyze/",
+            "/analyze",
             json={"base64_image": "abc"},
             headers={"Authorization": "Bearer bad"},
         )
@@ -45,7 +45,7 @@ class TestAnalyze:
         assert response.json()["detail"] == "Invalid token"
 
     def test_missing_authorization_header_is_rejected(self) -> None:
-        response = client.post("/analyze/", json={"base64_image": "abc"})
+        response = client.post("/analyze", json={"base64_image": "abc"})
         assert response.status_code == 401
 
     def test_token_is_passed_through_to_verifier(self, monkeypatch) -> None:
@@ -59,7 +59,7 @@ class TestAnalyze:
         monkeypatch.setattr(api.OllamaService, "generate", lambda data: {})
 
         client.post(
-            "/analyze/",
+            "/analyze",
             json={"base64_image": "abc"},
             headers={"Authorization": "Bearer my-secret-token"},
         )
@@ -77,7 +77,7 @@ class TestAnalyzeByMistral:
         )
 
         response = client.post(
-            "/analyze-by-mistral/",
+            "/analyze-by-mistral",
             json={"base64_image": "abc"},
             headers={"Authorization": "Bearer valid"},
         )
@@ -90,7 +90,7 @@ class TestAnalyzeByMistral:
         monkeypatch.setattr(api.Authorization, "verify_token", lambda token: False)
 
         response = client.post(
-            "/analyze-by-mistral/",
+            "/analyze-by-mistral",
             json={"base64_image": "abc"},
             headers={"Authorization": "Bearer bad"},
         )
@@ -99,7 +99,7 @@ class TestAnalyzeByMistral:
         assert response.json()["detail"] == "Invalid token"
 
     def test_missing_authorization_header_is_rejected(self) -> None:
-        response = client.post("/analyze-by-mistral/", json={"base64_image": "abc"})
+        response = client.post("/analyze-by-mistral", json={"base64_image": "abc"})
         assert response.status_code == 401
 
     def test_data_is_passed_through_to_service(self, monkeypatch) -> None:
@@ -113,7 +113,7 @@ class TestAnalyzeByMistral:
         monkeypatch.setattr(api.MistralVisionService, "generate", fake_generate)
 
         client.post(
-            "/analyze-by-mistral/",
+            "/analyze-by-mistral",
             json={"base64_image": "my-image-data"},
             headers={"Authorization": "Bearer valid"},
         )
