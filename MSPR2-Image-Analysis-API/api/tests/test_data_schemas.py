@@ -1,6 +1,12 @@
-"""Unit tests for ollama_schemas (pydantic models)."""
+"""Unit tests for data_schemas (pydantic models)."""
 
-from ollama_schemas import Food, OutputResponse, UploadDish
+from data_schemas import (
+    DishCalculateInput,
+    DishCalculateOutput,
+    Food,
+    OutputResponse,
+    UploadDish,
+)
 
 
 class TestUploadDish:
@@ -54,3 +60,27 @@ class TestOutputResponse:
         response = OutputResponse(aliments={"apple": {"calories_kcal": 95}})
         assert isinstance(response.aliments["apple"], Food)
         assert response.aliments["apple"].calories_kcal == 95
+
+
+class TestDishCalculateInput:
+    def test_accepts_nested_aliments_mapping(self) -> None:
+        payload = DishCalculateInput(aliments={"bread": {"quantity_g": 100}})
+        assert payload.aliments["bread"]["quantity_g"] == 100
+
+
+class TestDishCalculateOutput:
+    def test_holds_aggregated_dish_values(self) -> None:
+        dish = DishCalculateOutput(
+            dish_name="Tartine",
+            kcal=250,
+            carbs_g=30,
+            fats_g=5,
+            fiber_g=2.5,
+            proteins_g=8,
+        )
+        assert dish.dish_name == "Tartine"
+        assert dish.kcal == 250
+        assert dish.carbs_g == 30
+        assert dish.fats_g == 5
+        assert dish.fiber_g == 2.5
+        assert dish.proteins_g == 8

@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 
 import api
 
-from ollama_schemas import Food, OutputResponse
+from data_schemas import Food, OutputResponse
 
 client = TestClient(api.app)
 

@@ -1,10 +1,11 @@
 import { CONFIG } from '@/constants/config';
 import { getToken } from '@/services/api';
+import { CalculateDishResponse } from '@/types/calculate-dish-response';
 import { analyzedDish, splittedDish } from '@/types/splittedDish';
 
 export const calculDishService = {
 
-  calculate: async (input: splittedDish): Promise<analyzedDish> => {
+  calculate: async (input: splittedDish): Promise<CalculateDishResponse> => {
     const token = getToken();
     if (!token) {
       throw new Error("Vous devez être connecté pour analyser un plat");
@@ -27,13 +28,14 @@ export const calculDishService = {
         `Erreur lors de l'analyse de l'image (${response.status})`,
       );
     }
-    const castResponse = (await response.json()) as analyzedDish;
-    console.log("success:");
-    console.log(castResponse);
+    const castResponse = (await response.json()) as CalculateDishResponse;
+    
+    
 
-    if (!castResponse.aliments) {
+    if (!castResponse.dish_name || !castResponse.kcal) {
       throw new Error("Réponse invalide lors du calcul nutritionnel");
     }
+
     return castResponse;
   },
   

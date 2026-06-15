@@ -1,18 +1,28 @@
+#Libs
 from typing import Union
 from ollama import ChatResponse
 import json
+from mistralai import ChatCompletionResponse
 import re
 
-from ollama_schemas import OutputResponse, Food
+#Modules
+from data_schemas import OutputResponse, DishCalculateOutput, Food
 from color_enum import ColorEnum
 
 class Parser():
+    _mistral_dict_keys = [
+        'dish_name',
+        'kcal',
+        'carbs_g',
+        'fats_g',
+        'fiber_g',
+        'proteins_g',
+    ]
+    
     _CONFIDENCE_MAP = {"high": 0.9, "medium": 0.6, "low": 0.3}
 
     @staticmethod
     def _clean(content: str) -> str:
-        # llava sometimes escapes underscores ("name\_fr"), which is invalid
-        # JSON. Food data never contains real backslashes, so strip them all.
         return (
             str(content)
             .replace('`', '')
@@ -47,7 +57,6 @@ class Parser():
         """Return a list of food objects, tolerating a truncated JSON tail."""
         content = cls._clean(content)
 
-        # Try a clean parse first.
         try:
             data = json.loads(content)
             if isinstance(data, dict) and isinstance(data.get("foods"), list):
@@ -55,13 +64,10 @@ class Parser():
             if isinstance(data, list):
                 return data
             if isinstance(data, dict):
-                # Old format: {name: {fields}}
                 return [{"name_fr": k, **v} for k, v in data.items() if isinstance(v, dict)]
         except json.JSONDecodeError:
             pass
-
-        # Fallback: the response is malformed/truncated. Food objects are flat
-        # (no nested braces), so grab every complete `{...}` block.
+        
         entries = []
         for match in re.findall(r'\{[^{}]*\}', content):
             try:
@@ -73,7 +79,7 @@ class Parser():
         return entries
 
     @classmethod
-    def parse(cls, response: ChatResponse) -> Union[OutputResponse, dict]:
+    def ollama_reponse(cls, response: ChatResponse) -> Union[OutputResponse, dict]:
         try:
             entries = cls._extract_entries(response.message.content)
             if not entries:
@@ -87,29 +93,39 @@ class Parser():
 
                 food = Food(
                     quantity_g=cls._to_int(entry.get("quantity_g"), 20),
-                    calories_kcal=cls._to_int(entry.get("calories_kcal"), 0),
-                    proteins_g=cls._to_float(entry.get("proteins_g")),
-                    carbs_g=cls._to_float(entry.get("carbs_g")),
-                    fats_g=cls._to_float(entry.get("fats_g")),
-                    fiber_g=cls._to_float(entry.get("fiber_g")),
                     accuracy=cls._accuracy(entry),
                 )
 
                 if name in aliments:
-                    # Aggregate duplicates instead of overwriting.
                     existing = aliments[name]
                     existing.quantity_g += food.quantity_g
-                    existing.calories_kcal += food.calories_kcal
-                    existing.proteins_g += food.proteins_g
-                    existing.carbs_g += food.carbs_g
-                    existing.fats_g += food.fats_g
-                    existing.fiber_g += food.fiber_g
                     existing.accuracy = max(existing.accuracy, food.accuracy)
                 else:
                     aliments[name] = food
 
             return OutputResponse(aliments=aliments)
         except Exception as e:
-            print(response.message.content)
+            print(f"{ColorEnum.ERROR.format('[ERROR]')}: An error occurred while parsing the model response : {e}")
+            return {}
+        
+    @classmethod
+    def mistral_reponse(cls, response : ChatCompletionResponse) -> Union[DishCalculateOutput, dict]:
+        try:    
+            content = response.choices[0].message.content
+            
+            if(content):  
+                json_content = json.loads(cls._clean(content))
+                           
+                return DishCalculateOutput(
+                    dish_name=json_content[cls._mistral_dict_keys[0]] if cls._mistral_dict_keys[0] in json_content.keys() else 0,
+                    kcal=json_content[cls._mistral_dict_keys[1]] if cls._mistral_dict_keys[1] in json_content.keys() else 0,
+                    carbs_g=json_content[cls._mistral_dict_keys[2]] if cls._mistral_dict_keys[2] in json_content.keys() else 0,
+                    fats_g=json_content[cls._mistral_dict_keys[3]] if cls._mistral_dict_keys[3] in json_content.keys() else 0,
+                    fiber_g=json_content[cls._mistral_dict_keys[4]] if cls._mistral_dict_keys[4] in json_content.keys() else 0,
+                    proteins_g=json_content[cls._mistral_dict_keys[5]] if cls._mistral_dict_keys[5] in json_content.keys() else 0,
+                )
+                
+            return {}
+        except Exception as e:
             print(f"{ColorEnum.ERROR.format('[ERROR]')}: An error occurred while parsing the model response : {e}")
             return {}

@@ -9,7 +9,7 @@ from types import SimpleNamespace
 from ollama import ChatResponse, Message
 
 import ollama_service
-from ollama_schemas import OutputResponse, UploadDish
+from data_schemas import OutputResponse, UploadDish
 from ollama_service import OllamaService
 
 
@@ -139,4 +139,4 @@ class TestGenerate:
         OllamaService.generate(UploadDish(base64_image="the-image"))
 
         assert captured["model"] == "llama3.2-vision"
-        assert captured["messages"][0]["image"] == "the-image"
+        assert captured["messages"][0]["images"] == ["the-image"]

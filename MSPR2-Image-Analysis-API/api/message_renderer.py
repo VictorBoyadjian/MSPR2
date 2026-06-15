@@ -1,6 +1,8 @@
+#Libs
 import time
 from colorama import init
 
+#Modules
 from color_enum import ColorEnum
 
 class MessageRenderer():

@@ -23,6 +23,8 @@ import { calculDishService } from '@/services/calculDishService';
 import { dishService } from '@/services/dishService';
 import { useAuthStore } from '@/stores/authStore';
 import { analyzedDish, splittedDish } from '@/types/splittedDish';
+import { CalculateDishResponse } from '@/types/calculate-dish-response';
+import { AnnalysedMeal } from '@/components/meal/AnnalysedMeal';
 
 const MEAL_TYPES: { value: MealType; label: string }[] = [
   { value: 'breakfast', label: 'Petit déj' },
@@ -65,18 +67,6 @@ function parseAliments(raw?: string): FoodItem[] {
   }
 }
 
-function totalsOf(analyzed: analyzedDish) {
-  return Object.values(analyzed.aliments).reduce(
-    (acc, f) => ({
-      calories: acc.calories + (f.calories_kcal || 0),
-      proteins: acc.proteins + (f.proteins_g || 0),
-      carbs: acc.carbs + (f.carbs_g || 0),
-      fats: acc.fats + (f.fats_g || 0),
-    }),
-    { calories: 0, proteins: 0, carbs: 0, fats: 0 },
-  );
-}
-
 export default function AddMealScreen() {
   const router = useRouter();
   const theme = useTheme();
@@ -88,7 +78,7 @@ export default function AddMealScreen() {
   const [eatedAt, setEatedAt] = useState(() => new Date());
   const [error, setError] = useState('');
   const [phase, setPhase] = useState<Phase>('form');
-  const [analyzed, setAnalyzed] = useState<analyzedDish | null>(null);
+  const [analyzed, setAnalyzed] = useState<CalculateDishResponse | null>(null);
 
   const updateFood = (id: string, key: keyof FoodItem, value: string) =>
     setFoods((prev) => prev.map((f) => (f.id === id ? { ...f, [key]: value } : f)));
@@ -98,7 +88,7 @@ export default function AddMealScreen() {
   const addFood = () => setFoods((prev) => [...prev, emptyFood()]);
 
   const analyzedTotals = useMemo(
-    () => (analyzed ? totalsOf(analyzed) : null),
+    () => (analyzed ? analyzed : null),
     [analyzed],
   );
 
@@ -120,15 +110,14 @@ export default function AddMealScreen() {
       };
 
       const result = await calculDishService.calculate(input);
-      const totals = totalsOf(result);
 
       await dishService.create({
-        name: Object.keys(result.aliments).join(', '),
+        name: result.dish_name,
         meal_type: mealType,
-        calories_kcal: Math.round(totals.calories),
-        proteins_g: Math.round(totals.proteins),
-        carbs_g: Math.round(totals.carbs),
-        fats_g: Math.round(totals.fats),
+        calories_kcal: Math.round(result.kcal),
+        proteins_g: Math.round(result.proteins_g),
+        carbs_g: Math.round(result.carbs_g),
+        fats_g: Math.round(result.fats_g),
         eated_at: eatedAt.toISOString(),
         user_id: authStore.user?.id || '',
       });
@@ -154,43 +143,9 @@ export default function AddMealScreen() {
   }
 
   // --- Repas analysé : récapitulatif + bouton OK ---
-  if (phase === 'result' && analyzed && analyzedTotals) {
+  if (phase === 'result' && analyzed) {
     return (
-      <ThemedView style={styles.root}>
-        <SafeAreaView style={styles.safeArea}>
-          <ScrollView contentContainerStyle={styles.form}>
-            <ThemedText type="subtitle">Repas enregistré</ThemedText>
-
-            <ThemedView style={[styles.totals, { backgroundColor: theme.backgroundElement }]}>
-              <ThemedText type="smallBold">Total</ThemedText>
-              <ThemedText type="title">{Math.round(analyzedTotals.calories)} kcal</ThemedText>
-              <ThemedText type="small" themeColor="textSecondary">
-                P {Math.round(analyzedTotals.proteins)} g · G {Math.round(analyzedTotals.carbs)} g · L{' '}
-                {Math.round(analyzedTotals.fats)} g
-              </ThemedText>
-            </ThemedView>
-
-            {Object.entries(analyzed.aliments).map(([name, food]) => (
-              <ThemedView
-                key={name}
-                style={[styles.foodCard, { backgroundColor: theme.backgroundElement }]}>
-                <View style={styles.foodHeader}>
-                  <ThemedText type="smallBold">{name}</ThemedText>
-                  <ThemedText type="small" themeColor="textSecondary">
-                    {Math.round(food.quantity_g)} g
-                  </ThemedText>
-                </View>
-                <ThemedText type="small" themeColor="textSecondary">
-                  {Math.round(food.calories_kcal)} kcal · P {Math.round(food.proteins_g)} g · G{' '}
-                  {Math.round(food.carbs_g)} g · L {Math.round(food.fats_g)} g
-                </ThemedText>
-              </ThemedView>
-            ))}
-
-            <Button label="OK" onPress={() => router.back()} />
-          </ScrollView>
-        </SafeAreaView>
-      </ThemedView>
+      <AnnalysedMeal analyzed={analyzed} />
     );
   }
 
