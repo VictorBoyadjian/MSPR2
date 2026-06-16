@@ -39,6 +39,7 @@ class UserResource extends Resource
             'rest_bpm',
             'sport_per_week',
             'goal_id',
+            'target_weight',
         ];
     }
 

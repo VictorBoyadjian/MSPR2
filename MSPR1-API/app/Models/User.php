@@ -31,6 +31,7 @@ class User extends Authenticatable
         'rest_bpm',
         'sport_per_week',
         'goal_id',
+        'target_weight',
         'created_at',
         'updated_at',
     ];
@@ -47,6 +48,30 @@ class User extends Authenticatable
         'created_at',
         'updated_at'
     ];
+
+    /**
+     * Recalcule le poids cible dès que le programme (goal_id) change :
+     * target_weight = poids actuel × coefficient du goal. Couvre tous les chemins
+     * d'écriture (PATCH /me, register, mutate…) puisque branché sur l'event `saving`.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (User $user) {
+            if (! $user->isDirty('goal_id')) {
+                return;
+            }
+
+            if ($user->goal_id === null) {
+                $user->target_weight = null;
+                return;
+            }
+
+            $pct = Goal::whereKey($user->goal_id)->value('target_weight_pct');
+            if ($pct !== null && $user->weight_kg !== null) {
+                $user->target_weight = round($user->weight_kg * $pct, 2);
+            }
+        });
+    }
 
     public function sportSessions(): BelongsToMany
     {

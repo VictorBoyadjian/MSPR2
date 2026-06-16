@@ -30,6 +30,7 @@ class ProfileController {
             'rest_bpm'       => ['sometimes', 'nullable', 'integer'],
             'sport_per_week' => ['sometimes', 'nullable', 'numeric'],
             'goal_id'        => ['sometimes', 'nullable', 'integer', 'exists:goals,id'],
+            'target_weight'  => ['sometimes', 'nullable', 'numeric'],
             'allergies'      => ['sometimes', 'array'],
             'allergies.*'    => ['integer', 'exists:allergies,id'],
             'handicaps'      => ['sometimes', 'array'],

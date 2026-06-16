@@ -26,6 +26,7 @@ class GoalResource extends Resource
             'id',
             'name',
             'label',
+            'target_weight_pct',
             'created_at',
             'updated_at'
         ];
