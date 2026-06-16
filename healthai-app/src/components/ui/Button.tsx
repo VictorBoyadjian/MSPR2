@@ -26,7 +26,7 @@ export default function Button({
   const theme = useTheme();
   const isPrimary = variant === 'primary';
   const isDisabled = disabled || loading;
-  const color = isPrimary ? theme.background : theme.text;
+  const color = isPrimary ? theme.onAccent : theme.text;
 
   return (
     <Pressable
@@ -35,7 +35,7 @@ export default function Button({
       style={({ pressed }) => [
         styles.button,
         {
-          backgroundColor: isPrimary ? theme.text : theme.backgroundElement,
+          backgroundColor: isPrimary ? theme.accent : theme.backgroundElement,
           opacity: isDisabled ? 0.5 : pressed ? 0.8 : 1,
         },
       ]}>

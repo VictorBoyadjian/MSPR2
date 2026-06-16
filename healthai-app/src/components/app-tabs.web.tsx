@@ -51,11 +51,11 @@ type TabButtonProps = TabTriggerSlotProps & { icon: IconName };
 
 export function TabButton({ children, icon, isFocused, ...props }: TabButtonProps) {
   const theme = useTheme();
-  const color = isFocused ? theme.text : theme.textSecondary;
+  const color = isFocused ? theme.accentText : theme.textSecondary;
   return (
     <Pressable {...props} style={({ pressed }) => [styles.tabButton, pressed && styles.pressed]}>
       <Icon name={isFocused ? (`${icon}-filled` as IconName) : icon} size={24} color={color} />
-      <ThemedText type="small" themeColor={isFocused ? 'text' : 'textSecondary'}>
+      <ThemedText type="small" themeColor={isFocused ? 'accentText' : 'textSecondary'}>
         {children}
       </ThemedText>
     </Pressable>

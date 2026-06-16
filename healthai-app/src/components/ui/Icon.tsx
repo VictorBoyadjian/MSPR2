@@ -23,7 +23,10 @@ export type IconName =
   | 'edit'
   | 'close'
   | 'logout'
-  | 'trash';
+  | 'trash'
+  | 'theme-auto'
+  | 'theme-light'
+  | 'theme-dark';
 
 const GLYPHS: Record<IconName, IoniconName> = {
   home: 'home-outline',
@@ -43,6 +46,9 @@ const GLYPHS: Record<IconName, IoniconName> = {
   close: 'close',
   logout: 'log-out-outline',
   trash: 'trash-outline',
+  'theme-auto': 'contrast-outline',
+  'theme-light': 'sunny-outline',
+  'theme-dark': 'moon-outline',
 };
 
 type Props = {

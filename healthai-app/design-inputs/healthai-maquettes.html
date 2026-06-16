@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HealthAI — Maquettes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --accent:#c8fa46;
+  --accent-deep:#b6e82f;
+  --accent-soft:rgba(200,250,70,.12);
+  --on-accent:#0a0a0b;
+  --accent-text:#c8fa46;
+  --danger:#ff4d4d;
+  --good:#34c759;
+  --radius-card:22px;
+  --radius-pill:999px;
+  --shadow:none;
+  --font-disp:'Space Grotesk',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,sans-serif;
+}
+[data-theme="dark"]{
+  --bg:#0a0a0b;
+  --frame:#000;
+  --surface:#15171a;
+  --surface-2:#1e2024;
+  --surface-3:#262a2e;
+  --border:rgba(255,255,255,.08);
+  --border-strong:rgba(255,255,255,.14);
+  --text:#f4f5f4;
+  --text-dim:#8b9096;
+  --text-faint:#5a5f64;
+  --track:#26282b;
+  --page-bg:#070708;
+}
+[data-theme="light"]{
+  --bg:#f6f7f2;
+  --frame:#d9dbd2;
+  --surface:#ffffff;
+  --surface-2:#eef0e9;
+  --surface-3:#e4e7dd;
+  --border:rgba(0,0,0,.08);
+  --border-strong:rgba(0,0,0,.14);
+  --text:#111312;
+  --text-dim:#5e6469;
+  --text-faint:#a0a5a3;
+  --track:#e0e2da;
+  --accent-text:#5f7d00;
+  --on-accent:#16210a;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 8px 24px rgba(0,0,0,.06);
+  --page-bg:#eceee6;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--page-bg);color:var(--text);font-family:var(--font-body);-webkit-font-smoothing:antialiased}
+body{padding:40px 20px 80px;transition:background .35s ease}
+
+/* ============ PAGE CHROME ============ */
+.page-head{max-width:1280px;margin:0 auto 36px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.page-head .brand{font-family:var(--font-disp);font-weight:700;font-size:13px;letter-spacing:.22em;color:var(--accent-text)}
+.page-head h1{font-family:var(--font-disp);font-weight:700;font-size:clamp(28px,5vw,46px);letter-spacing:-.02em;line-height:1.02;margin-top:6px}
+.page-head p{color:var(--text-dim);font-size:15px;margin-top:10px;max-width:46ch}
+.theme-toggle{display:inline-flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);color:var(--text);
+  padding:11px 16px;border-radius:var(--radius-pill);font-family:var(--font-body);font-weight:600;font-size:13.5px;cursor:pointer;
+  box-shadow:var(--shadow);transition:.2s}
+.theme-toggle:hover{border-color:var(--accent);color:var(--accent-text)}
+.theme-toggle .dot{width:9px;height:9px;border-radius:50%;background:var(--accent)}
+
+.section-label{max-width:1280px;margin:54px auto 22px;display:flex;align-items:center;gap:14px}
+.section-label span:first-child{font-family:var(--font-disp);font-weight:600;font-size:12px;letter-spacing:.2em;color:var(--accent-text)}
+.section-label .ln{flex:1;height:1px;background:var(--border)}
+.section-label span:last-child{color:var(--text-faint);font-size:12px}
+
+/* ============ PHONE GALLERY ============ */
+.gallery{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:42px 32px;justify-items:center}
+.frame-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%}
+.frame-wrap .cap{font-size:12.5px;color:var(--text-dim);font-weight:500;text-align:center}
+.phone{width:300px;height:632px;background:var(--frame);border-radius:42px;padding:9px;
+  box-shadow:0 0 0 1px var(--border-strong),0 30px 60px -20px rgba(0,0,0,.55);position:relative;flex:none}
+[data-theme="light"] .phone{box-shadow:0 0 0 1px var(--border-strong),0 30px 50px -24px rgba(0,0,0,.25)}
+.screen{position:relative;width:100%;height:100%;background:var(--bg);border-radius:34px;overflow:hidden;
+  display:flex;flex-direction:column;transition:background .35s ease}
+.notch{position:absolute;top:8px;left:50%;transform:translateX(-50%);width:96px;height:20px;background:var(--frame);border-radius:12px;z-index:40}
+
+/* scroll content */
+.scr-pad{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:30px 20px 16px}
+.scr-pad.tight{padding-top:26px}
+
+/* ============ ONBOARDING SHARED ============ */
+.ob-top{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.back{width:34px;height:34px;flex:none;border-radius:11px;background:var(--surface-2);border:1px solid var(--border);
+  display:grid;place-items:center;color:var(--text-dim)}
+.back svg{width:14px;height:14px}
+.bar{flex:1;height:5px;border-radius:99px;background:var(--track);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--accent);box-shadow:0 0 10px var(--accent-soft)}
+.eyebrow{font-family:var(--font-disp);font-weight:600;font-size:11px;letter-spacing:.2em;color:var(--accent-text);margin-bottom:9px}
+.h1{font-family:var(--font-disp);font-weight:700;font-size:27px;letter-spacing:-.02em;line-height:1.05}
+.sub{color:var(--text-dim);font-size:13.5px;line-height:1.45;margin-top:9px}
+
+.footer{margin-top:auto;padding-top:14px}
+.btn{display:block;width:100%;text-align:center;border:none;cursor:pointer;font-family:var(--font-body);
+  font-weight:700;font-size:15px;padding:17px;border-radius:var(--radius-pill)}
+.btn-primary{background:var(--accent);color:var(--on-accent);box-shadow:0 8px 30px -8px var(--accent)}
+.btn-soft{background:var(--surface-2);color:var(--text);border:1px solid var(--border)}
+
+/* welcome */
+.logo{width:60px;height:60px;border-radius:18px;background:radial-gradient(circle at 50% 50%,var(--accent-soft),transparent 70%);
+  border:1px solid var(--accent-soft);display:grid;place-items:center;margin-bottom:26px}
+.logo b{width:16px;height:16px;border-radius:50%;background:var(--accent);box-shadow:0 0 18px 4px var(--accent)}
+.meta{color:var(--text-faint);font-size:12.5px;margin-top:22px;display:flex;gap:10px;align-items:center}
+.meta i{width:3px;height:3px;border-radius:50%;background:var(--text-faint);display:inline-block}
+
+/* big value + ruler */
+.bigval{text-align:center;margin:46px 0 6px}
+.bigval .n{font-family:var(--font-disp);font-weight:700;font-size:66px;letter-spacing:-.03em;line-height:1}
+.bigval .u{font-size:20px;color:var(--text-dim);font-weight:500;margin-left:4px}
+.bigval .hint{display:block;color:var(--text-faint);font-size:12px;margin-top:8px}
+.ruler{position:relative;height:60px;margin-top:14px}
+.ruler .ticks{position:absolute;inset:0 0 26px;
+  background:
+    repeating-linear-gradient(90deg,var(--track) 0 1px,transparent 1px 16px) 0 100%/100% 16px no-repeat,
+    repeating-linear-gradient(90deg,var(--track) 0 2px,transparent 2px 80px) 0 100%/100% 28px no-repeat;}
+.ruler .cur{position:absolute;left:50%;top:2px;width:3px;height:34px;background:var(--accent);border-radius:9px;
+  transform:translateX(-50%);box-shadow:0 0 12px 2px var(--accent-soft)}
+.ruler .labels{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;color:var(--text-faint);font-size:11.5px}
+
+/* radio options */
+.opt{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-radius:18px;
+  background:var(--surface);border:1px solid var(--border);margin-bottom:13px;font-size:15px;color:var(--text-dim)}
+.opt .rd{width:21px;height:21px;border-radius:50%;border:2px solid var(--border-strong)}
+.opt.on{background:var(--accent-soft);border-color:var(--accent);color:var(--text);font-weight:600}
+.opt.on .rd{border-color:var(--accent);background:radial-gradient(circle,var(--accent) 0 38%,transparent 42%)}
+
+/* silhouette grid */
+.sil-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:24px}
+.sil{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 6px 11px;text-align:center}
+.sil svg{width:34px;height:54px;color:var(--text-faint)}
+.sil span{display:block;margin-top:6px;font-size:12.5px;color:var(--text-dim)}
+.sil.on{background:var(--accent-soft);border-color:var(--accent)}
+.sil.on svg{color:var(--accent)}
+.sil.on span{color:var(--text);font-weight:700}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:11px;margin-top:26px}
+.chip{padding:13px 19px;border-radius:var(--radius-pill);background:var(--surface);border:1px solid var(--border);
+  font-size:14px;color:var(--text-dim)}
+.chip.on{background:var(--accent-soft);border-color:var(--accent);color:var(--text);font-weight:600}
+
+/* pulse intro */
+.heart-badge{width:92px;height:92px;border-radius:50%;margin:34px auto 30px;display:grid;place-items:center;
+  background:var(--accent-soft);border:1px solid var(--accent-soft)}
+.heart-badge svg{width:40px;height:40px;color:var(--accent);animation:beat 1.1s ease-in-out infinite}
+@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.18)}30%{transform:scale(1)}45%{transform:scale(1.1)}}
+.steps{display:flex;flex-direction:column;gap:18px}
+.step{display:flex;gap:14px;align-items:flex-start}
+.step .num{width:26px;height:26px;flex:none;border-radius:50%;border:1.5px solid var(--accent);color:var(--accent-text);
+  display:grid;place-items:center;font-weight:700;font-size:13px}
+.step p{font-size:13.5px;color:var(--text-dim);line-height:1.4}
+
+/* pulse timer */
+.timer-screen{align-items:center;justify-content:center;text-align:center;padding-top:0}
+.ring{position:relative;width:198px;height:198px;margin-bottom:34px}
+.ring svg{transform:rotate(-90deg)}
+.ring .mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .mid .hh{width:24px;height:24px;color:var(--accent);margin-bottom:12px}
+.ring .mid .t{font-family:var(--font-disp);font-weight:700;font-size:52px;line-height:1}
+.ring .mid .s{color:var(--text-dim);font-size:14px;margin-top:2px}
+.timer-screen .cap2{color:var(--text-dim);font-size:14px}
+
+/* counter */
+.counter{display:flex;align-items:center;justify-content:center;gap:30px;margin:46px 0 4px}
+.counter .pm{width:66px;height:66px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);
+  font-size:30px;color:var(--text);display:grid;place-items:center;line-height:0}
+.counter .cval{font-family:var(--font-disp);font-weight:700;font-size:64px;line-height:1;min-width:120px;text-align:center}
+.counter-lbl{text-align:center;color:var(--text-faint);font-size:11px;letter-spacing:.16em}
+.bpm{margin:26px auto 0;width:max-content;display:flex;align-items:center;gap:10px;padding:12px 22px;border-radius:var(--radius-pill);
+  background:var(--accent-soft);border:1px solid var(--accent)}
+.bpm svg{width:18px;height:18px;color:var(--accent)}
+.bpm b{font-family:var(--font-disp);font-size:20px;color:var(--text)}
+.bpm span{color:var(--text-dim);font-size:13px}
+.note{text-align:center;color:var(--text-faint);font-size:12.5px;line-height:1.5;margin-top:30px;padding:0 14px}
+
+/* ============ APP SHARED ============ */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 16px;border-bottom:1px solid var(--border)}
+.topbar .lg{font-family:var(--font-disp);font-weight:700;font-size:16px}
+.topbar .av{width:34px;height:34px;border-radius:50%;background:var(--surface-2);border:1px solid var(--border);display:grid;place-items:center;color:var(--text-dim)}
+.topbar .av svg{width:17px;height:17px}
+.app-body{flex:1;overflow:hidden;padding:22px 20px 14px}
+.app-h{font-family:var(--font-disp);font-weight:700;font-size:30px;letter-spacing:-.02em;line-height:1}
+.app-sub{color:var(--text-dim);font-size:13px;margin-top:6px}
+
+.btn-pill-accent{background:var(--accent);color:var(--on-accent);border:none;font-weight:700;font-size:13.5px;
+  padding:11px 18px;border-radius:var(--radius-pill);cursor:pointer}
+
+.bottom-nav{display:flex;justify-content:center;gap:6px;padding:12px;margin:auto 12px 12px;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--radius-pill)}
+.bottom-nav a{flex:1;text-align:center;padding:9px 4px;border-radius:var(--radius-pill);color:var(--text-dim);
+  font-size:12.5px;font-weight:600;text-decoration:none}
+.bottom-nav a.on{background:var(--accent);color:var(--on-accent)}
+
+/* home */
+.kicker{font-family:var(--font-disp);font-weight:600;font-size:11px;letter-spacing:.2em;color:var(--text-faint);margin:22px 0 11px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:15px 16px}
+.stat .lab{font-size:12.5px;color:var(--text-dim)}
+.stat .big{font-family:var(--font-disp);font-weight:700;font-size:32px;line-height:1.1;margin-top:5px}
+.stat .small{font-size:11.5px;color:var(--text-faint);margin-top:3px}
+.macros{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.macro{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:13px;padding:11px 12px}
+.macro b{font-family:var(--font-disp);font-size:18px}
+.macro span{display:block;font-size:11.5px;color:var(--text-dim);margin-top:1px}
+.home-cta{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+
+/* day switch */
+.dayswitch{display:flex;align-items:center;justify-content:center;gap:20px;margin:18px 0 14px;color:var(--text)}
+.dayswitch .ar{width:30px;height:30px;border-radius:9px;background:var(--surface-2);border:1px solid var(--border);display:grid;place-items:center;color:var(--text-dim)}
+.dayswitch .ar svg{width:13px;height:13px}
+.dayswitch b{font-weight:700;font-size:15px}
+
+/* nutrition */
+.meal-group{font-weight:700;font-size:13px;color:var(--text-dim);margin:4px 0 11px}
+.meal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px 16px;margin-bottom:11px;
+  display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.meal .nm{font-weight:700;font-size:14px;line-height:1.25}
+.meal .mac{color:var(--text-faint);font-size:11.5px;margin-top:5px}
+.meal .kc{color:var(--accent-text);font-weight:700;font-size:14px;white-space:nowrap}
+.kcalbar{margin-top:6px}
+.kcalbar .row{display:flex;justify-content:space-between;font-size:12px;color:var(--text-dim);margin-bottom:7px}
+.kcalbar .track{height:7px;border-radius:99px;background:var(--track);overflow:hidden}
+.kcalbar .track i{display:block;height:100%;width:45%;border-radius:99px;background:var(--accent)}
+.ideas-h{font-size:12.5px;color:var(--text-dim);margin:16px 0 9px}
+.idea{background:var(--surface);border:1px dashed var(--border-strong);border-radius:16px;padding:14px 16px}
+.idea .nm{font-weight:700;font-size:13.5px}
+.idea .mac{color:var(--text-faint);font-size:11.5px;margin-top:5px}
+
+/* sport timeline */
+.timeline{position:relative;flex:1;overflow:hidden}
+.tl-row{display:flex;gap:12px;height:46px}
+.tl-row .hr{width:42px;flex:none;font-size:11.5px;color:var(--text-faint);padding-top:0;transform:translateY(-6px)}
+.tl-row .ln{flex:1;border-top:1px solid var(--border)}
+.tl-abs{position:absolute;left:54px;right:0;top:0}
+.evt{position:absolute;background:var(--surface-3);border:1px solid var(--border);border-left:3px solid var(--accent);
+  border-radius:10px;padding:9px 11px;font-size:12.5px;font-weight:700;line-height:1.2;overflow:hidden}
+.now{position:absolute;left:54px;right:0;height:0;border-top:2px solid var(--danger)}
+.now::before{content:"";position:absolute;left:-5px;top:-5px;width:9px;height:9px;border-radius:50%;background:var(--danger)}
+
+/* profile */
+.prog-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-card);padding:18px;margin:18px 0 8px}
+.prog-card .k{font-size:11px;letter-spacing:.16em;color:var(--text-faint);font-weight:600}
+.prog-card .t{font-family:var(--font-disp);font-weight:700;font-size:24px;margin:6px 0 13px;line-height:1.05}
+.prog-card .rowb{display:flex;justify-content:space-between;align-items:center}
+.prog-card .rowb .lab{color:var(--text-dim);font-size:13px}
+.prog-card .rowb .val{font-family:var(--font-disp);font-weight:700;font-size:16px}
+.prog-card .chg{display:block;color:var(--accent-text);font-size:13px;font-weight:600;margin-top:11px}
+.form-k{font-size:11px;letter-spacing:.16em;color:var(--text-faint);font-weight:700;margin:20px 0 10px}
+.fld-l{font-size:13px;font-weight:600;margin:11px 0 7px}
+.fld{background:var(--surface-2);border:1px solid var(--border);border-radius:13px;padding:14px 15px;font-size:14px;color:var(--text)}
+.seg{display:flex;gap:8px;margin-top:4px}
+.seg span{padding:9px 16px;border-radius:var(--radius-pill);background:var(--surface-2);border:1px solid var(--border);
+  font-size:13px;color:var(--text-dim)}
+.seg span.on{background:var(--accent);color:var(--on-accent);font-weight:700;border-color:var(--accent)}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+@media(max-width:640px){body{padding:24px 12px 60px}.phone{width:280px;height:590px}}
+</style>
+</head>
+<body>
+
+<!-- PAGE HEADER -->
+<div class="page-head">
+  <div>
+    <div class="brand">HEALTHAI · DESIGN SYSTEM</div>
+    <h1>Maquettes complètes</h1>
+    <p>Parcours d'onboarding + application, refondus dans une seule direction artistique : noir profond, accent vert lime, gros titres grotesque. Bascule entre le thème sombre et le thème clair.</p>
+  </div>
+  <button class="theme-toggle" id="tg" onclick="toggleTheme()">
+    <span class="dot"></span><span id="tgl">Passer en clair</span>
+  </button>
+</div>
+
+<!-- ============ ONBOARDING ============ -->
+<div class="section-label"><span>ONBOARDING</span><span class="ln"></span><span>11 écrans</span></div>
+<div class="gallery">
+
+  <!-- Welcome -->
+  <div class="frame-wrap"><div class="phone"><div class="notch"></div><div class="screen">
+    <div class="scr-pad" style="justify-content:flex-end;padding-bottom:0">
+      <div class="logo"><b></b></div>
+      <div class="eyebrow">HEALTHAI</div>
+      <div class="h1" style="font-size:30px">Bienvenue test 7, construisons ton profil santé.</div>
+      <div class="sub">Quelques questions rapides pour calibrer tes objectifs et mesurer ton rythme cardiaque au repos.</div>
+      <div class="meta"><span>7 étapes</span><i></i><span>≈ 2 min</span><i></i><span>Confidentiel</span></div>
+      <div class="footer"><button class="btn btn-primary">Commencer</button></div>
+    </div>
+  </div></div><div class="cap">Accueil onboarding</div></div>
+
+  <!-- Étape 1 age -->
+  <div class="frame-wrap"><div class="phone"><div class="notch"></div><div class="screen">
+    <div class="scr-pad">
+      <div class="ob-top"><div class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><div class="bar"><i style="width:14%"></i></div></div>
+      <div class="eyebrow">ÉTAPE 1</div><div class="h1">Quel âge as-tu ?</div>
+      <div class="bigval"><span class="n">27</span><span class="u">ans</span><span class="hint">Touche le nombre pour saisir</span></div>
+      <div class="ruler"><div class="ticks"></div><div class="cur"></div><div class="labels"><span>18</span><span>23</span><span>28</span><span>33</span><span>38</span></div></div>
+      <div class="footer"><button class="btn btn-primary">Continuer</button></div>
+    </div>
+  </div></div><div class="cap">Étape 1 — Âge</div></div>
+
+  <!-- Étape 2 genre -->
+  <div class="frame-wrap"><div class="phone"><div class="notch"></div><div class="screen">
+    <div class="scr-pad">
+      <div class="ob-top"><div class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><div class="bar"><i style="width:26%"></i></div></div>
+      <div class="eyebrow">ÉTAPE 2</div><div class="h1">Quel est ton genre ?</div>
+      <div style="margin-top:26px">
+        <div class="opt on">Homme <span class="rd"></span></div>
+        <div class="opt">Femme <span class="rd"></span></div>
+        <div class="opt">Autre <span class="rd"></span></div>
+      </div>
+      <div class="footer"><button class="btn btn-primary">Continuer</button></div>
+    </div>
+  </div></div><div class="cap">Étape 2 — Genre</div></div>
+
+  <!-- Étape 3 taille -->
+  <div class="frame-wrap"><div class="phone"><div class="notch"></div><div class="screen">
+    <div class="scr-pad">
+      <div class="ob-top"><div class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><div class="bar"><i style="width:38%"></i></div></div>
+      <div class="eyebrow">ÉTAPE 3</div><div class="h1">Combien mesures-tu ?</div>
+      <div class="bigval"><span class="n">175</span><span class="u">cm</span><span class="hint">Touche le nombre pour saisir</span></div>
+      <div class="ruler"><div class="ticks"></div><div class="cur"></div><div class="labels"><span>165</span><span>170</span><span>175</span><span>180</span><span>185</span></div></div>
+      <div class="footer"><button class="btn btn-primary">Continuer</button></div>
+    </div>
+  </div></div><div class="cap">Étape 3 — Taille</div></div>
+
+  <!-- Étape 5 sport -->
+  <div class="frame-wrap"><div class="phone"><div class="notch"></div><div class="screen">
+    <div class="scr-pad">
+      <div class="ob-top"><div class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><div class="bar"><i style="width:50%"></i></div></div>
+      <div class="eyebrow">ÉTAPE 5</div><div class="h1">Sport par semaine ?</div>
+      <div class="sub">Heures d'activité physique modérée à intense.</div>
+      <div class="bigval" style="margin-top:32px"><span class="n">13.0</span><span class="u">h / sem</span><span class="hint">Touche le nombre pour saisir</span></div>
+      <div class="ruler"><div class="ticks"></div><div class="cur"></div><div class="labels"><span>5</span><span>10</span><span>13</span><span>15</span><span>20</span></div></div>
+      <div class="footer"><button class="btn btn-primary">Continuer</button></div>
+    </div>
+  </div></div><div class="cap">Étape 5 — Activité</div></div>
+
+  <!-- Étape 6 silhouette -->
+  <div class="frame-wrap"><div class="phone"><div class="notch"></div><div class="screen">
+    <div class="scr-pad">
+      <div class="ob-top"><div class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><div class="bar"><i style="width:58%"></i></div></div>
+      <div class="eyebrow">ÉTAPE 6</div><div class="h1">Quelle silhouette te ressemble ?</div>
+      <div class="sub">Une estimation suffit, tu pourras l'ajuster plus tard.</div>
+      <div class="sil-grid">
+        <div class="sil"><svg viewBox="0 0 40 60" fill="currentColor"><circle cx="20" cy="9" r="7"/><path d="M14 20h12l-2 24h-8z"/><rect x="15" y="42" width="4" height="16" rx="2"/><rect x="21" y="42" width="4" height="16" rx="2"/></svg><span>10–13 %</span></div>
+        <div class="sil on"><svg viewBox="0 0 40 60" fill="currentColor"><circle cx="20" cy="9" r="7"/><path d="M13 20h14l-3 24h-8z"/><rect x="15" y="42" width="4" height="16" rx="2"/><rect x="21" y="42" width="4" height="16" rx="2"/></svg><span>14–17 %</span></div>
+        <div class="sil"><svg viewBox="0 0 40 60" fill="currentColor"><circle cx="20" cy="9" r="7.5"/><path d="M12 20h16l-3 24H15z"/><rect x="15" y="42" width="4" height="16" rx="2"/><rect x="21" y="42" width="4" height="16" rx="2"/></svg><span>18–21 %</span></div>
+        <div class="sil"><svg viewBox="0 0 40 60" fill="currentColor"><circle cx="20" cy="9" r="8"/><path d="M11 20h18l-3 24H14z"/><rect x="14" y="42" width="5" height="16" rx="2"/><rect x="21" y="42" width="5" height="16" rx="2"/></svg><span>22–25 %</span></div>
+        <div class="sil"><svg viewBox="0 0 40 60" fill="currentColor"><circle cx="20" cy="9" r="8.5"/><path d="M10 21h20l-3 23H13z"/><rect x="13" y="42" width="6" height="16" rx="3"/><rect x="21" y="42" width="6" height="16" rx="3"/></svg><span>26–31 %</span></div>
+        <div class="sil"><svg viewBox="0 0 40 60" fill="currentColor"><circle cx="20" cy="10" r="9"/><path d="M9 22h22l-4 22H13z"/><rect x="12" y="42" width="6" height="16" rx="3"/><rect x="22" y="42" width="6" height="16" rx="3"/></svg><span>32 %+</span></div>
+      </div>
+      <div class="footer"><button class="btn btn-primary">Continuer</button></div>
+    </div>
+  </div></div><div class="cap">Étape 6 — Silhouette</div></div>
+
+  <!-- Étape 6 pouls intro -->
+  <div class="frame-wrap"><div class="phone"><div class="notch"></div><div class="screen">
+    <div class="scr-pad">
+      <div class="ob-top"><div class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><div class="bar"><i style="width:64%"></i></div></div>
+      <div class="eyebrow">ÉTAPE 6</div><div class="h1">Mesurons ton pouls</div>
+      <div class="sub">Au repos, pour estimer ta fréquence cardiaque de base.</div>
+      <div class="heart-badge"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.3-9C1 8.5 2.7 5 6 5c2 0 3.2 1.2 4 2.3C10.8 6.2 12 5 14 5c3.3 0 5 3.5 3.3 7-2.3 4.4-5.3 9-5.3 9z"/></svg></div>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><p>Assieds-toi et reste calme une dizaine de secondes.</p></div>
+        <div class="step"><div class="num">2</div><p>Pose l'index et le majeur sur l'intérieur du poignet opposé, ou sur le côté du cou.</p></div>
+        <div class="step"><div class="num">3</div><p>Quand tu sens les battements, lance la mesure et compte-les jusqu'à la fin.</p></div>
+      </div>
+      <div class="footer"><button class="btn btn-primary">Je sens mon pouls</button></div>
+    </div>
+  </div></div><div class="cap">Étape 6 — Pouls (intro)</div></div>
+
+  <!-- pulse timer -->
+  <div class="frame-wrap"><div class="phone"><div class="notch"></div><div class="screen">
+    <div class="scr-pad timer-screen">
+      <div class="ring">
+        <svg width="198" height="198" viewBox="0 0 198 198">
+          <circle cx="99" cy="99" r="88" fill="none" stroke="var(--track)" stroke-width="8"/>
+          <circle cx="99" cy="99" r="88" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round"
+            stroke-dasharray="553" stroke-dashoffset="138"/>
+        </svg>
+        <div class="mid">
+          <svg class="hh" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.3-9C1 8.5 2.7 5 6 5c2 0 3.2 1.2 4 2.3C10.8 6.2 12 5 14 5c3.3 0 5 3.5 3.3 7-2.3 4.4-5.3 9-5.3 9z"/></svg>
+          <div class="t">23</div><div class="s">sec</div>
+        </div>
+      </div>
+      <div class="cap2">Compte chaque battement</div>
+    </div>
+  </div></div><div class="cap">Mesure du pouls (30 s)</div></div>
+
+  <!-- Étape 6 battements -->
+  <div class="frame-wrap"><div class="phone"><div class="notch"></div><div class="screen">
+    <div class="scr-pad">
+      <div class="ob-top"><div class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><div class="bar"><i style="width:70%"></i></div></div>
+      <div class="eyebrow">ÉTAPE 6</div><div class="h1">Combien de battements ?</div>
+      <div class="sub">Saisis le nombre que tu as compté pendant les 30 secondes.</div>
+      <div class="counter"><div class="pm">−</div><div class="cval">35</div><div class="pm">+</div></div>
+      <div class="counter-lbl">BATTEMENTS COMPTÉS</div>
+      <div class="bpm"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.6-9.3-9C1 8.5 2.7 5 6 5c2 0 3.2 1.2 4 2.3C10.8 6.2 12 5 14 5c3.3 0 5 3.5 3.3 7-2.3 4.4-5.3 9-5.3 9z"/></svg><b>70</b><span>BPM au repos</span></div>
+      <div class="note">On double ton décompte sur 30 secondes pour obtenir les battements par minute.</div>
+      <div class="footer"><button class="btn btn-primary">Continuer</button></div>
+    </div>
+  </div></div><div class="cap">Étape 6 — Battements</div></div>
+
+  <!-- Étape 7 allergies -->
+  <div class="frame-wrap"><div class="phone"><div class="notch"></div><div class="screen">
+    <div class="scr-pad">
+      <div class="ob-top"><div class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><div class="bar"><i style="width:82%"></i></div></div>
+      <div class="eyebrow">ÉTAPE 7</div><div class="h1">Des allergies ?</div>
+      <div class="sub">Sélectionne celles qui te concernent. Tu peux ne rien cocher.</div>
+      <div class="chips">
+        <span class="chip">Arachides</span><span class="chip on">Crustacés</span><span class="chip">Fruits à coque</span>
+        <span class="chip on">Gluten</span><span class="chip">Lactose</span><span class="chip">Œufs</span>
+        <span class="chip">Poisson</span><span class="chip">Soja</span>
+      </div>
+      <div class="footer"><button class="btn btn-primary">Continuer</button></div>
+    </div>
+  </div></div><div class="cap">Étape 7 — Allergies</div></div>
+
+  <!-- Étape 8 handicaps -->
+  <div class="frame-wrap"><div class="phone"><div class="notch"></div><div class="screen">
+    <div class="scr-pad">
+      <div class="ob-top"><div class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><div class="bar"><i style="width:94%"></i></div></div>
+      <div class="eyebrow">ÉTAPE 8</div><div class="h1">Des handicaps ?</div>
+      <div class="sub">Sélectionne les zones concernées. Tu peux ne rien cocher.</div>
+      <div class="chips">
+        <span class="chip">Abdominaux</span><span class="chip">Bras</span><span class="chip">Bras droit</span>
+        <span class="chip">Bras gauche</span><span class="chip on">Dos</span><span class="chip">Épaules</span>
+        <span class="chip">Jambe droite</span><span class="chip">Jambe gauche</span><span class="chip">Jambes</span>
+        <span class="chip on">Nuque</span><span class="chip">Pied</span>
+      </div>
+      <div class="footer"><button class="btn btn-primary">Continuer</button></div>
+    </div>
+  </div></div><div class="cap">Étape 8 — Handicaps</div></div>
+
+</div>
+
+<!-- ============ APPLICATION ============ -->
+<div class="section-label"><span>APPLICATION · REFONTE</span><span class="ln"></span><span>4 écrans</span></div>
+<div class="gallery">
+
+  <!-- Accueil -->
+  <div class="frame-wrap"><div class="phone"><div class="notch"></div><div class="screen">
+    <div class="topbar"><div class="lg">HealthAI</div><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div></div>
+    <div class="app-body">
+      <div class="app-sub" style="margin:0 0 2px">Bonjour,</div>
+      <div class="app-h">test 5 👋</div>
+      <div class="kicker">AUJOURD'HUI</div>
+      <div class="grid2">
+        <div class="stat"><div class="lab">🍽 Repas</div><div class="big">2</div><div class="small">1160 kcal</div></div>
+        <div class="stat"><div class="lab">🏋 Séances</div><div class="big">3</div><div class="small">2 h 25 min</div></div>
+      </div>
+      <div class="kicker" style="letter-spacing:0;font-size:13px;color:var(--text);text-transform:none">Macros du jour</div>
+      <div class="macros">
+        <div class="macro"><b>95 g</b><span>Protéines</span></div>
+        <div class="macro"><b>135 g</b><span>Glucides</span></div>
+        <div class="macro"><b>22 g</b><span>Lipides</span></div>
+      </div>
+      <div class="home-cta">
+        <button class="btn btn-primary">🍽  Enregistrer un repas</button>
+        <button class="btn btn-soft">🏋  Nouvelle séance</button>
+      </div>
+    </div>
+    <div class="bottom-nav"><a class="on">Accueil</a><a>Repas</a><a>Sport</a><a>Profil</a></div>
+  </div></div><div class="cap">Accueil</div></div>
+
+  <!-- Nutrition -->
+  <div class="frame-wrap"><div class="phone"><div class="notch"></div><div class="screen">
+    <div class="topbar"><div class="lg">HealthAI</div><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div></div>
+    <div class="app-body">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="app-h">Nutrition</div><button class="btn-pill-accent">+ Ajouter</button>
+      </div>
+      <div class="dayswitch"><div class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><b>Aujourd'hui</b><div class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></div></div>
+      <div class="meal-group">Déjeuner</div>
+      <div class="meal"><div><div class="nm">Poulet sauté, riz et brocoli</div><div class="mac">P 45g · G 75g · L 10g</div></div><div class="kc">580 kcal</div></div>
+      <div class="meal"><div><div class="nm">Poulet sauté, riz et brocoli</div><div class="mac">P 50g · G 60g · L 12g</div></div><div class="kc">580 kcal</div></div>
+      <div class="kcalbar">
+        <div class="row"><span>1160 / 2593 kcal</span><span>1433 restantes</span></div>
+        <div class="track"><i></i></div>
+      </div>
+      <div class="ideas-h">Idées pour le petit déjeuner</div>
+      <div class="idea"><div class="nm">Smoothie bowl açaï, granola, fruits rouges</div><div class="mac">420 kcal · P12 G72 L10</div></div>
+    </div>
+    <div class="bottom-nav"><a>Accueil</a><a class="on">Repas</a><a>Sport</a><a>Profil</a></div>
+  </div></div><div class="cap">Nutrition</div></div>
+
+  <!-- Sport -->
+  <div class="frame-wrap"><div class="phone"><div class="notch"></div><div class="screen">
+    <div class="topbar"><div class="lg">HealthAI</div><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div></div>
+    <div class="app-body">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="app-h">Mes séances</div><button class="btn-pill-accent">+ Planifier</button>
+      </div>
+      <div class="dayswitch"><div class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></div><b>Aujourd'hui</b><div class="ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg></div></div>
+      <div class="timeline">
+        <div class="tl-row"><div class="hr">09:00</div><div class="ln"></div></div>
+        <div class="tl-row"><div class="hr">10:00</div><div class="ln"></div></div>
+        <div class="tl-row"><div class="hr">11:00</div><div class="ln"></div></div>
+        <div class="tl-row"><div class="hr">12:00</div><div class="ln"></div></div>
+        <div class="tl-row"><div class="hr">13:00</div><div class="ln"></div></div>
+        <div class="tl-row"><div class="hr">14:00</div><div class="ln"></div></div>
+        <div class="tl-abs">
+          <div class="evt" style="top:50px;left:0;right:0;height:38px">Intervalles VO2max — Zone 4-5</div>
+          <div class="evt" style="top:96px;left:0;width:48%;height:38px">Endurance fondamentale</div>
+          <div class="evt" style="top:96px;right:0;width:48%;height:38px">Endurance fondamentale</div>
+          <div class="now" style="top:140px"></div>
+        </div>
+      </div>
+    </div>
+    <div class="bottom-nav"><a>Accueil</a><a>Repas</a><a class="on">Sport</a><a>Profil</a></div>
+  </div></div><div class="cap">Sport · planning</div></div>
+
+  <!-- Profil -->
+  <div class="frame-wrap"><div class="phone"><div class="notch"></div><div class="screen">
+    <div class="topbar"><div class="lg">HealthAI</div><div class="av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div></div>
+    <div class="app-body">
+      <div class="app-h">Profil</div><div class="app-sub">Modifie tes informations</div>
+      <div class="prog-card">
+        <div class="k">MON PROGRAMME</div>
+        <div class="t">Amélioration du cardio</div>
+        <div class="rowb"><span class="lab">Poids cible</span><span class="val">66 kg</span></div>
+        <a class="chg">Changer de programme →</a>
+      </div>
+      <div class="form-k">IDENTITÉ</div>
+      <div class="fld-l">Prénom</div><div class="fld">test 5</div>
+      <div class="fld-l">Genre</div>
+      <div class="seg"><span class="on">Homme</span><span>Femme</span><span>Autre</span></div>
+      <div class="form-k">MENSURATIONS</div>
+      <div class="fld-l">Âge</div><div class="fld">22</div>
+    </div>
+    <div class="bottom-nav"><a>Accueil</a><a>Repas</a><a>Sport</a><a class="on">Profil</a></div>
+  </div></div><div class="cap">Profil</div></div>
+
+</div>
+
+<script>
+function toggleTheme(){
+  var r=document.documentElement;
+  var light=r.getAttribute('data-theme')==='light';
+  r.setAttribute('data-theme',light?'dark':'light');
+  document.getElementById('tgl').textContent=light?'Passer en clair':'Passer en sombre';
+}
+</script>
+</body>
+</html>

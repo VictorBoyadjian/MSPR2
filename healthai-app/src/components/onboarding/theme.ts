@@ -1,7 +1,10 @@
 // Design tokens de l'onboarding HealthAI (thème sombre / néon).
 // Autonome : n'utilise que des polices système (pas de dépendance Google Fonts).
+// L'accent provient du token de marque central (cf. constants/theme/colors.ts).
 
-export const accent = '#CBFF3C';
+import { Brand } from '@/constants/theme';
+
+export const accent = Brand.accent;
 
 function rgbOf(hex: string): [number, number, number] {
   const h = hex.replace('#', '');

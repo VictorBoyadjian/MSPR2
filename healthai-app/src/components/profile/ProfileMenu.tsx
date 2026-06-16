@@ -7,6 +7,7 @@ import Icon, { IconName } from '@/components/ui/Icon';
 import { Spacing } from '@/constants/theme';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/use-theme';
+import { useThemePreference, type ThemePreference } from '@/stores/themeStore';
 
 export default function ProfileMenu() {
   const { user, logout, deleteAccount } = useAuth();
@@ -72,6 +73,10 @@ export default function ProfileMenu() {
 
               <ThemedView style={[styles.separator, { backgroundColor: theme.backgroundSelected }]} />
 
+              <ThemeSwitcher />
+
+              <ThemedView style={[styles.separator, { backgroundColor: theme.backgroundSelected }]} />
+
               <MenuItem
                 icon="logout"
                 label="Se déconnecter"
@@ -89,6 +94,57 @@ export default function ProfileMenu() {
         </Pressable>
       </Modal>
     </>
+  );
+}
+
+const THEME_OPTIONS: { value: ThemePreference; label: string; icon: IconName }[] = [
+  { value: 'system', label: 'Auto', icon: 'theme-auto' },
+  { value: 'light', label: 'Clair', icon: 'theme-light' },
+  { value: 'dark', label: 'Sombre', icon: 'theme-dark' },
+];
+
+function ThemeSwitcher() {
+  const theme = useTheme();
+  const { preference, setPreference } = useThemePreference();
+
+  return (
+    <ThemedView style={styles.themeBlock}>
+      <ThemedText type="small" themeColor="textSecondary" style={styles.themeLabel}>
+        Apparence
+      </ThemedText>
+      <ThemedView style={[styles.segment, { backgroundColor: theme.surface2 }]}>
+        {THEME_OPTIONS.map((opt) => {
+          const active = preference === opt.value;
+          return (
+            <Pressable
+              key={opt.value}
+              accessibilityRole="button"
+              accessibilityState={{ selected: active }}
+              accessibilityLabel={`Thème ${opt.label}`}
+              onPress={() => setPreference(opt.value)}
+              style={({ pressed }) => [
+                styles.segmentItem,
+                active && { backgroundColor: theme.accentSoft },
+                pressed && !active && styles.itemPressed,
+              ]}>
+              <Icon
+                name={opt.icon}
+                size={16}
+                color={active ? theme.accentText : theme.textSecondary}
+              />
+              <ThemedText
+                type="small"
+                style={{
+                  color: active ? theme.accentText : theme.textSecondary,
+                  fontWeight: active ? '700' : '500',
+                }}>
+                {opt.label}
+              </ThemedText>
+            </Pressable>
+          );
+        })}
+      </ThemedView>
+    </ThemedView>
   );
 }
 
@@ -146,6 +202,31 @@ const styles = StyleSheet.create({
   separator: {
     height: StyleSheet.hairlineWidth,
     marginVertical: Spacing.one,
+  },
+  themeBlock: {
+    paddingHorizontal: Spacing.two,
+    paddingVertical: Spacing.one,
+    gap: Spacing.two,
+  },
+  themeLabel: {
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    fontSize: 11,
+  },
+  segment: {
+    flexDirection: 'row',
+    borderRadius: Spacing.two,
+    padding: Spacing.half,
+    gap: Spacing.half,
+  },
+  segmentItem: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing.one,
+    paddingVertical: Spacing.two,
+    borderRadius: Spacing.one + Spacing.half,
   },
   item: {
     flexDirection: 'row',

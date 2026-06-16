@@ -118,7 +118,7 @@ export default function EditWorkoutScreen() {
               <ThemedView style={styles.row}>
                 <ThemedText type="smallBold" style={styles.flexText}>{selected.name}</ThemedText>
                 <Pressable onPress={() => (picking ? setPicking(false) : openPicker())} hitSlop={8}>
-                  <ThemedText type="small" style={styles.change}>{picking ? 'Fermer' : 'Changer'}</ThemedText>
+                  <ThemedText type="small" style={[styles.change, { color: theme.accentText }]}>{picking ? 'Fermer' : 'Changer'}</ThemedText>
                 </Pressable>
               </ThemedView>
               <ThemedView style={styles.dateField}>
@@ -208,7 +208,7 @@ const styles = StyleSheet.create({
   form: { padding: Spacing.four, gap: Spacing.three },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   flexText: { flex: 1, marginRight: Spacing.two },
-  change: { color: '#3b82f6' },
+  change: { fontWeight: '600' },
   dateField: { gap: Spacing.one, marginTop: Spacing.two, alignItems: 'flex-start' },
   exercises: { gap: Spacing.two },
   exerciseList: { gap: Spacing.three },

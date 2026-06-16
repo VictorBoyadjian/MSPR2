@@ -91,7 +91,7 @@ export default function AddWorkoutScreen() {
                 <ThemedView style={styles.row}>
                   <ThemedText type="smallBold" style={styles.flexText}>{selected.name}</ThemedText>
                   <Pressable onPress={() => setSelected(null)} hitSlop={8}>
-                    <ThemedText type="small" style={styles.change}>Changer</ThemedText>
+                    <ThemedText type="small" style={[styles.change, { color: theme.accentText }]}>Changer</ThemedText>
                   </Pressable>
                 </ThemedView>
                 {selected.exercises?.length ? (
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   form: { padding: Spacing.four, gap: Spacing.three },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   flexText: { flex: 1, marginRight: Spacing.two },
-  change: { color: '#3b82f6' },
+  change: { fontWeight: '600' },
   dateField: { gap: Spacing.one, marginTop: Spacing.two, alignItems: 'flex-start' },
   searchRow: { flexDirection: 'row', gap: Spacing.two, alignItems: 'flex-end' },
   searchInput: { flex: 1 },
