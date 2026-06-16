@@ -95,7 +95,7 @@ export default function AddWorkoutScreen() {
                 ) : null}
                 <ThemedView style={styles.dateField}>
                   <ThemedText type="small" themeColor="textSecondary">Quand ?</ThemedText>
-                  <DateTimeField value={performedAt} onChange={setPerformedAt} />
+                  <DateTimeField value={performedAt} onChange={setPerformedAt} mode="datetime" />
                 </ThemedView>
                 <ThemedText type="small" themeColor="textSecondary">
                   Une date future planifie la séance, une date passée l&apos;enregistre comme faite.

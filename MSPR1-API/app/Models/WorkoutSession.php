@@ -36,6 +36,7 @@ class WorkoutSession extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_sessions', 'workout_session_id', 'user_id')
+            ->using(UserSession::class)
             ->withPivot(['id', 'performed_at']);
     }
 }
