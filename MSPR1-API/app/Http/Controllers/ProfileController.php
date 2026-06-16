@@ -31,6 +31,7 @@ class ProfileController {
             'sport_per_week' => ['sometimes', 'nullable', 'numeric'],
             'goal_id'        => ['sometimes', 'nullable', 'integer', 'exists:goals,id'],
             'target_weight'  => ['sometimes', 'nullable', 'numeric'],
+            'weeks_to_goal'  => ['sometimes', 'nullable', 'integer', 'min:1', 'max:104'],
             'allergies'      => ['sometimes', 'array'],
             'allergies.*'    => ['integer', 'exists:allergies,id'],
             'handicaps'      => ['sometimes', 'array'],

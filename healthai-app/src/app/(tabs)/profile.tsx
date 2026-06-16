@@ -141,7 +141,11 @@ export default function ProfileScreen() {
         </ThemedView>
 
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-          <ProgramBanner label={goalLabel} onPress={() => router.push('/program/select')} />
+          <ProgramBanner
+            label={goalLabel}
+            targetWeight={user.target_weight}
+            onPress={() => router.push('/program/select')}
+          />
 
           <ProfileForm
             values={values}

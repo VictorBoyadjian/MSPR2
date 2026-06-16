@@ -7,11 +7,17 @@ import { useTheme } from '@/hooks/use-theme';
 type Props = {
   /** Libellé du programme actuel, ou null si aucun n'est défini. */
   label: string | null;
+  /** Poids cible (kg) associé au programme. L'API peut le renvoyer en chaîne. */
+  targetWeight: number | string | null;
   onPress: () => void;
 };
 
-export default function ProgramBanner({ label, onPress }: Props) {
+export default function ProgramBanner({ label, targetWeight, onPress }: Props) {
   const theme = useTheme();
+  // L'API sérialise les FLOAT en chaîne : on normalise avant formatage.
+  const weight = targetWeight != null ? Number(targetWeight) : NaN;
+  const hasWeight = Number.isFinite(weight);
+  const fmtWeight = (w: number) => `${w.toFixed(1).replace(/\.0$/, '')} kg`;
   return (
     <Pressable
       onPress={onPress}
@@ -23,6 +29,12 @@ export default function ProgramBanner({ label, onPress }: Props) {
         <ThemedText type="small" themeColor="textSecondary">MON PROGRAMME</ThemedText>
         <ThemedText type="subtitle">{label ?? 'Aucun programme'}</ThemedText>
       </View>
+      {label && hasWeight ? (
+        <View style={styles.target}>
+          <ThemedText type="small" themeColor="textSecondary">Poids cible</ThemedText>
+          <ThemedText type="smallBold">{fmtWeight(weight)}</ThemedText>
+        </View>
+      ) : null}
       <ThemedText type="small" themeColor="textSecondary">
         {label ? 'Changer de programme →' : 'Choisir un programme →'}
       </ThemedText>
@@ -37,4 +49,5 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   text: { gap: Spacing.half },
+  target: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
 });

@@ -40,6 +40,7 @@ class UserResource extends Resource
             'sport_per_week',
             'goal_id',
             'target_weight',
+            'weeks_to_goal',
         ];
     }
 

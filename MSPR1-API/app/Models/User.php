@@ -32,6 +32,7 @@ class User extends Authenticatable
         'sport_per_week',
         'goal_id',
         'target_weight',
+        'weeks_to_goal',
         'created_at',
         'updated_at',
     ];

@@ -16,6 +16,8 @@ export type User = {
   rest_bpm: number | null;
   sport_per_week: number | null;
   goal_id: string | null;
+  target_weight: number | null;
+  weeks_to_goal: number | null;
   is_premium: boolean;
   is_active: boolean;
   remember_token?: string | null;
