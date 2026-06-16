@@ -22,7 +22,9 @@ import { buildOnboardingUpdate, DEFAULT_ONBOARDING_DATA, OnboardingData } from '
 import AllergiesStep from './steps/AllergiesStep';
 import BodyFatStep from './steps/BodyFatStep';
 import { BpmCount, BpmCountdown, BpmIntro, BpmMeasure } from './steps/BpmSteps';
+import GenderStep from './steps/GenderStep';
 import HandicapsStep from './steps/HandicapsStep';
+import ProgramStep from './steps/ProgramStep';
 import RulerStep from './steps/RulerStep';
 import SummaryStep from './steps/SummaryStep';
 import WelcomeStep from './steps/WelcomeStep';
@@ -31,6 +33,7 @@ import { colors } from './theme';
 type StepId =
   | 'welcome'
   | 'age'
+  | 'gender'
   | 'height'
   | 'weight'
   | 'sport'
@@ -41,6 +44,7 @@ type StepId =
   | 'bpmcount'
   | 'allergies'
   | 'handicaps'
+  | 'program'
   | 'summary';
 
 type StepConfig = {
@@ -55,6 +59,7 @@ type StepConfig = {
 const STEPS: StepConfig[] = [
   { id: 'welcome', chrome: false, footer: 'Commencer' },
   { id: 'age', prog: 0.1, footer: 'Continuer' },
+  { id: 'gender', prog: 0.16, footer: 'Continuer', valid: (d) => d.gender != null },
   { id: 'height', prog: 0.22, footer: 'Continuer' },
   { id: 'weight', prog: 0.33, footer: 'Continuer' },
   { id: 'sport', prog: 0.44, footer: 'Continuer' },
@@ -63,8 +68,9 @@ const STEPS: StepConfig[] = [
   { id: 'countdown', chrome: false, takeover: true },
   { id: 'measure', chrome: false, takeover: true },
   { id: 'bpmcount', prog: 0.8, footer: 'Continuer' },
-  { id: 'allergies', prog: 0.85, footer: 'Continuer' },
-  { id: 'handicaps', prog: 0.92, footer: 'Continuer' },
+  { id: 'allergies', prog: 0.8, footer: 'Continuer' },
+  { id: 'handicaps', prog: 0.87, footer: 'Continuer' },
+  { id: 'program', prog: 0.94, footer: 'Continuer', valid: (d) => d.goalId != null },
   { id: 'summary', prog: 1, footer: 'Créer mon compte' },
 ];
 
@@ -146,12 +152,14 @@ export default function OnboardingFlow() {
         return <WelcomeStep firstName={firstName} />;
       case 'age':
         return <RulerStep eyebrow="ÉTAPE 1" title="Quel âge as-tu ?" min={13} max={100} majorStep={5} unit="ans" value={data.age} onChange={(v) => patch({ age: v })} />;
+      case 'gender':
+        return <GenderStep value={data.gender} onChange={(g) => patch({ gender: g })} />;
       case 'height':
-        return <RulerStep eyebrow="ÉTAPE 2" title="Combien mesures-tu ?" min={120} max={220} majorStep={10} unit="cm" value={data.height} onChange={(v) => patch({ height: v })} />;
+        return <RulerStep eyebrow="ÉTAPE 3" title="Combien mesures-tu ?" min={120} max={220} majorStep={10} unit="cm" value={data.height} onChange={(v) => patch({ height: v })} />;
       case 'weight':
-        return <RulerStep eyebrow="ÉTAPE 3" title="Quel est ton poids ?" min={35} max={200} step={0.5} decimals={1} majorStep={10} unit="kg" value={data.weight} onChange={(v) => patch({ weight: v })} />;
+        return <RulerStep eyebrow="ÉTAPE 4" title="Quel est ton poids ?" min={35} max={200} step={0.5} decimals={1} majorStep={10} unit="kg" value={data.weight} onChange={(v) => patch({ weight: v })} />;
       case 'sport':
-        return <RulerStep eyebrow="ÉTAPE 4" title="Sport par semaine ?" sub="Heures d'activité physique modérée à intense." min={0} max={25} step={0.5} decimals={1} majorStep={5} unit="h / sem" value={data.sport} onChange={(v) => patch({ sport: v })} />;
+        return <RulerStep eyebrow="ÉTAPE 5" title="Sport par semaine ?" sub="Heures d'activité physique modérée à intense." min={0} max={25} step={0.5} decimals={1} majorStep={5} unit="h / sem" value={data.sport} onChange={(v) => patch({ sport: v })} />;
       case 'bodyfat':
         return <BodyFatStep value={data.bodyFat} onChange={(i) => patch({ bodyFat: i })} />;
       case 'bpmintro':
@@ -166,6 +174,8 @@ export default function OnboardingFlow() {
         return <AllergiesStep selected={data.allergies} onToggle={toggleAllergy} />;
       case 'handicaps':
         return <HandicapsStep selected={data.handicaps} onToggle={toggleHandicap} />;
+      case 'program':
+        return <ProgramStep data={data} selectedGoalId={data.goalId} onSelect={(id) => patch({ goalId: id })} />;
       case 'summary':
         return <SummaryStep data={data} firstName={firstName} />;
     }

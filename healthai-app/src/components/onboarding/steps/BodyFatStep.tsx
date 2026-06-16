@@ -15,7 +15,7 @@ export default function BodyFatStep({ value, onChange }: BodyFatStepProps) {
   return (
     <View>
       <StepHeader
-        eyebrow="ÉTAPE 5"
+        eyebrow="ÉTAPE 6"
         title="Quelle silhouette te ressemble ?"
         sub="Une estimation suffit, tu pourras l'ajuster plus tard."
       />

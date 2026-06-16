@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -5,13 +6,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import ProfileForm, { ProfileFormValues } from '@/components/profile/ProfileForm';
+import ProgramBanner from '@/components/profile/ProgramBanner';
 import Loader from '@/components/ui/Loader';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAllergies } from '@/hooks/useAllergies';
+import { useGoals } from '@/hooks/useGoals';
 import { useHandicaps } from '@/hooks/useHandicaps';
 import { useAuth } from '@/hooks/useAuth';
 import { ApiError } from '@/services/api';
 import { userService } from '@/services/userService';
+import { GenderEnum } from '@/types/users.type';
 
 const toStr = (n: number | null | undefined) => (n == null ? '' : String(n));
 const toNum = (s: string) => {
@@ -31,11 +35,14 @@ const emptyValues: ProfileFormValues = {
 };
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { user, refreshUser } = useAuth();
   const { items: allergies, loading: allergiesLoading, error: allergiesError } = useAllergies();
   const { items: handicaps, loading: handicapsLoading, error: handicapsError } = useHandicaps();
+  const { items: goals } = useGoals();
 
   const [values, setValues] = useState<ProfileFormValues>(emptyValues);
+  const [gender, setGender] = useState<GenderEnum | null>(null);
   const [selectedAllergies, setSelectedAllergies] = useState<string[]>([]);
   const [selectedHandicaps, setSelectedHandicaps] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
@@ -55,6 +62,7 @@ export default function ProfileScreen() {
       sport_per_week: toStr(user.sport_per_week),
       rest_bpm: toStr(user.rest_bpm),
     });
+    setGender(user.gender ?? null);
   }, [user]);
 
   // Charge les relations actuelles (le endpoint /me ne renvoie pas les relations).
@@ -72,6 +80,11 @@ export default function ProfileScreen() {
   const onChange = useCallback((field: keyof ProfileFormValues, value: string) => {
     setSuccess(false);
     setValues((v) => ({ ...v, [field]: value }));
+  }, []);
+
+  const onChangeGender = useCallback((value: GenderEnum) => {
+    setSuccess(false);
+    setGender(value);
   }, []);
 
   const onToggleAllergy = useCallback((id: string) => {
@@ -94,6 +107,7 @@ export default function ProfileScreen() {
         {
           first_name: values.first_name.trim(),
           last_name: values.last_name.trim(),
+          gender: gender ?? undefined,
           age: toNum(values.age),
           height_cm: toNum(values.height_cm),
           weight_kg: toNum(values.weight_kg),
@@ -111,9 +125,12 @@ export default function ProfileScreen() {
     } finally {
       setSaving(false);
     }
-  }, [user?.id, values, selectedAllergies, selectedHandicaps, refreshUser]);
+  }, [user?.id, values, gender, selectedAllergies, selectedHandicaps, refreshUser]);
 
   if (!user) return <Loader />;
+
+  const currentGoal = goals.find((g) => g.id === user.goal_id);
+  const goalLabel = currentGoal ? (currentGoal.label ?? currentGoal.name) : null;
 
   return (
     <ThemedView style={styles.root}>
@@ -124,9 +141,13 @@ export default function ProfileScreen() {
         </ThemedView>
 
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+          <ProgramBanner label={goalLabel} onPress={() => router.push('/program/select')} />
+
           <ProfileForm
             values={values}
             onChange={onChange}
+            gender={gender}
+            onChangeGender={onChangeGender}
             allergies={allergies}
             selectedAllergies={selectedAllergies}
             onToggleAllergy={onToggleAllergy}

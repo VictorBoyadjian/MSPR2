@@ -8,6 +8,13 @@ import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { Allergy } from '@/types/allergies.type';
 import { Handicap } from '@/types/handicaps.type';
+import { GenderEnum } from '@/types/users.type';
+
+const GENDER_OPTIONS: { value: GenderEnum; label: string }[] = [
+  { value: 'male', label: 'Homme' },
+  { value: 'female', label: 'Femme' },
+  { value: 'other', label: 'Autre' },
+];
 
 export type ProfileFormValues = {
   first_name: string;
@@ -23,6 +30,8 @@ export type ProfileFormValues = {
 type Props = {
   values: ProfileFormValues;
   onChange: (field: keyof ProfileFormValues, value: string) => void;
+  gender: GenderEnum | null;
+  onChangeGender: (value: GenderEnum) => void;
   allergies: Allergy[];
   selectedAllergies: string[];
   onToggleAllergy: (id: string) => void;
@@ -42,6 +51,8 @@ type Props = {
 export default function ProfileForm({
   values,
   onChange,
+  gender,
+  onChangeGender,
   allergies,
   selectedAllergies,
   onToggleAllergy,
@@ -62,6 +73,19 @@ export default function ProfileForm({
       <Section title="Identité">
         <Input label="Prénom" value={values.first_name} onChangeText={(v) => onChange('first_name', v)} />
         <Input label="Nom" value={values.last_name} onChangeText={(v) => onChange('last_name', v)} />
+        <View style={styles.field}>
+          <ThemedText type="small" themeColor="textSecondary">Genre</ThemedText>
+          <View style={styles.chips}>
+            {GENDER_OPTIONS.map((opt) => (
+              <Chip
+                key={opt.value}
+                label={opt.label}
+                selected={gender === opt.value}
+                onPress={() => onChangeGender(opt.value)}
+              />
+            ))}
+          </View>
+        </View>
       </Section>
 
       <Section title="Mensurations">
@@ -157,6 +181,7 @@ function Chip({ label, selected, onPress }: { label: string; selected: boolean; 
 const styles = StyleSheet.create({
   form: { gap: Spacing.four },
   section: { gap: Spacing.two },
+  field: { gap: Spacing.one },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two, marginTop: Spacing.one },
   chip: { paddingVertical: Spacing.two, paddingHorizontal: Spacing.three, borderRadius: 999 },
   error: { color: '#e5484d' },

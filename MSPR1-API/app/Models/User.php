@@ -30,6 +30,7 @@ class User extends Authenticatable
         'bodyfat',
         'rest_bpm',
         'sport_per_week',
+        'goal_id',
         'created_at',
         'updated_at',
     ];

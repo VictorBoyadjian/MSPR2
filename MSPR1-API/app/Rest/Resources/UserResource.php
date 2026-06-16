@@ -38,6 +38,7 @@ class UserResource extends Resource
             'bodyfat',
             'rest_bpm',
             'sport_per_week',
+            'goal_id',
         ];
     }
 

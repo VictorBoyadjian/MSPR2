@@ -15,6 +15,7 @@ export type User = {
   bodyfat: number | null;
   rest_bpm: number | null;
   sport_per_week: number | null;
+  goal_id: string | null;
   is_premium: boolean;
   is_active: boolean;
   remember_token?: string | null;

@@ -1,17 +1,23 @@
 // Récapitulatif du profil avant création du compte.
 import { StyleSheet, Text, View } from 'react-native';
 
+import { useGoals } from '@/hooks/useGoals';
+
 import Heart from '../components/Heart';
 import StepHeader from '../components/StepHeader';
 import { BODY_FAT_OPTIONS, beatsToBpm, computeBmi, OnboardingData } from '../data';
 import { accent, accentA, colors, tabular } from '../theme';
 
 export default function SummaryStep({ data, firstName }: { data: OnboardingData; firstName?: string }) {
+  const { items: goals } = useGoals();
   const bpm = beatsToBpm(data.beats);
   const fmt = (n: number) => n.toFixed(1).replace(/\.0$/, '');
+  const genderLabels: Record<string, string> = { male: 'Homme', female: 'Femme', other: 'Autre' };
+  const goal = goals.find((g) => g.id === data.goalId);
   const rows: [string, string][] = [
     ['Prénom', firstName || '—'],
     ['Âge', `${data.age} ans`],
+    ['Genre', data.gender ? genderLabels[data.gender] : '—'],
     ['Taille', `${data.height} cm`],
     ['Poids', `${fmt(data.weight)} kg`],
     ['Sport', `${fmt(data.sport)} h / sem`],
@@ -19,6 +25,7 @@ export default function SummaryStep({ data, firstName }: { data: OnboardingData;
     ['IMC', `${computeBmi(data.weight, data.height)}`],
     ['Allergies', data.allergies.length ? `${data.allergies.length} sélectionnée(s)` : 'Aucune'],
     ['Handicaps', data.handicaps.length ? `${data.handicaps.length} sélectionné(s)` : 'Aucun'],
+    ['Programme', goal ? (goal.label ?? goal.name) : '—'],
   ];
 
   return (

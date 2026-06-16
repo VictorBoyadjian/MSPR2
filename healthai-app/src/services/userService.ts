@@ -1,16 +1,18 @@
 import { sendRequest, users } from '@/services/api';
-import { User } from '@/types/users.type';
+import { GenderEnum, User } from '@/types/users.type';
 
 /** Champs profil éditables (issus de l'onboarding, colonnes table users). */
 export type UpdateUserAttributes = Partial<{
   first_name: string;
   last_name: string;
   age: number;
+  gender: GenderEnum;
   weight_kg: number;
   height_cm: number;
   bodyfat: number;
   rest_bpm: number;
   sport_per_week: number;
+  goal_id: number;
 }>;
 
 export const userService = {
@@ -26,12 +28,14 @@ export const userService = {
 
   /**
    * Met à jour le profil de l'utilisateur courant via PATCH /me.
-   * `allergies` et `handicaps` sont des tableaux d'ids qui remplacent l'ensemble correspondant.
+   * `allergyIds`/`handicapIds` ne sont envoyés (et donc resynchronisés) que s'ils sont
+   * fournis : on peut mettre à jour uniquement des attributs (ex. goal_id) sans toucher
+   * aux relations.
    */
-  update: (attributes: UpdateUserAttributes, allergyIds: string[], handicapIds: string[]) =>
+  update: (attributes: UpdateUserAttributes, allergyIds?: string[], handicapIds?: string[]) =>
     sendRequest<User>('PATCH', '/me', {
       ...attributes,
-      allergies: allergyIds.map(Number),
-      handicaps: handicapIds.map(Number),
+      ...(allergyIds ? { allergies: allergyIds.map(Number) } : {}),
+      ...(handicapIds ? { handicaps: handicapIds.map(Number) } : {}),
     }),
 };
