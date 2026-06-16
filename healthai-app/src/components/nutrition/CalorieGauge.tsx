@@ -1,4 +1,4 @@
-// Jauge calorique du jour : objectif vs calories déjà mangées.
+// Jauge calorique du jour (compacte) : objectif vs calories déjà mangées.
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -20,12 +20,9 @@ export default function CalorieGauge({ target, eaten }: Props) {
 
   if (!target) {
     return (
-      <View style={[styles.card, { backgroundColor: theme.backgroundElement }]}>
-        <ThemedText type="smallBold" themeColor="textSecondary">OBJECTIF DU JOUR</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
-          Choisis un programme pour obtenir ton objectif calorique.
-        </ThemedText>
-      </View>
+      <ThemedText type="small" themeColor="textSecondary" style={styles.hint}>
+        Choisis un programme pour ton objectif calorique.
+      </ThemedText>
     );
   }
 
@@ -34,19 +31,15 @@ export default function CalorieGauge({ target, eaten }: Props) {
   const remaining = Math.round(target - eaten);
 
   return (
-    <View style={[styles.card, { backgroundColor: theme.backgroundElement }]}>
-      <View style={styles.head}>
-        <ThemedText type="smallBold" themeColor="textSecondary">OBJECTIF DU JOUR</ThemedText>
-        <ThemedText type="small" themeColor="textSecondary">
-          {over ? `${Math.abs(remaining)} kcal au-dessus` : `${remaining} kcal restantes`}
+    <View style={styles.wrap}>
+      <View style={styles.row}>
+        <ThemedText type="small" themeColor="textSecondary" style={styles.label}>
+          {Math.round(eaten)} / {Math.round(target)} kcal
+        </ThemedText>
+        <ThemedText type="small" themeColor="textSecondary" style={styles.label}>
+          {over ? `+${Math.abs(remaining)}` : `${remaining} restantes`}
         </ThemedText>
       </View>
-
-      <View style={styles.numbers}>
-        <ThemedText type="title">{Math.round(eaten)}</ThemedText>
-        <ThemedText type="subtitle" themeColor="textSecondary"> / {Math.round(target)} kcal</ThemedText>
-      </View>
-
       <View style={[styles.track, { backgroundColor: theme.backgroundSelected }]}>
         <View
           style={[
@@ -63,9 +56,10 @@ export default function CalorieGauge({ target, eaten }: Props) {
 }
 
 const styles = StyleSheet.create({
-  card: { padding: Spacing.three, borderRadius: Spacing.three, gap: Spacing.two },
-  head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  numbers: { flexDirection: 'row', alignItems: 'baseline' },
-  track: { height: 10, borderRadius: 5, overflow: 'hidden' },
-  fill: { height: '100%', borderRadius: 5 },
+  wrap: { gap: Spacing.one },
+  hint: { fontSize: 12 },
+  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  label: { fontSize: 12 },
+  track: { height: 5, borderRadius: 3, overflow: 'hidden' },
+  fill: { height: '100%', borderRadius: 3 },
 });
