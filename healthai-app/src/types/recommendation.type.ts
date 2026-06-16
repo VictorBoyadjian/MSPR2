@@ -28,6 +28,12 @@ export type ProgramOutput = {
   objective: string;
 };
 
+// Retour utilisateur envoyé au moteur : compare le profil prédit au profil choisi.
+export type FeedbackInput = {
+  prediction_id: string;
+  chosen_profile: string; // goals.name retenu par l'utilisateur
+};
+
 export type RecommendOutput = {
   prediction_id: string;
   profile: string; // profil recommandé (le mieux classé)

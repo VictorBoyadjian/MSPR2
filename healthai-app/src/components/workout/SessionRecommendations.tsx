@@ -1,12 +1,13 @@
-// Recommandations de repas en pile de cartes : une seule carte visible, la suivante
-// apparaît derrière. On balaie la carte du dessus sur le côté pour passer à la suivante (infini).
+// Recommandations de séances en pile de cartes : une seule carte visible, la suivante
+// apparaît derrière. On balaie la carte du dessus sur le côté pour passer à la suivante
+// (infini) ; un simple tap ouvre la page de planification de la séance.
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Dimensions, PanResponder, StyleSheet, View } from 'react-native';
+import { Animated, Dimensions, PanResponder, Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
-import { RecommendedMeal } from '@/types/nutrition.type';
+import { RecommendedSession } from '@/types/workout-sessions.type';
 
 const { width } = Dimensions.get('window');
 const SWIPE_THRESHOLD = width * 0.25;
@@ -21,34 +22,58 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-function MealCardBody({ meal }: { meal: RecommendedMeal }) {
+function SessionCardBody({ session }: { session: RecommendedSession }) {
+  const meta = [
+    session.session_type,
+    session.total_duration_min ? `${session.total_duration_min} min` : null,
+    session.difficulty,
+  ]
+    .filter(Boolean)
+    .join(' · ');
   return (
     <>
       <ThemedText type="small" numberOfLines={2} style={styles.name}>
-        {meal.name}
+        {session.name}
       </ThemedText>
       <ThemedText type="small" themeColor="textSecondary" style={styles.meta}>
-        {Math.round(meal.calories_kcal)} kcal · P{Math.round(meal.proteins_g)} G{Math.round(meal.carbs_g)} L{Math.round(meal.fats_g)}
+        {meta}
       </ThemedText>
     </>
   );
 }
 
-export default function MealRecommendations({ meals }: { meals: RecommendedMeal[] }) {
+export default function SessionRecommendations({
+  sessions,
+  onPress,
+}: {
+  sessions: RecommendedSession[];
+  onPress: (session: RecommendedSession) => void;
+}) {
   const theme = useTheme();
-  const [deck, setDeck] = useState<RecommendedMeal[]>([]);
+  const [deck, setDeck] = useState<RecommendedSession[]>([]);
   const [index, setIndex] = useState(0);
   const position = useRef(new Animated.ValueXY()).current;
+  // La carte n'est cliquable que lorsqu'elle est à sa position de repos (pas en plein
+  // balayage / animation) : évite un clic parasite après un drag, surtout sur le web.
+  const atRest = useRef(true);
 
   // Réinitialise (ordre aléatoire) quand la liste source change.
   useEffect(() => {
-    setDeck(meals.length ? shuffle(meals) : []);
+    setDeck(sessions.length ? shuffle(sessions) : []);
     setIndex(0);
     position.setValue({ x: 0, y: 0 });
-  }, [meals, position]);
+  }, [sessions, position]);
+
+  useEffect(() => {
+    const id = position.addListener(({ x, y }) => {
+      atRest.current = Math.abs(x) < 1 && Math.abs(y) < 1;
+    });
+    return () => position.removeListener(id);
+  }, [position]);
 
   const panResponder = useRef(
     PanResponder.create({
+      // Ne prend la main que sur un vrai balayage : un tap reste géré par le Pressable.
       onMoveShouldSetPanResponder: (_, g) => Math.abs(g.dx) > 6,
       onPanResponderMove: Animated.event([null, { dx: position.x, dy: position.y }], {
         useNativeDriver: false,
@@ -101,22 +126,26 @@ export default function MealRecommendations({ meals }: { meals: RecommendedMeal[
         key={`back-${index}`}
         style={[
           styles.card,
-          cardBg,
           { transform: [{ scale: backScale }, { translateY: backTranslateY }], opacity: backOpacity },
         ]}>
-        <MealCardBody meal={back} />
+        <View style={[styles.cardInner, cardBg]}>
+          <SessionCardBody session={back} />
+        </View>
       </Animated.View>
 
-      {/* Carte du dessus, balayable. */}
+      {/* Carte du dessus, balayable (swipe) et cliquable (tap → planification). */}
       <Animated.View
         key={`front-${index}`}
         {...panResponder.panHandlers}
         style={[
           styles.card,
-          cardBg,
           { transform: [{ translateX: position.x }, { translateY: position.y }, { rotate }] },
         ]}>
-        <MealCardBody meal={front} />
+        <Pressable
+          onPress={() => atRest.current && onPress(front)}
+          style={[styles.cardInner, cardBg]}>
+          <SessionCardBody session={front} />
+        </Pressable>
       </Animated.View>
     </View>
   );
@@ -129,6 +158,10 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: CARD_H,
+    borderRadius: Spacing.two,
+  },
+  cardInner: {
+    flex: 1,
     padding: Spacing.two,
     borderRadius: Spacing.two,
     gap: 4,

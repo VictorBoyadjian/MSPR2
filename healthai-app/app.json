@@ -2,7 +2,7 @@
   "expo": {
     "name": "healthai-app",
     "slug": "healthai-app",
-    "version": "1.0.11",
+    "version": "1.0.12",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "healthaiapp",
@@ -17,6 +17,8 @@
       }
     },
     "android": {
+      "package": "com.healthai.app",
+      "versionCode": 12,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

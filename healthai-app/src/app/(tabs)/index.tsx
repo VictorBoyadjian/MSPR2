@@ -1,14 +1,16 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useMemo } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
+import Icon, { IconName } from '@/components/ui/Icon';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAuth } from '@/hooks/useAuth';
+import { useTheme } from '@/hooks/use-theme';
 import { useDishes } from '@/hooks/useDishes';
 import { useWorkouts } from '@/hooks/useWorkouts';
 import { isSameDay } from '@/utils/day';
@@ -57,7 +59,7 @@ export default function DashboardScreen() {
       <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
         <ThemedView style={styles.greeting}>
           <ThemedText themeColor="textSecondary">Bonjour,</ThemedText>
-          <ThemedText type="subtitle">{user?.first_name ?? 'Athlète'} 👋</ThemedText>
+          <ThemedText type="subtitle">{user?.first_name ?? 'Athlète'}</ThemedText>
         </ThemedView>
 
         <ScrollView
@@ -69,14 +71,14 @@ export default function DashboardScreen() {
 
           <ThemedView style={styles.summaryRow}>
             <SummaryCard
-              emoji="🍽️"
+              icon="meals"
               title="Repas"
               value={String(mealSummary.count)}
               caption={`${Math.round(mealSummary.calories)} kcal`}
               onPress={() => router.push('/meals')}
             />
             <SummaryCard
-              emoji="🏋️"
+              icon="workouts"
               title="Séances"
               value={String(sportSummary.count)}
               caption={sportSummary.minutes ? formatDuration(sportSummary.minutes) : 'Aucune'}
@@ -96,9 +98,10 @@ export default function DashboardScreen() {
           </Card>
 
           <ThemedView style={styles.actions}>
-            <Button label="🍽️  Enregistrer un repas" onPress={() => router.push('/meal/add')} />
+            <Button icon="meals" label="Enregistrer un repas" onPress={() => router.push('/meal/add')} />
             <Button
-              label="🏋️  Nouvelle séance"
+              icon="workouts"
+              label="Nouvelle séance"
               variant="secondary"
               onPress={() => router.push('/workout/add')}
             />
@@ -110,30 +113,34 @@ export default function DashboardScreen() {
 }
 
 function SummaryCard({
-  emoji,
+  icon,
   title,
   value,
   caption,
   onPress,
 }: {
-  emoji: string;
+  icon: IconName;
   title: string;
   value: string;
   caption: string;
   onPress: () => void;
 }) {
+  const theme = useTheme();
   return (
-    <Card style={styles.summaryCard}>
-      <ThemedText themeColor="textSecondary" onPress={onPress}>
-        {emoji} {title}
-      </ThemedText>
-      <ThemedText type="title" style={styles.summaryValue} onPress={onPress}>
-        {value}
-      </ThemedText>
-      <ThemedText type="small" themeColor="textSecondary" onPress={onPress}>
-        {caption}
-      </ThemedText>
-    </Card>
+    <Pressable style={styles.summaryCardPressable} onPress={onPress}>
+      <Card style={styles.summaryCard}>
+        <ThemedView style={styles.summaryTitle}>
+          <Icon name={icon} size={16} color={theme.textSecondary} />
+          <ThemedText themeColor="textSecondary">{title}</ThemedText>
+        </ThemedView>
+        <ThemedText type="title" style={styles.summaryValue}>
+          {value}
+        </ThemedText>
+        <ThemedText type="small" themeColor="textSecondary">
+          {caption}
+        </ThemedText>
+      </Card>
+    </Pressable>
   );
 }
 
@@ -167,9 +174,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: Spacing.three,
   },
+  summaryCardPressable: { flex: 1 },
   summaryCard: {
-    flex: 1,
     gap: Spacing.half,
+  },
+  summaryTitle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.one,
+    backgroundColor: 'transparent',
   },
   summaryValue: {
     fontSize: 40,

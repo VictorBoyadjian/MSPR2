@@ -15,6 +15,7 @@ import { useRecommendation } from '@/hooks/useRecommendation';
 import { useTheme } from '@/hooks/use-theme';
 import { useAuth } from '@/hooks/useAuth';
 import { ApiError } from '@/services/api';
+import { recommendationService } from '@/services/recommendationService';
 import { userService } from '@/services/userService';
 import { buildRecommendInputFromUser, orderGoals, rankByName } from '@/utils/recommendation';
 
@@ -49,6 +50,16 @@ export default function ProgramSelectScreen() {
     try {
       await userService.update({ goal_id: Number(selectedGoalId) });
       await refreshUser();
+
+      // Feedback au moteur : profil prédit vs profil choisi. Non bloquant.
+      const chosenProfile = goals.find((g) => g.id === selectedGoalId)?.name;
+      if (reco?.prediction_id && chosenProfile) {
+        recommendationService.feedback({
+          prediction_id: reco.prediction_id,
+          chosen_profile: chosenProfile,
+        });
+      }
+
       router.back();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'Une erreur est survenue.');

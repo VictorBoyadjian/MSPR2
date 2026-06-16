@@ -9,9 +9,11 @@ import WeightEditorModal from '@/components/health/WeightEditorModal';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import Card from '@/components/ui/Card';
+import Icon from '@/components/ui/Icon';
 import Loader from '@/components/ui/Loader';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useHealth } from '@/hooks/useHealth';
+import { useTheme } from '@/hooks/use-theme';
 import { useAuthStore } from '@/stores/authStore';
 
 const DEFAULT_WEIGHT = 70;
@@ -19,6 +21,7 @@ const DEFAULT_RESTING_BPM = 70;
 
 export default function HealthScreen() {
   const { user } = useAuthStore();
+  const theme = useTheme();
   const { stats, metric, loading, error, refresh, save } = useHealth();
   const [editingWeight, setEditingWeight] = useState(false);
   const [editingHr, setEditingHr] = useState(false);
@@ -30,8 +33,9 @@ export default function HealthScreen() {
   );
 
   // Le poids et le pouls affichés viennent de la dernière métrique, avec repli sur le profil.
-  const weight = metric?.weight_kg ?? user?.weight_kg ?? null;
-  const restingHr = metric?.heart_rate_resting ?? user?.rest_bpm ?? null;
+  // L'API renvoie souvent les numériques en chaîne : on normalise en number | null.
+  const weight = toFiniteOrNull(metric?.weight_kg ?? user?.weight_kg);
+  const restingHr = toFiniteOrNull(metric?.heart_rate_resting ?? user?.rest_bpm);
 
   return (
     <ThemedView style={styles.root}>
@@ -77,9 +81,12 @@ export default function HealthScreen() {
 
               <Pressable style={styles.statCard} onPress={() => setEditingHr(true)}>
                 <Card style={styles.statCardFill}>
-                  <ThemedText type="small" themeColor="textSecondary">
-                    ❤️ Pouls au repos
-                  </ThemedText>
+                  <View style={styles.labelRow}>
+                    <Icon name="pulse" size={15} color={theme.textSecondary} />
+                    <ThemedText type="small" themeColor="textSecondary">
+                      Pouls au repos
+                    </ThemedText>
+                  </View>
                   <ThemedText type="title" style={styles.statValue}>
                     {restingHr ?? '—'}
                   </ThemedText>
@@ -93,9 +100,12 @@ export default function HealthScreen() {
             <Pressable onPress={() => setEditingWeight(true)}>
               <Card style={styles.weightCard}>
                 <View style={styles.weightText}>
-                  <ThemedText type="small" themeColor="textSecondary">
-                    ⚖️ Poids
-                  </ThemedText>
+                  <View style={styles.labelRow}>
+                    <Icon name="weight" size={15} color={theme.textSecondary} />
+                    <ThemedText type="small" themeColor="textSecondary">
+                      Poids
+                    </ThemedText>
+                  </View>
                   <ThemedText type="title" style={styles.statValue}>
                     {weight != null ? `${formatWeight(weight)} kg` : '—'}
                   </ThemedText>
@@ -130,9 +140,17 @@ export default function HealthScreen() {
   );
 }
 
-/** Nombre compact à la française (ex. « 3,5 » ou « 4 »). */
+/** Normalise une valeur API (souvent une chaîne) en `number`, ou `null` si absente/invalide. */
+function toFiniteOrNull(value: unknown): number | null {
+  if (value == null) return null;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : null;
+}
+
+/** Nombre compact à la française (ex. « 3,5 » ou « 4 »), robuste aux valeurs en chaîne. */
 function formatHours(hours: number): string {
-  return Number.isInteger(hours) ? String(hours) : hours.toFixed(1).replace('.', ',');
+  const n = Number(hours) || 0;
+  return Number.isInteger(n) ? String(n) : n.toFixed(1).replace('.', ',');
 }
 
 function formatWeight(kg: number): string {
@@ -164,5 +182,6 @@ const styles = StyleSheet.create({
   statValue: { fontSize: 36, lineHeight: 42 },
   weightCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   weightText: { gap: Spacing.half },
+  labelRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.one },
   empty: { textAlign: 'center', marginVertical: Spacing.two },
 });

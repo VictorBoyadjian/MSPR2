@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import Button from '@/components/ui/Button';
+import Icon from '@/components/ui/Icon';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -26,7 +27,7 @@ export default function AddMealScreen() {
                 styles.card,
                 { backgroundColor: theme.backgroundElement, opacity: pressed ? 0.8 : 1 },
               ]}>
-              <ThemedText type="title">📷</ThemedText>
+              <Icon name="camera" size={40} color={theme.text} />
               <ThemedText type="smallBold">Scanner mon repas</ThemedText>
               <ThemedText type="small" style={styles.cardHint}>
                 Prenez une photo, l&apos;analyse est automatique.
@@ -39,7 +40,7 @@ export default function AddMealScreen() {
                 styles.card,
                 { backgroundColor: theme.backgroundElement, opacity: pressed ? 0.8 : 1 },
               ]}>
-              <ThemedText type="title">✏️</ThemedText>
+              <Icon name="edit" size={40} color={theme.text} />
               <ThemedText type="smallBold">Enregistrer à la main</ThemedText>
               <ThemedText type="small" style={styles.cardHint}>
                 Saisissez vous-même les informations du repas.

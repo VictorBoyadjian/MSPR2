@@ -42,7 +42,7 @@ export default function LoginScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           style={styles.form}>
           <ThemedText type="title">Connexion</ThemedText>
-          <ThemedText themeColor="textSecondary">Content de vous revoir 👋</ThemedText>
+          <ThemedText themeColor="textSecondary">Content de vous revoir</ThemedText>
 
           <Input
             label="Email"
