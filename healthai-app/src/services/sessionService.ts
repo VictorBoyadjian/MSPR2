@@ -1,69 +1,46 @@
-import { exercises, sportSessions } from '@/services/api';
-import { Exercise } from '@/types/exercises.type';
-import { SportSession } from '@/types/sport-sessions.type';
+import { sendRequest, workoutSessions } from '@/services/api';
+import { UserSession, WorkoutSession } from '@/types/workout-sessions.type';
 
-export type SessionExerciseInput = {
-  exerciseId: string;
-  sets?: number;
-  reps?: number;
-  duration_min?: number;
-  order?: number;
+// Lomkit `like` est sensible à la casse : on capitalise comme ailleurs dans l'app.
+const cap = (s: string) => `%${s.charAt(0).toUpperCase()}${s.slice(1)}%`;
+
+type MeSessionsResponse = {
+  data: (WorkoutSession & { pivot?: { id: string; performed_at: string } })[];
 };
 
-export type CreateSessionInput = {
-  duration_min: number;
-  performed_at: string;
-  userId: string;
-  exercises: SessionExerciseInput[];
-};
+export const sessionService = {
+  /** Catalogue : recherche de séances, optionnellement filtrées par profil (goal). */
+  search: async (term: string, profile?: string | null): Promise<WorkoutSession[]> => {
+    const filters: { field: string; operator?: string; value: unknown }[] = [];
+    if (profile) filters.push({ field: 'profile', value: profile });
+    if (term.trim()) filters.push({ field: 'name', operator: 'like', value: cap(term.trim()) });
 
-export const workoutService = {
-  list: async (userId: string): Promise<SportSession[]> => {
-    const response = await sportSessions.search({
-      sorts: [{ field: 'id', direction: 'desc' }],
-      includes: [{ relation: 'exercises' }, { relation: 'users' }],
-      limit: 50,
-    });
-    // performed_at vit dans le pivot user_sessions : on l'extrait pour l'utilisateur courant
-    // et on ne garde que les séances qui lui appartiennent.
-    return response.data
-      .map((session) => {
-        const me = session.users?.find((u) => String(u.id) === String(userId));
-        return { ...session, performed_at: me?.pivot?.performed_at };
-      })
-      .filter((session) => !!session.performed_at);
-  },
-
-  searchExercises: async (term: string): Promise<Exercise[]> => {
-    const value = term ? `%${term.charAt(0).toUpperCase()}${term.slice(1)}%` : null;
-    const response = await exercises.search({
-      filters: value ? [{ field: 'name', operator: 'like', value }] : [],
+    const response = await workoutSessions.search({
+      filters,
+      includes: [{ relation: 'exercises' }],
+      sorts: [{ field: 'id', direction: 'asc' }],
       limit: 25,
     });
     return response.data;
   },
 
-  create: (input: CreateSessionInput) =>
-    sportSessions.mutate([
-      {
-        operation: 'create',
-        attributes: { duration_min: input.duration_min },
-        relations: {
-          users: [
-            {
-              operation: 'attach',
-              key: input.userId,
-              pivot: { performed_at: input.performed_at },
-            },
-          ],
-          exercises: input.exercises.map((e, index) => ({
-            operation: 'attach',
-            key: e.exerciseId,
-            pivot: { sets: e.sets, reps: e.reps, duration_min: e.duration_min, order: e.order ?? index },
-          })),
-        },
-      },
-    ]),
+  /** Séances de l'utilisateur (faites + planifiées), aplaties pour l'affichage. */
+  listMine: async (): Promise<UserSession[]> => {
+    const res = await sendRequest<MeSessionsResponse>('GET', '/me/sessions');
+    return res.data.map((s) => ({
+      ...s,
+      userSessionId: s.pivot?.id ?? '',
+      performedAt: s.pivot?.performed_at ?? '',
+    }));
+  },
 
-  remove: (id: string) => sportSessions.delete([id]),
+  /** Enregistre une séance (date passée = faite, future = planifiée). */
+  record: (workoutSessionId: string, performedAt: string) =>
+    sendRequest('POST', '/me/sessions', {
+      workout_session_id: Number(workoutSessionId),
+      performed_at: performedAt,
+    }),
+
+  /** Supprime une séance enregistrée (par l'id de la ligne user_sessions). */
+  remove: (userSessionId: string) => sendRequest('DELETE', `/me/sessions/${userSessionId}`),
 };

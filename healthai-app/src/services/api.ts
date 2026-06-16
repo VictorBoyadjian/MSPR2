@@ -2,10 +2,10 @@ import { CONFIG } from '@/constants/config';
 import { Allergy } from '@/types/allergies.type';
 import { Dish } from '@/types/dishes.type';
 import { Handicap } from '@/types/handicaps.type';
-import { Exercise } from '@/types/exercises.type';
+import { WorkoutExercise } from '@/types/workout-exercises.type';
 import { Goal } from '@/types/goals.type';
 import { Metric } from '@/types/metrics.type';
-import { SportSession } from '@/types/sport-sessions.type';
+import { WorkoutSession } from '@/types/workout-sessions.type';
 import { User } from '@/types/users.type';
 
 let authToken: string | null = null;
@@ -122,8 +122,8 @@ function resource<T>(path: string) {
 }
 
 export const dishes = resource<Dish>('/dishes');
-export const exercises = resource<Exercise>('/exercises');
-export const sportSessions = resource<SportSession>('/sport_sessions');
+export const workoutExercises = resource<WorkoutExercise>('/workout_exercises');
+export const workoutSessions = resource<WorkoutSession>('/workout_sessions');
 export const metrics = resource<Metric>('/metrics');
 export const goals = resource<Goal>('/goals');
 export const users = resource<User>('/users');

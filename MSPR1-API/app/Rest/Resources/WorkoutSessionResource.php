@@ -2,19 +2,18 @@
 
 namespace App\Rest\Resources;
 
-use App\Models\SportSession;
+use App\Models\WorkoutSession;
 use App\Rest\Resources\Resource;
-use Lomkit\Rest\Relations\BelongsTo;
-use Lomkit\Rest\Relations\BelongsToMany as BelongsToMany;
+use Lomkit\Rest\Relations\BelongsToMany;
 
-class SportSessionResource extends Resource
+class WorkoutSessionResource extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var class-string<\Illuminate\Database\Eloquent\Model>
      */
-    public static $model = SportSession::class;
+    public static $model = WorkoutSession::class;
 
     /**
      * The exposed fields that could be provided
@@ -25,7 +24,14 @@ class SportSessionResource extends Resource
     {
         return [
             'id',
-            'duration_min'
+            'name',
+            'profile',
+            'session_type',
+            'total_duration_min',
+            'difficulty',
+            'description',
+            'objective',
+            'created_at',
         ];
     }
 
@@ -37,11 +43,10 @@ class SportSessionResource extends Resource
     public function relations(\Lomkit\Rest\Http\Requests\RestRequest $request): array
     {
         return [
+            BelongsToMany::make('exercises', WorkoutExerciseResource::class)
+                ->withPivotFields(['order_num', 'sets', 'reps', 'rest_sec', 'notes']),
             BelongsToMany::make('users', UserResource::class)
-                ->withPivotFields(['performed_at']),
-            BelongsToMany::make('exercises', ExerciseResource::class)
-                ->withPivotFields(['reps', 'sets', 'duration_min', 'order']),
-            BelongsToMany::make('goals', GoalResource::class)
+                ->withPivotFields(['id', 'performed_at']),
         ];
     }
 

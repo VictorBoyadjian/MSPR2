@@ -3,14 +3,14 @@
 namespace App\Rest\Controllers;
 
 use App\Rest\Controllers\Controller;
-use App\Rest\Resources\ExerciseResource;
+use App\Rest\Resources\WorkoutSessionResource;
 
-class ExerciceController extends Controller
+class WorkoutSessionController extends Controller
 {
     /**
      * The resource the controller corresponds to.
      *
      * @var class-string<\Lomkit\Rest\Http\Resource>
      */
-    public static $resource = ExerciseResource::class;
+    public static $resource = WorkoutSessionResource::class;
 }

@@ -2,20 +2,19 @@
 
 namespace App\Access\Controls;
 
-use App\Access\Perimeters\OwnPerimiter;
-use App\Models\Session;
-use App\Models\SportSession;
+use App\Access\Perimeters\GlobalPerimiter;
+use App\Models\WorkoutExercise;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Lomkit\Access\Controls\Control;
 
-class SportSessionControl extends Control
+class WorkoutExerciseControl extends Control
 {
      /**
       * The model the control refers to.
       * @var class-string<Model>
       */
-     protected string $model = SportSession::class;
+     protected string $model = WorkoutExercise::class;
 
     /**
      * Retrieve the list of perimeter definitions for the current control.
@@ -25,7 +24,7 @@ class SportSessionControl extends Control
     protected function perimeters(): array
     {
         return [
-            OwnPerimiter::new()
+            GlobalPerimiter::new()
                 ->allowed(function (Model $user, string $method) {
                     return true;
                 })

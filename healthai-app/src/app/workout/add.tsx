@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
-import { useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
@@ -10,98 +10,61 @@ import Card from '@/components/ui/Card';
 import DateTimeField from '@/components/ui/DateTimeField';
 import Input from '@/components/ui/Input';
 import { Spacing } from '@/constants/theme';
+import { useGoals } from '@/hooks/useGoals';
 import { useTheme } from '@/hooks/use-theme';
 import { ApiError } from '@/services/api';
-import { workoutService } from '@/services/sessionService';
+import { sessionService } from '@/services/sessionService';
 import { useAuthStore } from '@/stores/authStore';
-import { Exercise } from '@/types/exercises.type';
-
-type Selected = {
-  uid: string;
-  exerciseId: string;
-  name: string;
-  sets?: number;
-  reps?: number;
-};
+import { WorkoutSession } from '@/types/workout-sessions.type';
 
 export default function AddWorkoutScreen() {
   const router = useRouter();
   const theme = useTheme();
-  const authStore = useAuthStore();
+  const { user } = useAuthStore();
+  const { items: goals } = useGoals();
 
-  const [duration, setDuration] = useState('');
-  const [performedAt, setPerformedAt] = useState(() => new Date());
+  // Profil de l'utilisateur (goal) : on propose d'abord les séances de son programme.
+  const profile = useMemo(
+    () => goals.find((g) => g.id === user?.goal_id)?.name ?? null,
+    [goals, user?.goal_id],
+  );
+
   const [term, setTerm] = useState('');
-  const [results, setResults] = useState<Exercise[]>([]);
+  const [results, setResults] = useState<WorkoutSession[]>([]);
   const [searching, setSearching] = useState(false);
-  const [selected, setSelected] = useState<Selected[]>([]);
+  const [selected, setSelected] = useState<WorkoutSession | null>(null);
+  const [performedAt, setPerformedAt] = useState(() => new Date());
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const uidRef = useRef(0);
 
-  const onSearch = async () => {
-    setSearching(true);
-    try {
-      setResults(await workoutService.searchExercises(term.trim()));
-    } catch {
-      setResults([]);
-    } finally {
-      setSearching(false);
-    }
-  };
+  const runSearch = useCallback(
+    async (t: string) => {
+      setSearching(true);
+      try {
+        setResults(await sessionService.search(t, profile));
+      } catch {
+        setResults([]);
+      } finally {
+        setSearching(false);
+      }
+    },
+    [profile],
+  );
 
-  const addExercise = (exercise: Exercise) => {
-    const uid = String(uidRef.current++);
-    setSelected((prev) => [
-      ...prev,
-      { uid, exerciseId: exercise.id, name: exercise.name, sets: 3, reps: 10 },
-    ]);
-  };
-
-  const updateField = (uid: string, field: 'sets' | 'reps', value: string) => {
-    const n = value ? Number(value) : undefined;
-    setSelected((prev) => prev.map((s) => (s.uid === uid ? { ...s, [field]: n } : s)));
-  };
-
-  const removeExercise = (uid: string) => {
-    setSelected((prev) => prev.filter((s) => s.uid !== uid));
-  };
-
-  const moveExercise = (uid: string, direction: -1 | 1) => {
-    setSelected((prev) => {
-      const index = prev.findIndex((s) => s.uid === uid);
-      const target = index + direction;
-      if (index === -1 || target < 0 || target >= prev.length) return prev;
-      const next = [...prev];
-      [next[index], next[target]] = [next[target], next[index]];
-      return next;
-    });
-  };
+  // Chargement initial : séances du programme de l'utilisateur.
+  useEffect(() => {
+    runSearch('');
+  }, [runSearch]);
 
   const onSubmit = async () => {
-    const minutes = Number(duration);
-    if (!minutes || minutes <= 0) {
-      setError('Indiquez une durée valide.');
-      return;
-    }
-    if (selected.length === 0) {
-      setError('Ajoutez au moins un exercice.');
-      return;
-    }
-    if (!authStore.user?.id) {
-      setError('Vous devez être connecté.');
+    if (!selected) {
+      setError('Choisis une séance.');
       return;
     }
     setError('');
     setLoading(true);
     try {
-      await workoutService.create({
-        duration_min: minutes,
-        performed_at: performedAt.toISOString(),
-        userId: authStore.user.id,
-        exercises: selected.map(({ exerciseId, sets, reps }) => ({ exerciseId, sets, reps })),
-      });
-      // L'ordre des exercices correspond à leur position dans `selected`.
+      await sessionService.record(selected.id, performedAt.toISOString());
       router.back();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'Une erreur est survenue.');
@@ -113,121 +76,68 @@ export default function AddWorkoutScreen() {
   return (
     <ThemedView style={styles.root}>
       <SafeAreaView style={styles.safeArea}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          style={styles.flex}>
+        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
           <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
-            <ThemedText type="subtitle">Nouvelle séance</ThemedText>
+            <ThemedText type="subtitle">Planifier une séance</ThemedText>
 
-            <ThemedView style={styles.dateField}>
-              <DateTimeField value={performedAt} onChange={setPerformedAt} />
-            </ThemedView>
-
-            <Input
-              label="Durée (min)"
-              value={duration}
-              onChangeText={setDuration}
-              keyboardType="numeric"
-              placeholder="45"
-            />
-
-            <ThemedText type="smallBold" themeColor="textSecondary">
-              Exercices sélectionnés
-            </ThemedText>
-            {selected.length === 0 ? (
-              <ThemedText type="small" themeColor="textSecondary">
-                Aucun exercice. Recherchez-en ci-dessous.
-              </ThemedText>
-            ) : (
-              selected.map((s, index) => (
-                <Card key={s.uid}>
-                  <ThemedView style={styles.rowBetween}>
-                    <ThemedView style={styles.titleRow}>
-                      <ThemedText type="smallBold" themeColor="textSecondary" style={styles.order}>
-                        {index + 1}.
-                      </ThemedText>
-                      <ThemedText type="smallBold" style={styles.flexText}>
-                        {s.name}
-                      </ThemedText>
-                    </ThemedView>
-                    <ThemedView style={styles.actions}>
-                      <Pressable
-                        onPress={() => moveExercise(s.uid, -1)}
-                        disabled={index === 0}
-                        hitSlop={8}>
-                        <ThemedText type="small" style={index === 0 ? styles.arrowDisabled : styles.arrow}>
-                          ↑
-                        </ThemedText>
-                      </Pressable>
-                      <Pressable
-                        onPress={() => moveExercise(s.uid, 1)}
-                        disabled={index === selected.length - 1}
-                        hitSlop={8}>
-                        <ThemedText
-                          type="small"
-                          style={index === selected.length - 1 ? styles.arrowDisabled : styles.arrow}>
-                          ↓
-                        </ThemedText>
-                      </Pressable>
-                      <Pressable onPress={() => removeExercise(s.uid)} hitSlop={8}>
-                        <ThemedText type="small" style={styles.remove}>
-                          Retirer
-                        </ThemedText>
-                      </Pressable>
-                    </ThemedView>
-                  </ThemedView>
-                  <ThemedView style={styles.macros}>
-                    <Input
-                      label="Séries"
-                      value={s.sets ? String(s.sets) : ''}
-                      onChangeText={(v) => updateField(s.uid, 'sets', v)}
-                      keyboardType="numeric"
-                      style={styles.macroInput}
-                    />
-                    <Input
-                      label="Reps"
-                      value={s.reps ? String(s.reps) : ''}
-                      onChangeText={(v) => updateField(s.uid, 'reps', v)}
-                      keyboardType="numeric"
-                      style={styles.macroInput}
-                    />
-                  </ThemedView>
-                </Card>
-              ))
-            )}
-
-            <ThemedView style={styles.searchRow}>
-              <Input
-                value={term}
-                onChangeText={setTerm}
-                placeholder="Rechercher un exercice"
-                onSubmitEditing={onSearch}
-                style={styles.searchInput}
-              />
-              <Button label="OK" onPress={onSearch} loading={searching} />
-            </ThemedView>
-
-            {results.map((ex) => (
-              <Pressable
-                key={ex.id}
-                onPress={() => addExercise(ex)}
-                style={[styles.result, { backgroundColor: theme.backgroundElement }]}>
-                <ThemedText type="small">{ex.name}</ThemedText>
-                {ex.body_part ? (
-                  <ThemedText type="small" themeColor="textSecondary">
-                    {ex.body_part}
+            {selected ? (
+              <Card>
+                <ThemedView style={styles.row}>
+                  <ThemedText type="smallBold" style={styles.flexText}>{selected.name}</ThemedText>
+                  <Pressable onPress={() => setSelected(null)} hitSlop={8}>
+                    <ThemedText type="small" style={styles.change}>Changer</ThemedText>
+                  </Pressable>
+                </ThemedView>
+                {selected.exercises?.length ? (
+                  <ThemedText type="small" themeColor="textSecondary" numberOfLines={2}>
+                    {selected.exercises.map((e) => e.name).join(', ')}
                   </ThemedText>
                 ) : null}
-              </Pressable>
-            ))}
+                <ThemedView style={styles.dateField}>
+                  <ThemedText type="small" themeColor="textSecondary">Quand ?</ThemedText>
+                  <DateTimeField value={performedAt} onChange={setPerformedAt} />
+                </ThemedView>
+                <ThemedText type="small" themeColor="textSecondary">
+                  Une date future planifie la séance, une date passée l&apos;enregistre comme faite.
+                </ThemedText>
+              </Card>
+            ) : (
+              <>
+                <ThemedView style={styles.searchRow}>
+                  <Input
+                    value={term}
+                    onChangeText={setTerm}
+                    placeholder="Rechercher une séance"
+                    onSubmitEditing={() => runSearch(term)}
+                    style={styles.searchInput}
+                  />
+                  <Button label="OK" onPress={() => runSearch(term)} loading={searching} />
+                </ThemedView>
 
-            {error ? (
-              <ThemedText type="small" style={styles.error}>
-                {error}
-              </ThemedText>
-            ) : null}
+                {searching ? (
+                  <ActivityIndicator />
+                ) : (
+                  results.map((s) => (
+                    <Pressable
+                      key={s.id}
+                      onPress={() => setSelected(s)}
+                      style={[styles.result, { backgroundColor: theme.backgroundElement }]}>
+                      <ThemedText type="small" style={styles.flexText} numberOfLines={1}>{s.name}</ThemedText>
+                      <ThemedText type="small" themeColor="textSecondary">
+                        {s.total_duration_min ? `${s.total_duration_min} min` : ''}
+                      </ThemedText>
+                    </Pressable>
+                  ))
+                )}
+                {!searching && results.length === 0 ? (
+                  <ThemedText type="small" themeColor="textSecondary">Aucune séance trouvée.</ThemedText>
+                ) : null}
+              </>
+            )}
 
-            <Button label="Enregistrer la séance" onPress={onSubmit} loading={loading} />
+            {error ? <ThemedText type="small" style={styles.error}>{error}</ThemedText> : null}
+
+            <Button label="Enregistrer" onPress={onSubmit} loading={loading} disabled={!selected} />
             <Button label="Annuler" variant="secondary" onPress={() => router.back()} />
           </ScrollView>
         </KeyboardAvoidingView>
@@ -241,17 +151,10 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   flex: { flex: 1 },
   form: { padding: Spacing.four, gap: Spacing.three },
-  dateField: { width: '50%', alignItems: 'flex-start' },
-  rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  titleRow: { flexDirection: 'row', alignItems: 'center', flex: 1, gap: Spacing.one },
-  order: { minWidth: 20 },
-  actions: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three },
-  arrow: { fontSize: 18 },
-  arrowDisabled: { fontSize: 18, opacity: 0.3 },
-  flexText: { flex: 1 },
-  remove: { color: '#e5484d' },
-  macros: { flexDirection: 'row', gap: Spacing.two },
-  macroInput: { flex: 1 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  flexText: { flex: 1, marginRight: Spacing.two },
+  change: { color: '#3b82f6' },
+  dateField: { gap: Spacing.one, marginTop: Spacing.two, alignItems: 'flex-start' },
   searchRow: { flexDirection: 'row', gap: Spacing.two, alignItems: 'flex-end' },
   searchInput: { flex: 1 },
   result: {
@@ -260,6 +163,7 @@ const styles = StyleSheet.create({
     borderRadius: Spacing.two,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   error: { color: '#e5484d' },
 });

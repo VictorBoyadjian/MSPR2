@@ -3,7 +3,6 @@ id = "b33f4d25-22c8-4355-9b01-571b2597f965"
 name = "MSPR1"
 
 [flyway]
-callbackLocations = [ "filesystem:callbacks" ]
 locations = [ "filesystem:migrations" ]
 mixed = true
 outOfOrder = true

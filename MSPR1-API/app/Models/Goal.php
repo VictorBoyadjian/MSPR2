@@ -30,9 +30,4 @@ class Goal extends Model
     {
         return $this->hasMany(User::class);
     }
-
-        public function sportSessions() : BelongsToMany
-    {
-        return $this->belongsToMany(SportSession::class, 'session_goals');
-    }
 }

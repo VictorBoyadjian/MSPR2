@@ -1,12 +1,12 @@
-CREATE TABLE exercises (
-    id           SERIAL PRIMARY KEY,
-    name         VARCHAR(255) NOT NULL,
-    category     VARCHAR(100),
-    body_part    VARCHAR(100),
-    equipment    VARCHAR(100),
-    difficulty   difficulty_enum,
-    instructions TEXT,
-    source       VARCHAR(100),
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
+/* Catalogue d'exercices (orthographe « exercises » conservée : table utilisée ailleurs). */
+
+CREATE TABLE workout_exercises (
+    id          SERIAL PRIMARY KEY,
+    name        VARCHAR(255) NOT NULL UNIQUE,
+    body_part   VARCHAR(100),
+    category    VARCHAR(100),
+    difficulty  VARCHAR(50),
+    equipment   VARCHAR(100),
+    description TEXT,
+    created_at  TIMESTAMP DEFAULT NOW()
 );

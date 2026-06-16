@@ -41,7 +41,6 @@ class GoalResource extends Resource
     {
         return [
             BelongsToMany::make('users', UserResource::class),
-            BelongsToMany::make('sportSessions', SportSessionResource::class)
         ];
     }
 

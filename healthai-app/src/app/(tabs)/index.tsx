@@ -44,11 +44,11 @@ export default function DashboardScreen() {
   const sportSummary = useMemo(() => {
     const today = new Date();
     const todaySessions = sessions.filter((s) =>
-      s.performed_at ? isSameDay(new Date(s.performed_at), today) : false,
+      s.performedAt ? isSameDay(new Date(s.performedAt), today) : false,
     );
     return {
       count: todaySessions.length,
-      minutes: todaySessions.reduce((sum, s) => sum + (Number(s.duration_min) || 0), 0),
+      minutes: todaySessions.reduce((sum, s) => sum + (Number(s.total_duration_min) || 0), 0),
     };
   }, [sessions]);
 

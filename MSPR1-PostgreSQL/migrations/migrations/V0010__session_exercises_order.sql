@@ -1,2 +1,1 @@
-ALTER TABLE session_exercises
-    ADD COLUMN "order" INT NOT NULL DEFAULT 0;
+/* Obsolète : l'ordre des exercices est porté par session_exercises.order_num (V0006). */

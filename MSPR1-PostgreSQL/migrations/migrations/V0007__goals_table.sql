@@ -8,7 +8,5 @@ CREATE TABLE "goals" (
 ALTER TABLE users
 ADD COLUMN goal_id INT REFERENCES goals(id) ON DELETE SET NULL;
 
-CREATE TABLE "session_goals" (
-  "sport_session_id" INT REFERENCES sport_sessions(id) ON DELETE CASCADE,
-  "goal_id" INT REFERENCES goals(id) ON DELETE CASCADE
-);
+/* Le profil/goal d'une séance est désormais porté par workout_sessions.profile :
+   plus de table pivot session_goals. */

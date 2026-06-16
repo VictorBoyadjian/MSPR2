@@ -74,10 +74,10 @@ class User extends Authenticatable
         });
     }
 
-    public function sportSessions(): BelongsToMany
+    public function workoutSessions(): BelongsToMany
     {
-        return $this->belongsToMany(SportSession::class, 'user_sessions')
-            ->withPivot(['performed_at']);
+        return $this->belongsToMany(WorkoutSession::class, 'user_sessions', 'user_id', 'workout_session_id')
+            ->withPivot(['id', 'performed_at']);
     }
 
     public function metrics(): HasMany

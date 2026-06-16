@@ -9,12 +9,12 @@ CREATE INDEX idx_users_goal_id ON users(goal_id);
 CREATE INDEX idx_users_created_at ON users(created_at);
 
 
-/* ---------- EXERCISES ---------- */
-CREATE INDEX idx_exercises_category ON exercises(category);
-CREATE INDEX idx_exercises_body_part ON exercises(body_part);
-CREATE INDEX idx_exercises_equipment ON exercises(equipment);
-CREATE INDEX idx_exercises_difficulty ON exercises(difficulty);
-CREATE INDEX idx_exercises_created_at ON exercises(created_at);
+/* ---------- WORKOUT EXERCISES ---------- */
+CREATE INDEX idx_workout_exercises_category ON workout_exercises(category);
+CREATE INDEX idx_workout_exercises_body_part ON workout_exercises(body_part);
+CREATE INDEX idx_workout_exercises_equipment ON workout_exercises(equipment);
+CREATE INDEX idx_workout_exercises_difficulty ON workout_exercises(difficulty);
+CREATE INDEX idx_workout_exercises_created_at ON workout_exercises(created_at);
 
 
 /* ---------- METRICS ---------- */
@@ -23,27 +23,24 @@ CREATE INDEX idx_metrics_user_recorded_at ON metrics(user_id, recorded_at);
 CREATE INDEX idx_metrics_recorded_at ON metrics(recorded_at);
 
 
-/* ---------- SESSIONS ---------- */
-CREATE INDEX idx_sport_sessions_created_at ON sport_sessions(created_at);
+/* ---------- WORKOUT SESSIONS ---------- */
+CREATE INDEX idx_workout_sessions_profile ON workout_sessions(profile);
+CREATE INDEX idx_workout_sessions_created_at ON workout_sessions(created_at);
 
 
-/* ---------- USER_SESSIONS (many-to-many) ---------- */
+/* ---------- USER_SESSIONS (séances effectuées / planifiées) ---------- */
 CREATE INDEX idx_user_sessions_user_id ON user_sessions(user_id);
-CREATE INDEX idx_user_sessions_sport_session_id ON user_sessions(sport_session_id);
+CREATE INDEX idx_user_sessions_workout_session_id ON user_sessions(workout_session_id);
 CREATE INDEX idx_user_sessions_performed_at ON user_sessions(performed_at);
 
 
 /* ---------- SESSION_EXERCISES ---------- */
-CREATE INDEX idx_session_exercises_sport_session_id ON session_exercises(sport_session_id);
+CREATE INDEX idx_session_exercises_session_id ON session_exercises(session_id);
 CREATE INDEX idx_session_exercises_exercise_id ON session_exercises(exercise_id);
+
 
 /* ---------- GOALS ---------- */
 CREATE INDEX idx_goals_name ON goals(name);
-
-
-/* ---------- SESSION_GOALS ---------- */
-CREATE INDEX idx_session_goals_sport_session_id ON session_goals(sport_session_id);
-CREATE INDEX idx_session_goals_goal_id ON session_goals(goal_id);
 
 
 /* ---------- DISHES ---------- */
