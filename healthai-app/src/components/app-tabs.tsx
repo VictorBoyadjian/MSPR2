@@ -25,6 +25,17 @@ function profileTabIcon({ color, size }: { color: ColorValue; size: number }) {
   );
 }
 
+function healthTabIcon({ color, size }: { color: ColorValue; size: number }) {
+  return (
+    <SymbolView
+      name="heart.fill"
+      size={size}
+      tintColor={color as string}
+      fallback={<Image source={require('@/assets/images/tabIcons/home.png')} style={{ width: size, height: size, tintColor: color }} resizeMode="contain" />}
+    />
+  );
+}
+
 export default function AppTabs() {
   const scheme = useColorScheme() ?? 'light';
   const colors = Colors[scheme as 'light' | 'dark'] ?? Colors.light;
@@ -56,6 +67,13 @@ export default function AppTabs() {
         options={{
           title: 'Sport',
           tabBarIcon: tabIcon(require('@/assets/images/tabIcons/explore.png')),
+        }}
+      />
+      <Tabs.Screen
+        name="health"
+        options={{
+          title: 'Santé',
+          tabBarIcon: healthTabIcon,
         }}
       />
       <Tabs.Screen

@@ -37,6 +37,25 @@ class Metric extends Model
         'updated_at'
     ];
 
+    /**
+     * Force des types numériques (et non des chaînes PDO) côté JSON : le front
+     * fait de l'arithmétique sur le poids / pouls et attend des `number`.
+     */
+    protected $casts = [
+        'recorded_at'        => 'datetime',
+        'weight_kg'          => 'float',
+        'bmi'                => 'float',
+        'body_fat_pct'       => 'float',
+        'heart_rate_avg'     => 'integer',
+        'heart_rate_max'     => 'integer',
+        'heart_rate_resting' => 'integer',
+        'calories_burned'    => 'float',
+        'session_duration_h' => 'float',
+        'workout_frequency'  => 'integer',
+        'water_intake_l'     => 'float',
+        'experience_level'   => 'integer',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

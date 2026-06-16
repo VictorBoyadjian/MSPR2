@@ -1,5 +1,6 @@
 import { sendRequest, workoutSessions } from '@/services/api';
 import { UserSession, WorkoutSession } from '@/types/workout-sessions.type';
+import { apiDateToIso } from '@/utils/formatDate';
 
 // Lomkit `like` est sensible à la casse : on capitalise comme ailleurs dans l'app.
 const cap = (s: string) => `%${s.charAt(0).toUpperCase()}${s.slice(1)}%`;
@@ -30,7 +31,7 @@ export const sessionService = {
     return res.data.map((s) => ({
       ...s,
       userSessionId: s.pivot?.id ?? '',
-      performedAt: s.pivot?.performed_at ?? '',
+      performedAt: apiDateToIso(s.pivot?.performed_at ?? ''),
     }));
   },
 
@@ -39,6 +40,16 @@ export const sessionService = {
     sendRequest('POST', '/me/sessions', {
       workout_session_id: Number(workoutSessionId),
       performed_at: performedAt,
+    }),
+
+  /** Modifie une séance enregistrée (date et/ou séance choisie). */
+  update: (
+    userSessionId: string,
+    payload: { workoutSessionId?: string; performedAt?: string },
+  ) =>
+    sendRequest('PATCH', `/me/sessions/${userSessionId}`, {
+      ...(payload.workoutSessionId ? { workout_session_id: Number(payload.workoutSessionId) } : {}),
+      ...(payload.performedAt ? { performed_at: payload.performedAt } : {}),
     }),
 
   /** Supprime une séance enregistrée (par l'id de la ligne user_sessions). */

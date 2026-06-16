@@ -52,10 +52,12 @@ workflows:
     publishing:
       app_store_connect:
         auth: integration
+        # "Send to beta preview" → distribue le build sur TestFlight beta
         submit_to_testflight: true
+        # Cibler un groupe EXTERNE déclenche automatiquement la Beta App Review.
         beta_groups:
-          - Internal Testers
-        
+          - Gael  # TODO: nom exact du groupe externe dans App Store Connect > TestFlight
+
 
   android-workflow:
     name: Android — Google Play Internal

@@ -37,6 +37,8 @@ export default function MealDetailScreen() {
   const [eatedAt, setEatedAt] = useState(() => new Date());
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const num = (v: string) => (v ? Number(v.replace(',', '.')) : undefined);
 
@@ -82,6 +84,24 @@ export default function MealDetailScreen() {
       setError(e instanceof ApiError ? e.message : 'Une erreur est survenue.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const onDelete = async () => {
+    // Premier appui : on demande confirmation (Alert peu fiable sur web).
+    if (!confirmDelete) {
+      setConfirmDelete(true);
+      return;
+    }
+    setError('');
+    setDeleting(true);
+    try {
+      await dishService.remove(id);
+      router.back();
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : 'Une erreur est survenue.');
+      setDeleting(false);
+      setConfirmDelete(false);
     }
   };
 
@@ -162,6 +182,11 @@ export default function MealDetailScreen() {
 
             <Button label="Enregistrer" onPress={onSubmit} loading={loading} />
             <Button label="Annuler" variant="secondary" onPress={() => router.back()} />
+            <Pressable onPress={onDelete} disabled={deleting} style={styles.delete}>
+              <ThemedText type="smallBold" style={styles.deleteTx}>
+                {confirmDelete ? 'Confirmer la suppression' : 'Supprimer le repas'}
+              </ThemedText>
+            </Pressable>
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -184,4 +209,6 @@ const styles = StyleSheet.create({
   macros: { flexDirection: 'row', gap: Spacing.two },
   macroInput: { flex: 1, minWidth: 0 },
   error: { color: '#e5484d' },
+  delete: { alignItems: 'center', paddingVertical: Spacing.two },
+  deleteTx: { color: '#e5484d' },
 });

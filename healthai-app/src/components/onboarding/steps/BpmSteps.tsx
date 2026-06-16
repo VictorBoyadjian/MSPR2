@@ -11,7 +11,7 @@ import { accent, accentA, colors, tabular } from '../theme';
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 /* ---------------- Intro ---------------- */
-export function BpmIntro() {
+export function BpmIntro({ eyebrow = 'ÉTAPE 6' }: { eyebrow?: string }) {
   const steps = [
     'Assieds-toi et reste calme une dizaine de secondes.',
     "Pose l'index et le majeur sur l'intérieur du poignet opposé, ou sur le côté du cou.",
@@ -20,7 +20,7 @@ export function BpmIntro() {
   return (
     <View>
       <StepHeader
-        eyebrow="ÉTAPE 6"
+        eyebrow={eyebrow}
         title="Mesurons ton pouls"
         sub="Au repos, pour estimer ta fréquence cardiaque de base."
       />
@@ -141,13 +141,21 @@ export function BpmMeasure({ duration = 30000, onDone }: { duration?: number; on
 }
 
 /* ---------------- Saisie des battements comptés ---------------- */
-export function BpmCount({ count, setCount }: { count: number; setCount: (value: number) => void }) {
+export function BpmCount({
+  count,
+  setCount,
+  eyebrow = 'ÉTAPE 6',
+}: {
+  count: number;
+  setCount: (value: number) => void;
+  eyebrow?: string;
+}) {
   const bpm = beatsToBpm(count);
   const adjust = (d: number) => setCount(Math.max(10, Math.min(160, count + d)));
   return (
     <View>
       <StepHeader
-        eyebrow="ÉTAPE 6"
+        eyebrow={eyebrow}
         title="Combien de battements ?"
         sub="Saisis le nombre que tu as compté pendant les 30 secondes."
       />

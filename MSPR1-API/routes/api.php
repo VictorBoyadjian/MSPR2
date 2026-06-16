@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HealthMetricController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UserSessionController;
@@ -31,8 +32,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Séances de l'utilisateur connecté (faites / planifiées).
     Route::get('me/sessions', [UserSessionController::class, 'index'])->name('me.sessions.index');
+    Route::get('me/sessions/stats', [UserSessionController::class, 'stats'])->name('me.sessions.stats');
     Route::post('me/sessions', [UserSessionController::class, 'store'])->name('me.sessions.store');
+    Route::patch('me/sessions/{id}', [UserSessionController::class, 'update'])->name('me.sessions.update');
     Route::delete('me/sessions/{id}', [UserSessionController::class, 'destroy'])->name('me.sessions.destroy');
+
+    // Suivi santé : une métrique par jour (poids, pouls au repos), calculs sport à part.
+    Route::get('me/metrics/current', [HealthMetricController::class, 'current'])->name('me.metrics.current');
+    Route::put('me/metrics', [HealthMetricController::class, 'upsert'])->name('me.metrics.upsert');
 
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 });
