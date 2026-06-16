@@ -17,9 +17,6 @@ if not DATABASE_URL:
         "Voir .env.example pour le format."
     )
 
-# ---------------------------------------------------------------------------
-# Mapping profil → filtres BDD
-# ---------------------------------------------------------------------------
 
 _PROFILE_CONFIG: dict[str, dict] = {
     "prise_masse_confirme": {
@@ -97,9 +94,6 @@ _PROFILE_CONFIG: dict[str, dict] = {
 }
 
 
-# ---------------------------------------------------------------------------
-# Requêtes BDD
-# ---------------------------------------------------------------------------
 
 def _get_exercises(cur, filters: dict, limit: int = 6) -> list[str]:
     categories_ph = ",".join(["%s"] * len(filters["categories"]))
@@ -156,9 +150,6 @@ def _get_foods(cur, filters: dict, limit: int = 5) -> list[str]:
     ]
 
 
-# ---------------------------------------------------------------------------
-# Interface publique
-# ---------------------------------------------------------------------------
 
 @dataclass
 class Program:
@@ -166,8 +157,6 @@ class Program:
     sessions_per_week: int
     session_duration_min: int
     focus: str
-    activities: list[str]
-    nutrition_examples: list[str]
     intensity: str
     weekly_volume_h: float
     progression: str
@@ -181,18 +170,11 @@ def get_program(profile: str) -> Program:
 
     cfg = _PROFILE_CONFIG[profile]
 
-    with psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
-        with conn.cursor() as cur:
-            exercises = _get_exercises(cur, cfg["exercise_filters"])
-            foods     = _get_foods(cur, cfg["food_filters"])
-
     return Program(
         profile=profile,
         sessions_per_week=cfg["sessions_per_week"],
         session_duration_min=cfg["session_duration_min"],
         focus=cfg["focus"],
-        activities=exercises,
-        nutrition_examples=foods,
         intensity=cfg["intensity"],
         weekly_volume_h=cfg["weekly_volume_h"],
         progression=cfg["progression"],
@@ -210,8 +192,6 @@ def program_to_dict(program: Program) -> dict:
         "sessions_per_week":    program.sessions_per_week,
         "session_duration_min": program.session_duration_min,
         "focus":                program.focus,
-        "activities":           program.activities,
-        "nutrition_examples":   program.nutrition_examples,
         "intensity":            program.intensity,
         "weekly_volume_h":      program.weekly_volume_h,
         "progression":          program.progression,
