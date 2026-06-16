@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import RestingHrEditorModal from '@/components/health/RestingHrEditorModal';
 import WeeklySportChart from '@/components/health/WeeklySportChart';
+import WeightChart from '@/components/health/WeightChart';
 import WeightEditorModal from '@/components/health/WeightEditorModal';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -22,7 +23,7 @@ const DEFAULT_RESTING_BPM = 70;
 export default function HealthScreen() {
   const { user } = useAuthStore();
   const theme = useTheme();
-  const { stats, metric, loading, error, refresh, save } = useHealth();
+  const { stats, metric, weightHistory, loading, error, refresh, save } = useHealth();
   const [editingWeight, setEditingWeight] = useState(false);
   const [editingHr, setEditingHr] = useState(false);
 
@@ -97,8 +98,8 @@ export default function HealthScreen() {
               </Pressable>
             </View>
 
-            <Pressable onPress={() => setEditingWeight(true)}>
-              <Card style={styles.weightCard}>
+            <Card style={styles.weightCard}>
+              <Pressable style={styles.weightHead} onPress={() => setEditingWeight(true)}>
                 <View style={styles.weightText}>
                   <View style={styles.labelRow}>
                     <Icon name="weight" size={15} color={theme.textSecondary} />
@@ -113,8 +114,9 @@ export default function HealthScreen() {
                 <ThemedText type="smallBold" themeColor="textSecondary">
                   Modifier ›
                 </ThemedText>
-              </Card>
-            </Pressable>
+              </Pressable>
+              {weightHistory.length >= 2 ? <WeightChart data={weightHistory} /> : null}
+            </Card>
           </ScrollView>
         )}
       </SafeAreaView>
@@ -180,7 +182,8 @@ const styles = StyleSheet.create({
   statCard: { flex: 1, gap: Spacing.half },
   statCardFill: { flex: 1, gap: Spacing.half },
   statValue: { fontSize: 36, lineHeight: 42 },
-  weightCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  weightCard: { gap: Spacing.one },
+  weightHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   weightText: { gap: Spacing.half },
   labelRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.one },
   empty: { textAlign: 'center', marginVertical: Spacing.two },

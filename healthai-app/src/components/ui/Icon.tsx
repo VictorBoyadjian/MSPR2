@@ -24,6 +24,16 @@ export type IconName =
   | 'close'
   | 'logout'
   | 'trash'
+  | 'add'
+  | 'breakfast'
+  | 'lunch'
+  | 'dinner'
+  | 'snack'
+  | 'search'
+  | 'chevron'
+  | 'time'
+  | 'flame'
+  | 'list'
   | 'theme-auto'
   | 'theme-light'
   | 'theme-dark';
@@ -46,6 +56,16 @@ const GLYPHS: Record<IconName, IoniconName> = {
   close: 'close',
   logout: 'log-out-outline',
   trash: 'trash-outline',
+  add: 'add',
+  breakfast: 'cafe-outline',
+  lunch: 'restaurant-outline',
+  dinner: 'moon-outline',
+  snack: 'nutrition-outline',
+  search: 'search-outline',
+  chevron: 'chevron-forward',
+  time: 'time-outline',
+  flame: 'flame-outline',
+  list: 'list-outline',
   'theme-auto': 'contrast-outline',
   'theme-light': 'sunny-outline',
   'theme-dark': 'moon-outline',

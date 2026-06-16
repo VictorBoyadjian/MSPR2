@@ -2,7 +2,7 @@
   "expo": {
     "name": "healthai-app",
     "slug": "healthai-app",
-    "version": "1.0.12",
+    "version": "1.0.13",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "healthaiapp",
@@ -17,7 +17,7 @@
       }
     },
     "android": {
-      "package": "com.healthai.app",
+      "package": "healthai.app",
       "versionCode": 12,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -54,7 +54,8 @@
       ],
       "expo-image",
       "expo-secure-store",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      "./plugins/withSwift5Pods"
     ],
     "experiments": {
       "typedRoutes": true,

@@ -1,17 +1,18 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { useMemo, useState } from 'react';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
 import DateTimeField from '@/components/ui/DateTimeField';
-import Input from '@/components/ui/Input';
+import { SessionExerciseList } from '@/components/workout/SessionExerciseList';
+import { SessionSearch } from '@/components/workout/SessionSearch';
+import { SessionSummaryCard } from '@/components/workout/SessionSummaryCard';
 import { Spacing } from '@/constants/theme';
 import { useGoals } from '@/hooks/useGoals';
-import { useTheme } from '@/hooks/use-theme';
+import { useSessionExercises } from '@/hooks/useSessionExercises';
 import { ApiError } from '@/services/api';
 import { sessionService } from '@/services/sessionService';
 import { useAuthStore } from '@/stores/authStore';
@@ -19,7 +20,6 @@ import { WorkoutSession } from '@/types/workout-sessions.type';
 
 export default function AddWorkoutScreen() {
   const router = useRouter();
-  const theme = useTheme();
   const { user } = useAuthStore();
   const { items: goals } = useGoals();
   // Pré-sélection éventuelle (depuis une carte de recommandation).
@@ -31,9 +31,6 @@ export default function AddWorkoutScreen() {
     [goals, user?.goal_id],
   );
 
-  const [term, setTerm] = useState('');
-  const [results, setResults] = useState<WorkoutSession[]>([]);
-  const [searching, setSearching] = useState(false);
   const [selected, setSelected] = useState<WorkoutSession | null>(
     params.workoutSessionId
       ? ({ id: params.workoutSessionId, name: params.name ?? 'Séance' } as WorkoutSession)
@@ -43,24 +40,8 @@ export default function AddWorkoutScreen() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const runSearch = useCallback(
-    async (t: string) => {
-      setSearching(true);
-      try {
-        setResults(await sessionService.search(t, profile));
-      } catch {
-        setResults([]);
-      } finally {
-        setSearching(false);
-      }
-    },
-    [profile],
-  );
-
-  // Chargement initial : séances du programme de l'utilisateur.
-  useEffect(() => {
-    runSearch('');
-  }, [runSearch]);
+  // Étapes de la séance sélectionnée (affichées même tant qu'elle n'est pas planifiée).
+  const { exercises, loading: loadingExercises } = useSessionExercises(selected?.id);
 
   const onSubmit = async () => {
     if (!selected) {
@@ -87,58 +68,31 @@ export default function AddWorkoutScreen() {
             <ThemedText type="subtitle">Planifier une séance</ThemedText>
 
             {selected ? (
-              <Card>
-                <ThemedView style={styles.row}>
-                  <ThemedText type="smallBold" style={styles.flexText}>{selected.name}</ThemedText>
-                  <Pressable onPress={() => setSelected(null)} hitSlop={8}>
-                    <ThemedText type="small" style={[styles.change, { color: theme.accentText }]}>Changer</ThemedText>
-                  </Pressable>
-                </ThemedView>
-                {selected.exercises?.length ? (
-                  <ThemedText type="small" themeColor="textSecondary" numberOfLines={2}>
-                    {selected.exercises.map((e) => e.name).join(', ')}
-                  </ThemedText>
-                ) : null}
-                <ThemedView style={styles.dateField}>
-                  <ThemedText type="small" themeColor="textSecondary">Quand ?</ThemedText>
-                  <DateTimeField value={performedAt} onChange={setPerformedAt} mode="datetime" />
-                </ThemedView>
-                <ThemedText type="small" themeColor="textSecondary">
-                  Une date future planifie la séance, une date passée l&apos;enregistre comme faite.
-                </ThemedText>
-              </Card>
-            ) : (
               <>
-                <ThemedView style={styles.searchRow}>
-                  <Input
-                    value={term}
-                    onChangeText={setTerm}
-                    placeholder="Rechercher une séance"
-                    onSubmitEditing={() => runSearch(term)}
-                    style={styles.searchInput}
-                  />
-                  <Button label="OK" onPress={() => runSearch(term)} loading={searching} />
-                </ThemedView>
+                <SessionSummaryCard
+                  session={selected}
+                  exerciseCount={exercises.length}
+                  action={{ label: 'Changer', onPress: () => setSelected(null) }}>
+                  <View style={styles.dateField}>
+                    <ThemedText type="small" themeColor="textSecondary">
+                      Quand ?
+                    </ThemedText>
+                    <DateTimeField value={performedAt} onChange={setPerformedAt} mode="datetime" />
+                  </View>
+                  <ThemedText type="small" themeColor="textSecondary">
+                    Une date future planifie la séance, une date passée l&apos;enregistre comme faite.
+                  </ThemedText>
+                </SessionSummaryCard>
 
-                {searching ? (
-                  <ActivityIndicator />
-                ) : (
-                  results.map((s) => (
-                    <Pressable
-                      key={s.id}
-                      onPress={() => setSelected(s)}
-                      style={[styles.result, { backgroundColor: theme.backgroundElement }]}>
-                      <ThemedText type="small" style={styles.flexText} numberOfLines={1}>{s.name}</ThemedText>
-                      <ThemedText type="small" themeColor="textSecondary">
-                        {s.total_duration_min ? `${s.total_duration_min} min` : ''}
-                      </ThemedText>
-                    </Pressable>
-                  ))
-                )}
-                {!searching && results.length === 0 ? (
-                  <ThemedText type="small" themeColor="textSecondary">Aucune séance trouvée.</ThemedText>
-                ) : null}
+                <ThemedView style={styles.exercises}>
+                  <ThemedText type="smallBold" themeColor="textSecondary">
+                    Exercices{exercises.length ? ` (${exercises.length})` : ''}
+                  </ThemedText>
+                  <SessionExerciseList exercises={exercises} loading={loadingExercises} />
+                </ThemedView>
               </>
+            ) : (
+              <SessionSearch profile={profile} onSelect={setSelected} autoFocus />
             )}
 
             {error ? <ThemedText type="small" style={styles.error}>{error}</ThemedText> : null}
@@ -157,19 +111,7 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   flex: { flex: 1 },
   form: { padding: Spacing.four, gap: Spacing.three },
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  flexText: { flex: 1, marginRight: Spacing.two },
-  change: { fontWeight: '600' },
   dateField: { gap: Spacing.one, marginTop: Spacing.two, alignItems: 'flex-start' },
-  searchRow: { flexDirection: 'row', gap: Spacing.two, alignItems: 'flex-end' },
-  searchInput: { flex: 1 },
-  result: {
-    paddingVertical: Spacing.two,
-    paddingHorizontal: Spacing.three,
-    borderRadius: Spacing.two,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
+  exercises: { gap: Spacing.two },
   error: { color: '#e5484d' },
 });

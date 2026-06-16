@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 
 import { AuthProvider } from '@/components/auth/auth-provider';
 import { ThemePreferenceProvider } from '@/components/theme/theme-preference-provider';
+import { ConfirmProvider } from '@/components/ui/ConfirmDialog';
 import Loader from '@/components/ui/Loader';
 import { useAuth } from '@/hooks/useAuth';
 import { useColorSchemeResolved } from '@/hooks/use-theme';
@@ -56,7 +57,9 @@ export default function RootLayout() {
   return (
     <ThemePreferenceProvider>
       <AuthProvider>
-        <ThemedNavigation />
+        <ConfirmProvider>
+          <ThemedNavigation />
+        </ConfirmProvider>
       </AuthProvider>
     </ThemePreferenceProvider>
   );

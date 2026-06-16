@@ -4,7 +4,7 @@ import { Platform, Pressable, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
+import { useColorSchemeResolved, useTheme } from '@/hooks/use-theme';
 import { formatDate, formatDateTime } from '@/utils/formatDate';
 
 type Props = {
@@ -20,6 +20,7 @@ const toLocalDateTime = (d: Date) => `${toLocalDate(d)}T${pad(d.getHours())}:${p
 
 export default function DateTimeField({ value, onChange, mode = 'date' }: Props) {
   const theme = useTheme();
+  const scheme = useColorSchemeResolved();
   const withTime = mode === 'datetime';
   // Android : sélection en deux temps (date puis heure).
   const [androidStep, setAndroidStep] = useState<'date' | 'time' | null>(null);
@@ -50,6 +51,10 @@ export default function DateTimeField({ value, onChange, mode = 'date' }: Props)
         value={value}
         mode={withTime ? 'datetime' : 'date'}
         display="compact"
+        // Aligne la pastille du picker sur le thème courant (sinon fond noir
+        // par défaut sur un fond clair/gris) et reprend l'accent de l'app.
+        themeVariant={scheme}
+        accentColor={theme.accent}
         onChange={(_, date) => date && onChange(date)}
       />
     );

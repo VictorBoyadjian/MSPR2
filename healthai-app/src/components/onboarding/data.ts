@@ -33,12 +33,12 @@ export const DEFAULT_ONBOARDING_DATA: OnboardingData = {
 
 /** Tranches de masse grasse présentées via les silhouettes (label + % médian envoyé à l'API). */
 export const BODY_FAT_OPTIONS = [
-  { label: '10–13 %', value: 11.5 },
-  { label: '14–17 %', value: 15.5 },
-  { label: '18–21 %', value: 19.5 },
-  { label: '22–25 %', value: 23.5 },
-  { label: '26–31 %', value: 28.5 },
-  { label: '32 %+', value: 34 },
+  { label: '4–9 %', value: 6.5 },
+  { label: '10–14 %', value: 12 },
+  { label: '15–19 %', value: 17 },
+  { label: '20–24 %', value: 22 },
+  { label: '25–29 %', value: 27 },
+  { label: '30 %+', value: 32 },
 ] as const;
 
 /** BPM au repos = battements comptés sur 30 s × 2. */

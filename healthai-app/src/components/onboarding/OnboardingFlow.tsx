@@ -161,7 +161,7 @@ export default function OnboardingFlow() {
       case 'sport':
         return <RulerStep eyebrow="ÉTAPE 5" title="Sport par semaine ?" sub="Heures d'activité physique modérée à intense." min={0} max={25} step={0.5} decimals={1} majorStep={5} unit="h / sem" value={data.sport} onChange={(v) => patch({ sport: v })} />;
       case 'bodyfat':
-        return <BodyFatStep value={data.bodyFat} onChange={(i) => patch({ bodyFat: i })} />;
+        return <BodyFatStep value={data.bodyFat} gender={data.gender} onChange={(i) => patch({ bodyFat: i })} />;
       case 'bpmintro':
         return <BpmIntro />;
       case 'countdown':

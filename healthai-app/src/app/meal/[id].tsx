@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import Button from '@/components/ui/Button';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import DateTimeField from '@/components/ui/DateTimeField';
 import Input from '@/components/ui/Input';
 import { Spacing } from '@/constants/theme';
@@ -27,7 +28,8 @@ export default function MealDetailScreen() {
   const router = useRouter();
   const theme = useTheme();
   const authStore = useAuthStore();
-  
+  const confirm = useConfirm();
+
   const [name, setName] = useState('');
   const [mealType, setMealType] = useState<MealType>('lunch');
   const [calories, setCalories] = useState('');
@@ -38,7 +40,6 @@ export default function MealDetailScreen() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const num = (v: string) => (v ? Number(v.replace(',', '.')) : undefined);
 
@@ -88,11 +89,13 @@ export default function MealDetailScreen() {
   };
 
   const onDelete = async () => {
-    // Premier appui : on demande confirmation (Alert peu fiable sur web).
-    if (!confirmDelete) {
-      setConfirmDelete(true);
-      return;
-    }
+    const ok = await confirm({
+      title: 'Supprimer le repas',
+      message: 'Ce repas sera définitivement supprimé.',
+      confirmLabel: 'Supprimer',
+      destructive: true,
+    });
+    if (!ok) return;
     setError('');
     setDeleting(true);
     try {
@@ -101,7 +104,6 @@ export default function MealDetailScreen() {
     } catch (e) {
       setError(e instanceof ApiError ? e.message : 'Une erreur est survenue.');
       setDeleting(false);
-      setConfirmDelete(false);
     }
   };
 
@@ -184,7 +186,7 @@ export default function MealDetailScreen() {
             <Button label="Annuler" variant="secondary" onPress={() => router.back()} />
             <Pressable onPress={onDelete} disabled={deleting} style={styles.delete}>
               <ThemedText type="smallBold" style={styles.deleteTx}>
-                {confirmDelete ? 'Confirmer la suppression' : 'Supprimer le repas'}
+                Supprimer le repas
               </ThemedText>
             </Pressable>
           </ScrollView>

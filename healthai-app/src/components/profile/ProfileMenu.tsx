@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Alert, Modal, Pressable, StyleSheet } from 'react-native';
+import { Modal, Pressable, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { useConfirm } from '@/components/ui/ConfirmDialog';
 import Icon, { IconName } from '@/components/ui/Icon';
 import { Spacing } from '@/constants/theme';
 import { useAuth } from '@/hooks/useAuth';
@@ -12,6 +13,7 @@ import { useThemePreference, type ThemePreference } from '@/stores/themeStore';
 export default function ProfileMenu() {
   const { user, logout, deleteAccount } = useAuth();
   const theme = useTheme();
+  const confirm = useConfirm();
   const [open, setOpen] = useState(false);
 
   const close = () => setOpen(false);
@@ -21,26 +23,25 @@ export default function ProfileMenu() {
     logout();
   };
 
-  const handleDelete = () => {
-    Alert.alert(
-      'Supprimer le compte',
-      'Cette action est définitive. Toutes vos données seront supprimées. Continuer ?',
-      [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: 'Supprimer',
-          style: 'destructive',
-          onPress: async () => {
-            close();
-            try {
-              await deleteAccount();
-            } catch {
-              Alert.alert('Erreur', "Impossible de supprimer le compte pour le moment.");
-            }
-          },
-        },
-      ],
-    );
+  const handleDelete = async () => {
+    const ok = await confirm({
+      title: 'Supprimer le compte',
+      message: 'Cette action est définitive. Toutes vos données seront supprimées. Continuer ?',
+      confirmLabel: 'Supprimer',
+      destructive: true,
+    });
+    if (!ok) return;
+    close();
+    try {
+      await deleteAccount();
+    } catch {
+      await confirm({
+        title: 'Erreur',
+        message: 'Impossible de supprimer le compte pour le moment.',
+        confirmLabel: 'OK',
+        cancelLabel: 'Fermer',
+      });
+    }
   };
 
   return (

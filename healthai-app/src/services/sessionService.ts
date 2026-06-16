@@ -11,17 +11,19 @@ type MeSessionsResponse = {
 };
 
 export const sessionService = {
-  /** Catalogue : recherche de séances, optionnellement filtrées par profil (goal). */
-  search: async (term: string, profile?: string | null): Promise<WorkoutSession[]> => {
+  /**
+   * Catalogue : recherche de séances par nom sur l'ensemble du catalogue.
+   * Le tri « recommandées d'abord » (selon le profil) est fait à l'affichage.
+   */
+  search: async (term: string): Promise<WorkoutSession[]> => {
     const filters: { field: string; operator?: string; value: unknown }[] = [];
-    if (profile) filters.push({ field: 'profile', value: profile });
     if (term.trim()) filters.push({ field: 'name', operator: 'like', value: cap(term.trim()) });
 
     const response = await workoutSessions.search({
       filters,
       includes: [{ relation: 'exercises' }],
       sorts: [{ field: 'id', direction: 'asc' }],
-      limit: 25,
+      limit: 50,
     });
     return response.data;
   },
