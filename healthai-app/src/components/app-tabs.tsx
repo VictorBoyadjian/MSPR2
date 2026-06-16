@@ -1,8 +1,9 @@
 import { Tabs } from 'expo-router';
-import { ColorValue, useColorScheme } from 'react-native';
+import { ColorValue } from 'react-native';
 
 import Icon, { IconName } from '@/components/ui/Icon';
 import { Colors } from '@/constants/theme';
+import { useColorSchemeResolved } from '@/hooks/use-theme';
 
 /** Icône d'onglet : version pleine quand actif, contour sinon. */
 function tabIcon(base: IconName) {
@@ -14,14 +15,13 @@ function tabIcon(base: IconName) {
 }
 
 export default function AppTabs() {
-  const scheme = useColorScheme() ?? 'light';
-  const colors = Colors[scheme as 'light' | 'dark'] ?? Colors.light;
+  const colors = Colors[useColorSchemeResolved()];
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.text,
+        tabBarActiveTintColor: colors.accentText,
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: { backgroundColor: colors.background },
       }}>

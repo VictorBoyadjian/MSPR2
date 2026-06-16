@@ -1,10 +1,11 @@
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider, useRouter, useSegments } from 'expo-router';
 import { useEffect } from 'react';
-import { useColorScheme } from 'react-native';
 
 import { AuthProvider } from '@/components/auth/auth-provider';
+import { ThemePreferenceProvider } from '@/components/theme/theme-preference-provider';
 import Loader from '@/components/ui/Loader';
 import { useAuth } from '@/hooks/useAuth';
+import { useColorSchemeResolved } from '@/hooks/use-theme';
 
 function RootNavigator() {
   const { isAuthenticated, isLoading, onboardingPending } = useAuth();
@@ -42,13 +43,21 @@ function RootNavigator() {
   );
 }
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
+function ThemedNavigation() {
+  const scheme = useColorSchemeResolved();
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AuthProvider>
-        <RootNavigator />
-      </AuthProvider>
+    <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <RootNavigator />
     </ThemeProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <ThemePreferenceProvider>
+      <AuthProvider>
+        <ThemedNavigation />
+      </AuthProvider>
+    </ThemePreferenceProvider>
   );
 }

@@ -163,7 +163,7 @@ export default function DayTimetable({ day, sessions, onPress }: Props) {
                   },
                 ]}
               >
-                <View style={[styles.blockAccent, { backgroundColor: theme.text }]} />
+                <View style={[styles.blockAccent, { backgroundColor: theme.accent }]} />
                 <View style={styles.blockBody}>
                   <ThemedText type="smallBold" numberOfLines={1}>
                     {p.session.name}

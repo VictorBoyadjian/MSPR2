@@ -35,7 +35,7 @@ export default function ProgramBanner({ label, targetWeight, onPress }: Props) {
           <ThemedText type="smallBold">{fmtWeight(weight)}</ThemedText>
         </View>
       ) : null}
-      <ThemedText type="small" themeColor="textSecondary">
+      <ThemedText type="small" themeColor="accentText" style={styles.cta}>
         {label ? 'Changer de programme →' : 'Choisir un programme →'}
       </ThemedText>
     </Pressable>
@@ -50,4 +50,5 @@ const styles = StyleSheet.create({
   },
   text: { gap: Spacing.half },
   target: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  cta: { fontWeight: '600' },
 });
