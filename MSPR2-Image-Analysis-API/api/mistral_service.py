@@ -12,7 +12,7 @@ from color_enum import ColorEnum
 load_dotenv('.env')
 
 class MistralService():
-    _client = Mistral(api_key=os.getenv('MISTRAL_API_KEY'))
+    _client = Mistral(api_key=(os.getenv('MISTRAL_API_KEY') or '').strip())
     
     @classmethod
     def generate(cls, data : DishCalculateInput) -> Union[DishCalculateOutput, dict]:
