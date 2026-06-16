@@ -29,11 +29,13 @@ function shortHours(hours: number): string {
 export default function WeeklySportChart({ week }: { week: DaySportHours[] }) {
   const theme = useTheme();
   const today = localToday();
-  const max = Math.max(0.5, ...week.map((d) => d.hours));
+  // L'API peut renvoyer les heures en chaîne : on normalise avant tout calcul.
+  const days = week.map((d) => ({ ...d, hours: Number(d.hours) || 0 }));
+  const max = Math.max(0.5, ...days.map((d) => d.hours));
 
   return (
     <View style={styles.chart}>
-      {week.map((day) => {
+      {days.map((day) => {
         const isToday = day.date === today;
         const ratio = max > 0 ? day.hours / max : 0;
         return (

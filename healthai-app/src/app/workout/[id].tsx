@@ -5,12 +5,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import ExerciseRow from '@/components/workout/ExerciseRow';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import DateTimeField from '@/components/ui/DateTimeField';
 import Input from '@/components/ui/Input';
 import { Spacing } from '@/constants/theme';
 import { useGoals } from '@/hooks/useGoals';
+import { useSessionExercises } from '@/hooks/useSessionExercises';
 import { useTheme } from '@/hooks/use-theme';
 import { ApiError } from '@/services/api';
 import { sessionService } from '@/services/sessionService';
@@ -45,6 +47,14 @@ export default function EditWorkoutScreen() {
   const [loading, setLoading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  const { exercises, loading: loadingExercises } = useSessionExercises(selected.id);
+
+  const onLaunch = () =>
+    router.push({
+      pathname: '/workout/run',
+      params: { workoutSessionId: selected.id, name: selected.name },
+    });
 
   const runSearch = useCallback(
     async (t: string) => {
@@ -117,6 +127,31 @@ export default function EditWorkoutScreen() {
               </ThemedView>
             </Card>
 
+            {!picking ? (
+              <>
+                <Button label="Lancer la séance" icon="pulse" onPress={onLaunch} />
+
+                <ThemedView style={styles.exercises}>
+                  <ThemedText type="smallBold" themeColor="textSecondary">
+                    Exercices{exercises.length ? ` (${exercises.length})` : ''}
+                  </ThemedText>
+                  {loadingExercises ? (
+                    <ActivityIndicator />
+                  ) : exercises.length === 0 ? (
+                    <ThemedText type="small" themeColor="textSecondary">
+                      Aucun exercice pour cette séance.
+                    </ThemedText>
+                  ) : (
+                    <Card style={styles.exerciseList}>
+                      {exercises.map((ex, i) => (
+                        <ExerciseRow key={ex.id} exercise={ex} index={i} />
+                      ))}
+                    </Card>
+                  )}
+                </ThemedView>
+              </>
+            ) : null}
+
             {picking ? (
               <>
                 <ThemedView style={styles.searchRow}>
@@ -175,6 +210,8 @@ const styles = StyleSheet.create({
   flexText: { flex: 1, marginRight: Spacing.two },
   change: { color: '#3b82f6' },
   dateField: { gap: Spacing.one, marginTop: Spacing.two, alignItems: 'flex-start' },
+  exercises: { gap: Spacing.two },
+  exerciseList: { gap: Spacing.three },
   searchRow: { flexDirection: 'row', gap: Spacing.two, alignItems: 'flex-end' },
   searchInput: { flex: 1 },
   result: {

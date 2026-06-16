@@ -1,6 +1,7 @@
 import { ActivityIndicator, Pressable, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
+import Icon, { IconName } from '@/components/ui/Icon';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -10,6 +11,8 @@ type Props = {
   variant?: 'primary' | 'secondary';
   loading?: boolean;
   disabled?: boolean;
+  /** Icône optionnelle affichée avant le libellé. */
+  icon?: IconName;
 };
 
 export default function Button({
@@ -18,10 +21,12 @@ export default function Button({
   variant = 'primary',
   loading = false,
   disabled = false,
+  icon,
 }: Props) {
   const theme = useTheme();
   const isPrimary = variant === 'primary';
   const isDisabled = disabled || loading;
+  const color = isPrimary ? theme.background : theme.text;
 
   return (
     <Pressable
@@ -35,13 +40,14 @@ export default function Button({
         },
       ]}>
       {loading ? (
-        <ActivityIndicator color={isPrimary ? theme.background : theme.text} />
+        <ActivityIndicator color={color} />
       ) : (
-        <ThemedText
-          type="smallBold"
-          style={{ color: isPrimary ? theme.background : theme.text }}>
-          {label}
-        </ThemedText>
+        <>
+          {icon ? <Icon name={icon} size={18} color={color} /> : null}
+          <ThemedText type="smallBold" style={{ color }}>
+            {label}
+          </ThemedText>
+        </>
       )}
     </Pressable>
   );
@@ -49,6 +55,8 @@ export default function Button({
 
 const styles = StyleSheet.create({
   button: {
+    flexDirection: 'row',
+    gap: Spacing.two,
     paddingVertical: Spacing.three,
     paddingHorizontal: Spacing.four,
     borderRadius: Spacing.three,

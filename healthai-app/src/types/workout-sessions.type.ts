@@ -22,3 +22,43 @@ export type UserSession = WorkoutSession & {
   userSessionId: string;
   performedAt: string;
 };
+
+/** Exercice d'une séance recommandée par le moteur ML (POST /sessions/exercises). */
+export type RecommendedExercise = {
+  order_num: number;
+  exercise_name: string;
+  body_part: string;
+  category: string;
+  equipment: string;
+  sets: number;
+  reps: string;
+  rest_sec: number;
+  notes: string;
+};
+
+/** Séance recommandée par le moteur ML, liée au catalogue via `session_id`. */
+export type RecommendedSession = {
+  session_id: number;
+  name: string;
+  profile: string;
+  session_type: string;
+  total_duration_min: number;
+  difficulty: string;
+  description: string;
+  objective: string;
+  exercises: RecommendedExercise[];
+};
+
+export type SessionsRecoInput = {
+  profile: string;
+  session_type?: string | null;
+  body_parts_to_exclude: string[];
+};
+
+export type SessionsRecoOutput = {
+  profile: string;
+  session_type_filter: string | null;
+  body_parts_excluded: string[];
+  count: number;
+  sessions: RecommendedSession[];
+};

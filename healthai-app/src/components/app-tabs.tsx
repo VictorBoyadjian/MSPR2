@@ -1,39 +1,16 @@
 import { Tabs } from 'expo-router';
-import { SymbolView } from 'expo-symbols';
-import { ColorValue, Image, ImageSourcePropType, useColorScheme } from 'react-native';
+import { ColorValue, useColorScheme } from 'react-native';
 
+import Icon, { IconName } from '@/components/ui/Icon';
 import { Colors } from '@/constants/theme';
 
-function tabIcon(src: ImageSourcePropType) {
-  return ({ color, size }: { color: ColorValue; size: number }) => (
-    <Image
-      source={src}
-      style={{ width: size, height: size, tintColor: color }}
-      resizeMode="contain"
-    />
+/** Icône d'onglet : version pleine quand actif, contour sinon. */
+function tabIcon(base: IconName) {
+  const TabBarIcon = ({ color, size, focused }: { color: ColorValue; size: number; focused: boolean }) => (
+    <Icon name={focused ? (`${base}-filled` as IconName) : base} size={size} color={color} />
   );
-}
-
-function profileTabIcon({ color, size }: { color: ColorValue; size: number }) {
-  return (
-    <SymbolView
-      name={{ ios: 'person.fill', android: 'person', web: 'person' }}
-      size={size}
-      tintColor={color as string}
-      fallback={<Image source={require('@/assets/images/tabIcons/home.png')} style={{ width: size, height: size, tintColor: color }} resizeMode="contain" />}
-    />
-  );
-}
-
-function healthTabIcon({ color, size }: { color: ColorValue; size: number }) {
-  return (
-    <SymbolView
-      name="heart.fill"
-      size={size}
-      tintColor={color as string}
-      fallback={<Image source={require('@/assets/images/tabIcons/home.png')} style={{ width: size, height: size, tintColor: color }} resizeMode="contain" />}
-    />
-  );
+  TabBarIcon.displayName = `TabBarIcon(${base})`;
+  return TabBarIcon;
 }
 
 export default function AppTabs() {
@@ -48,41 +25,11 @@ export default function AppTabs() {
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: { backgroundColor: colors.background },
       }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Accueil',
-          tabBarIcon: tabIcon(require('@/assets/images/tabIcons/home.png')),
-        }}
-      />
-      <Tabs.Screen
-        name="meals"
-        options={{
-          title: 'Repas',
-          tabBarIcon: tabIcon(require('@/assets/images/tabIcons/nutrition.png')),
-        }}
-      />
-      <Tabs.Screen
-        name="workouts"
-        options={{
-          title: 'Sport',
-          tabBarIcon: tabIcon(require('@/assets/images/tabIcons/explore.png')),
-        }}
-      />
-      <Tabs.Screen
-        name="health"
-        options={{
-          title: 'Santé',
-          tabBarIcon: healthTabIcon,
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Profil',
-          tabBarIcon: profileTabIcon,
-        }}
-      />
+      <Tabs.Screen name="index" options={{ title: 'Accueil', tabBarIcon: tabIcon('home') }} />
+      <Tabs.Screen name="meals" options={{ title: 'Repas', tabBarIcon: tabIcon('meals') }} />
+      <Tabs.Screen name="workouts" options={{ title: 'Sport', tabBarIcon: tabIcon('workouts') }} />
+      <Tabs.Screen name="health" options={{ title: 'Santé', tabBarIcon: tabIcon('health') }} />
+      <Tabs.Screen name="profile" options={{ title: 'Profil', tabBarIcon: tabIcon('profile') }} />
     </Tabs>
   );
 }

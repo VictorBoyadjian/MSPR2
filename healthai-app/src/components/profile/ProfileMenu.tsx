@@ -1,9 +1,9 @@
-import { SymbolView } from 'expo-symbols';
-import { ComponentProps, useState } from 'react';
+import { useState } from 'react';
 import { Alert, Modal, Pressable, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import Icon, { IconName } from '@/components/ui/Icon';
 import { Spacing } from '@/constants/theme';
 import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/use-theme';
@@ -52,12 +52,7 @@ export default function ProfileMenu() {
           styles.iconButton,
           { backgroundColor: theme.backgroundElement, opacity: pressed ? 0.7 : 1 },
         ]}>
-        <SymbolView
-          name={{ ios: 'person.fill', android: 'person', web: 'person' }}
-          size={20}
-          tintColor={theme.text}
-          fallback={<ThemedText type="smallBold">👤</ThemedText>}
-        />
+        <Icon name="profile-filled" size={20} color={theme.text} />
       </Pressable>
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={close}>
@@ -78,13 +73,13 @@ export default function ProfileMenu() {
               <ThemedView style={[styles.separator, { backgroundColor: theme.backgroundSelected }]} />
 
               <MenuItem
-                icon={{ ios: 'rectangle.portrait.and.arrow.right', android: 'logout', web: 'logout' }}
+                icon="logout"
                 label="Se déconnecter"
                 onPress={handleLogout}
                 color={theme.text}
               />
               <MenuItem
-                icon={{ ios: 'trash.fill', android: 'delete', web: 'delete' }}
+                icon="trash"
                 label="Supprimer mon compte"
                 onPress={handleDelete}
                 color="#E5484D"
@@ -97,15 +92,13 @@ export default function ProfileMenu() {
   );
 }
 
-type SymbolName = ComponentProps<typeof SymbolView>['name'];
-
 function MenuItem({
   icon,
   label,
   onPress,
   color,
 }: {
-  icon: SymbolName;
+  icon: IconName;
   label: string;
   onPress: () => void;
   color: string;
@@ -114,7 +107,7 @@ function MenuItem({
     <Pressable
       onPress={onPress}
       style={({ pressed }) => [styles.item, pressed && styles.itemPressed]}>
-      <SymbolView name={icon} size={18} tintColor={color} />
+      <Icon name={icon} size={18} color={color} />
       <ThemedText type="small" style={{ color }}>
         {label}
       </ThemedText>

@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -22,6 +22,8 @@ export default function AddWorkoutScreen() {
   const theme = useTheme();
   const { user } = useAuthStore();
   const { items: goals } = useGoals();
+  // Pré-sélection éventuelle (depuis une carte de recommandation).
+  const params = useLocalSearchParams<{ workoutSessionId?: string; name?: string }>();
 
   // Profil de l'utilisateur (goal) : on propose d'abord les séances de son programme.
   const profile = useMemo(
@@ -32,7 +34,11 @@ export default function AddWorkoutScreen() {
   const [term, setTerm] = useState('');
   const [results, setResults] = useState<WorkoutSession[]>([]);
   const [searching, setSearching] = useState(false);
-  const [selected, setSelected] = useState<WorkoutSession | null>(null);
+  const [selected, setSelected] = useState<WorkoutSession | null>(
+    params.workoutSessionId
+      ? ({ id: params.workoutSessionId, name: params.name ?? 'Séance' } as WorkoutSession)
+      : null,
+  );
   const [performedAt, setPerformedAt] = useState(() => new Date());
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);

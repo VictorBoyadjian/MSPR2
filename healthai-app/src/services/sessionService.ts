@@ -1,4 +1,5 @@
 import { sendRequest, workoutSessions } from '@/services/api';
+import { WorkoutExercise } from '@/types/workout-exercises.type';
 import { UserSession, WorkoutSession } from '@/types/workout-sessions.type';
 import { apiDateToIso } from '@/utils/formatDate';
 
@@ -23,6 +24,26 @@ export const sessionService = {
       limit: 25,
     });
     return response.data;
+  },
+
+  /**
+   * Récupère une séance du catalogue avec ses exercices (relation `exercises`,
+   * triée côté API par `order_num`). Le endpoint `/me/sessions` ne charge pas
+   * les exercices : on passe donc par la recherche REST sur l'id de la séance.
+   */
+  getById: async (workoutSessionId: string): Promise<WorkoutSession | null> => {
+    const response = await workoutSessions.search({
+      filters: [{ field: 'id', value: Number(workoutSessionId) }],
+      includes: [{ relation: 'exercises' }],
+      limit: 10,
+    });
+    return response.data[0] ?? null;
+  },
+
+  /** Exercices d'une séance (vide si la séance est introuvable). */
+  getExercises: async (workoutSessionId: string): Promise<WorkoutExercise[]> => {
+    const session = await sessionService.getById(workoutSessionId);
+    return session?.exercises ?? [];
   },
 
   /** Séances de l'utilisateur (faites + planifiées), aplaties pour l'affichage. */

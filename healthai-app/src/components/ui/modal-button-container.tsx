@@ -1,7 +1,8 @@
 import React, { PropsWithChildren, useState } from 'react';
-import { Alert, Modal, StyleSheet, Text, Pressable, View } from 'react-native';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
+import { Alert, Modal, StyleSheet, Pressable, View } from 'react-native';
 import { useTheme } from '@/hooks/use-theme';
+
+import Icon from '@/components/ui/Icon';
 
 export function ModalButtonContainer({ buttonChild, modalChild }: PropsWithChildren<{ buttonChild: React.ReactNode; modalChild: React.ReactNode }>) {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,7 +32,7 @@ export function ModalButtonContainer({ buttonChild, modalChild }: PropsWithChild
             <Pressable
               style={styles.closeButton}
               onPress={() => setModalVisible(!modalVisible)}>
-              <Text style={styles.closeButtonText}>✕</Text>
+              <Icon name="close" size={20} color="#888" />
             </Pressable>
             {modalChild}
           </View>
