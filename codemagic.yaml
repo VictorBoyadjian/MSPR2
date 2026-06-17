@@ -9,17 +9,17 @@ workflows:
     environment:
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: healthai-app
+        bundle_identifier: healthai.app
       vars:
         XCODE_WORKSPACE: ios/healthaiapp.xcworkspace
         XCODE_SCHEME: healthaiapp
-      node: latest
+      node: 22
       xcode: latest
     scripts:
       - name: Install dependencies
         # npm install déclenche le hook postinstall → patch-package applique
         # patches/expo-modules-jsi+56.0.9.patch (fix `weak let` Swift 6 / Xcode 26).
-        script: npm install
+        script: npm install --legacy-peer-deps
 
       - name: Expo prebuild (iOS)
         # Régénère ios/. Le config plugin ./plugins/withSwift5Pods force
@@ -82,11 +82,11 @@ workflows:
         - keystore_reference  # TODO: nom de ton keystore configuré dans Codemagic
       vars:
         PACKAGE_NAME: healthai.app
-      node: latest
+      node: 22
       java: 17
     scripts:
       - name: Install dependencies
-        script: npm install
+        script: npm install --legacy-peer-deps
 
       - name: Expo prebuild (Android)
         script: npx expo prebuild --platform android --non-interactive

@@ -1,6 +1,6 @@
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import RestingHrEditorModal from '@/components/health/RestingHrEditorModal';
@@ -23,9 +23,12 @@ const DEFAULT_RESTING_BPM = 70;
 export default function HealthScreen() {
   const { user } = useAuthStore();
   const theme = useTheme();
+  const { width } = useWindowDimensions();
   const { stats, metric, weightHistory, loading, error, refresh, save } = useHealth();
   const [editingWeight, setEditingWeight] = useState(false);
   const [editingHr, setEditingHr] = useState(false);
+
+  const statFontSize = width < 375 ? 24 : width < 414 ? 28 : 32;
 
   useFocusEffect(
     useCallback(() => {
@@ -72,7 +75,7 @@ export default function HealthScreen() {
                 <ThemedText type="small" themeColor="textSecondary">
                   Moyenne hebdo
                 </ThemedText>
-                <ThemedText type="title" style={styles.statValue}>
+                <ThemedText type="title" style={[styles.statValue, { fontSize: statFontSize, lineHeight: statFontSize * 1.2 }]}>
                   {stats ? formatHours(stats.weekly_average_hours) : '—'}
                 </ThemedText>
                 <ThemedText type="small" themeColor="textSecondary">
@@ -88,7 +91,7 @@ export default function HealthScreen() {
                       Pouls au repos
                     </ThemedText>
                   </View>
-                  <ThemedText type="title" style={styles.statValue}>
+                  <ThemedText type="title" style={[styles.statValue, { fontSize: statFontSize, lineHeight: statFontSize * 1.2 }]}>
                     {restingHr ?? '—'}
                   </ThemedText>
                   <ThemedText type="smallBold" themeColor="textSecondary">
@@ -107,7 +110,7 @@ export default function HealthScreen() {
                       Poids
                     </ThemedText>
                   </View>
-                  <ThemedText type="title" style={styles.statValue}>
+                  <ThemedText type="title" style={[styles.statValue, { fontSize: statFontSize, lineHeight: statFontSize * 1.2 }]}>
                     {weight != null ? `${formatWeight(weight)} kg` : '—'}
                   </ThemedText>
                 </View>
@@ -181,7 +184,7 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: 'row', gap: Spacing.three },
   statCard: { flex: 1, gap: Spacing.half },
   statCardFill: { flex: 1, gap: Spacing.half },
-  statValue: { fontSize: 36, lineHeight: 42 },
+  statValue: { fontWeight: '600' },
   weightCard: { gap: Spacing.one },
   weightHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   weightText: { gap: Spacing.half },
