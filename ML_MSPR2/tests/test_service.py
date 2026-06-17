@@ -1,5 +1,9 @@
 """Unit tests for FitnessService — pure-logic methods (no DB, no ML models)."""
 
+import os
+from unittest.mock import MagicMock, patch, call
+
+import numpy as np
 import pytest
 
 from app.schemas import CaloriesInput, NutritionInput
@@ -140,3 +144,268 @@ class TestPredictLegacy:
         result = mock_fitness_service.predict_legacy(data)
         expected_imc = round(70.0 / (1.75 ** 2), 2)
         assert result.imc == expected_imc
+
+
+# ---------------------------------------------------------------------------
+# Helpers for DB mocking
+# ---------------------------------------------------------------------------
+
+def _make_db_mock(rows):
+    """Return a (conn_mock, cur_mock) pair that yields `rows` from fetchall."""
+    cur = MagicMock()
+    cur.__enter__ = MagicMock(return_value=cur)
+    cur.__exit__ = MagicMock(return_value=False)
+    cur.fetchall.return_value = rows
+
+    conn = MagicMock()
+    conn.__enter__ = MagicMock(return_value=conn)
+    conn.__exit__ = MagicMock(return_value=False)
+    conn.cursor.return_value = cur
+    return conn, cur
+
+
+# ---------------------------------------------------------------------------
+# FitnessService.get_meals
+# ---------------------------------------------------------------------------
+
+_MEAL_ROW = {
+    "name": "Salade César",
+    "meal_type": "lunch",
+    "calories_kcal": 350.0,
+    "proteins_g": 25.0,
+    "carbs_g": 15.0,
+    "fats_g": 20.0,
+    "allergens": [],
+}
+
+
+class TestGetMeals:
+    def test_returns_meals_output(self, mock_fitness_service):
+        from app.schemas import MealsInput, MealsOutput
+        conn, _ = _make_db_mock([_MEAL_ROW])
+        data = MealsInput(profile="perte_poids_debutant")
+        with patch("psycopg2.connect", return_value=conn), \
+             patch.dict(os.environ, {"DATABASE_URL": "postgresql://test"}):
+            result = mock_fitness_service.get_meals(data)
+        assert isinstance(result, MealsOutput)
+        assert result.count == 1
+        assert result.meals[0].name == "Salade César"
+
+    def test_returns_empty_when_no_rows(self, mock_fitness_service):
+        from app.schemas import MealsInput
+        conn, _ = _make_db_mock([])
+        data = MealsInput(profile="maintien_bien_etre")
+        with patch("psycopg2.connect", return_value=conn), \
+             patch.dict(os.environ, {"DATABASE_URL": "postgresql://test"}):
+            result = mock_fitness_service.get_meals(data)
+        assert result.count == 0
+        assert result.meals == []
+
+    def test_raises_without_database_url(self, mock_fitness_service):
+        from app.schemas import MealsInput
+        data = MealsInput(profile="perte_poids_debutant")
+        with patch.dict(os.environ, {}, clear=True):
+            os.environ.pop("DATABASE_URL", None)
+            with pytest.raises(RuntimeError, match="DATABASE_URL"):
+                mock_fitness_service.get_meals(data)
+
+    def test_filters_by_meal_type(self, mock_fitness_service):
+        from app.schemas import MealsInput
+        conn, cur = _make_db_mock([_MEAL_ROW])
+        data = MealsInput(profile="perte_poids_debutant", meal_type="lunch")
+        with patch("psycopg2.connect", return_value=conn), \
+             patch.dict(os.environ, {"DATABASE_URL": "postgresql://test"}):
+            mock_fitness_service.get_meals(data)
+        # meal_type filter must appear in the SQL executed
+        sql_calls = [str(c) for c in cur.execute.call_args_list]
+        assert any("meal_type" in s for s in sql_calls)
+
+    def test_filters_by_allergen(self, mock_fitness_service):
+        from app.schemas import MealsInput
+        conn, cur = _make_db_mock([])
+        data = MealsInput(profile="perte_poids_debutant", allergens_to_exclude=["gluten"])
+        with patch("psycopg2.connect", return_value=conn), \
+             patch.dict(os.environ, {"DATABASE_URL": "postgresql://test"}):
+            mock_fitness_service.get_meals(data)
+        sql_calls = [str(c) for c in cur.execute.call_args_list]
+        assert any("allergens" in s for s in sql_calls)
+
+
+# ---------------------------------------------------------------------------
+# FitnessService.get_sessions
+# ---------------------------------------------------------------------------
+
+_SESSION_ROW = {
+    "id": 1,
+    "name": "Full Body A",
+    "profile": "prise_masse_debutant",
+    "session_type": "full_body",
+    "total_duration_min": 60,
+    "difficulty": "beginner",
+    "description": "desc",
+    "objective": "obj",
+}
+
+_EXERCISE_ROW = {
+    "order_num": 1,
+    "exercise_name": "Squat",
+    "body_part": "Quadriceps",
+    "category": "compound",
+    "equipment": "barbell",
+    "sets": 3,
+    "reps": "8-10",
+    "rest_sec": 90,
+    "notes": None,
+}
+
+
+class TestGetSessions:
+    def test_returns_session_output(self, mock_fitness_service):
+        from app.schemas import SessionInput, SessionOutput
+
+        cur = MagicMock()
+        cur.__enter__ = MagicMock(return_value=cur)
+        cur.__exit__ = MagicMock(return_value=False)
+        cur.fetchall.side_effect = [[_SESSION_ROW], [_EXERCISE_ROW]]
+
+        conn = MagicMock()
+        conn.__enter__ = MagicMock(return_value=conn)
+        conn.__exit__ = MagicMock(return_value=False)
+        conn.cursor.return_value = cur
+
+        data = SessionInput(profile="prise_masse_debutant")
+        with patch("psycopg2.connect", return_value=conn), \
+             patch.dict(os.environ, {"DATABASE_URL": "postgresql://test"}):
+            result = mock_fitness_service.get_sessions(data)
+
+        assert isinstance(result, SessionOutput)
+        assert result.count == 1
+        assert result.sessions[0].name == "Full Body A"
+        assert result.sessions[0].exercises[0].exercise_name == "Squat"
+
+    def test_returns_empty_when_no_sessions(self, mock_fitness_service):
+        from app.schemas import SessionInput
+        conn, cur = _make_db_mock([])
+        data = SessionInput(profile="amelioration_cardio")
+        with patch("psycopg2.connect", return_value=conn), \
+             patch.dict(os.environ, {"DATABASE_URL": "postgresql://test"}):
+            result = mock_fitness_service.get_sessions(data)
+        assert result.count == 0
+
+    def test_raises_without_database_url(self, mock_fitness_service):
+        from app.schemas import SessionInput
+        data = SessionInput(profile="perte_poids_debutant")
+        with patch.dict(os.environ, {}, clear=True):
+            os.environ.pop("DATABASE_URL", None)
+            with pytest.raises(RuntimeError, match="DATABASE_URL"):
+                mock_fitness_service.get_sessions(data)
+
+    def test_body_parts_excluded_filters_exercises(self, mock_fitness_service):
+        from app.schemas import SessionInput
+
+        cur = MagicMock()
+        cur.__enter__ = MagicMock(return_value=cur)
+        cur.__exit__ = MagicMock(return_value=False)
+        cur.fetchall.side_effect = [[_SESSION_ROW], []]
+
+        conn = MagicMock()
+        conn.__enter__ = MagicMock(return_value=conn)
+        conn.__exit__ = MagicMock(return_value=False)
+        conn.cursor.return_value = cur
+
+        data = SessionInput(profile="prise_masse_debutant", body_parts_to_exclude=["jambes"])
+        with patch("psycopg2.connect", return_value=conn), \
+             patch.dict(os.environ, {"DATABASE_URL": "postgresql://test"}):
+            result = mock_fitness_service.get_sessions(data)
+
+        sql_calls = [str(c) for c in cur.execute.call_args_list]
+        assert any("body_part" in s for s in sql_calls)
+
+
+# ---------------------------------------------------------------------------
+# FitnessService.recommend
+# ---------------------------------------------------------------------------
+
+_PROG_DICT = {
+    "sessions_per_week": 3, "session_duration_min": 45, "focus": "cardio",
+    "intensity": "moderate", "weekly_volume_h": 2.25, "progression": "linear",
+    "nutrition_tip": "eat well", "objective": "lose weight",
+}
+
+RECOMMEND_DATA = dict(
+    age=30, gender="male", weight_kg=75.0, height_cm=175.0,
+    body_fat_pct=15.0, resting_bpm=65, experience_level="intermediate",
+)
+
+
+class TestRecommend:
+    def _setup_model(self, svc):
+        svc._model.predict_proba.return_value = np.array([[0.5, 0.3, 0.2]])
+        svc._model.predict.return_value = np.array([0])
+        svc._encoder.inverse_transform.return_value = ["perte_poids_debutant"]
+
+    def test_returns_recommend_output(self, mock_fitness_service):
+        from app.schemas import RecommendInput, RecommendOutput
+        import sys
+        self._setup_model(mock_fitness_service)
+        sys.modules["ml.src.recommendation_engine.engine"].get_program.return_value = MagicMock()
+        sys.modules["ml.src.recommendation_engine.engine"].program_to_dict.return_value = _PROG_DICT
+
+        data = RecommendInput(**RECOMMEND_DATA)
+        with patch("app.service.sys_path_appended", True):
+            result = mock_fitness_service.recommend(data)
+
+        from app.schemas import RecommendOutput
+        assert isinstance(result, RecommendOutput)
+        assert result.profile == "perte_poids_debutant"
+
+    def test_prediction_id_is_uuid(self, mock_fitness_service):
+        import sys, uuid
+        self._setup_model(mock_fitness_service)
+        sys.modules["ml.src.recommendation_engine.engine"].get_program.return_value = MagicMock()
+        sys.modules["ml.src.recommendation_engine.engine"].program_to_dict.return_value = _PROG_DICT
+
+        from app.schemas import RecommendInput
+        data = RecommendInput(**RECOMMEND_DATA)
+        with patch("app.service.sys_path_appended", True):
+            result = mock_fitness_service.recommend(data)
+
+        uuid.UUID(result.prediction_id)  # raises if not valid UUID
+
+    def test_bmi_computed_in_output(self, mock_fitness_service):
+        import sys
+        self._setup_model(mock_fitness_service)
+        sys.modules["ml.src.recommendation_engine.engine"].get_program.return_value = MagicMock()
+        sys.modules["ml.src.recommendation_engine.engine"].program_to_dict.return_value = _PROG_DICT
+
+        from app.schemas import RecommendInput
+        data = RecommendInput(**RECOMMEND_DATA)
+        with patch("app.service.sys_path_appended", True):
+            result = mock_fitness_service.recommend(data)
+
+        expected_bmi = round(75.0 / (1.75 ** 2), 2)
+        assert result.bmi == expected_bmi
+
+    def test_raises_when_ml_not_imported(self, mock_fitness_service):
+        from app.schemas import RecommendInput
+        data = RecommendInput(**RECOMMEND_DATA)
+        with patch("app.service.sys_path_appended", False), \
+             patch("app.service._IMPORT_ERROR", "module not found", create=True):
+            with pytest.raises(RuntimeError, match="Import ML modules failed"):
+                mock_fitness_service.recommend(data)
+
+    def test_top_profiles_has_three_entries(self, mock_fitness_service):
+        import sys
+        svc = mock_fitness_service
+        svc._model.predict_proba.return_value = np.array([[0.5, 0.3, 0.2]])
+        svc._model.predict.return_value = np.array([0])
+        svc._encoder.inverse_transform.side_effect = lambda x: ["perte_poids_debutant"]
+        sys.modules["ml.src.recommendation_engine.engine"].get_program.return_value = MagicMock()
+        sys.modules["ml.src.recommendation_engine.engine"].program_to_dict.return_value = _PROG_DICT
+
+        from app.schemas import RecommendInput
+        data = RecommendInput(**RECOMMEND_DATA)
+        with patch("app.service.sys_path_appended", True):
+            result = mock_fitness_service.recommend(data)
+
+        assert len(result.top_profiles) == 3

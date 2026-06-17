@@ -38,6 +38,28 @@ def _make_mock_ml_modules():
 _make_mock_ml_modules()
 
 
+def _stub_firebase():
+    """Stub app.firebase so google-auth is not required."""
+    firebase_mod = types.ModuleType("app.firebase")
+    firebase_mod.log_prediction = MagicMock()
+    firebase_mod.log_feedback = MagicMock()
+    firebase_mod.get_comparison_stats = MagicMock(return_value={
+        "total_with_feedback": 0,
+        "followed_recommendation": 0,
+        "follow_rate_pct": 0.0,
+        "by_profile": {},
+    })
+    for name in [
+        "google", "google.auth", "google.auth.transport",
+        "google.auth.transport.requests", "google.oauth2", "google.oauth2.service_account",
+    ]:
+        sys.modules.setdefault(name, types.ModuleType(name))
+    sys.modules["app.firebase"] = firebase_mod
+
+
+_stub_firebase()
+
+
 @pytest.fixture()
 def mock_fitness_service():
     """Patch FitnessService singleton so no model files are needed."""
