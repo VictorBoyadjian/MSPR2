@@ -17,9 +17,9 @@ workflows:
       xcode: latest
     scripts:
       - name: Install dependencies
-        # npm install déclenche le hook postinstall → patch-package applique
-        # patches/expo-modules-jsi+56.0.9.patch (fix `weak let` Swift 6 / Xcode 26).
-        script: npm install --legacy-peer-deps
+        script: |
+          npm install --legacy-peer-deps --ignore-scripts
+          npx patch-package
 
       - name: Expo prebuild (iOS)
         # Régénère ios/. Le config plugin ./plugins/withSwift5Pods force
@@ -86,7 +86,9 @@ workflows:
       java: 17
     scripts:
       - name: Install dependencies
-        script: npm install --legacy-peer-deps
+        script: |
+          npm install --legacy-peer-deps --ignore-scripts
+          npx patch-package
 
       - name: Expo prebuild (Android)
         script: npx expo prebuild --platform android --non-interactive

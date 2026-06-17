@@ -135,9 +135,11 @@ function ThemeSwitcher() {
               />
               <ThemedText
                 type="small"
+                numberOfLines={1}
                 style={{
                   color: active ? theme.accentText : theme.textSecondary,
                   fontWeight: active ? '700' : '500',
+                  textAlign: 'center',
                 }}>
                 {opt.label}
               </ThemedText>
@@ -222,11 +224,12 @@ const styles = StyleSheet.create({
   },
   segmentItem: {
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     gap: Spacing.one,
     paddingVertical: Spacing.two,
+    paddingHorizontal: Spacing.one,
     borderRadius: Spacing.one + Spacing.half,
   },
   item: {
