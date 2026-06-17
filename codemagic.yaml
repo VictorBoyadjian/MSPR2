@@ -9,7 +9,7 @@ workflows:
     environment:
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: healthai.app
+        bundle_identifier: healthai-app
       vars:
         XCODE_WORKSPACE: ios/healthaiapp.xcworkspace
         XCODE_SCHEME: healthaiapp
