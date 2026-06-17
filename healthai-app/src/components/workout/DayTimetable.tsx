@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -89,24 +89,34 @@ export default function DayTimetable({ day, sessions, onPress }: Props) {
     [startHour, endHour],
   );
 
-  const isToday = isSameDay(day, new Date());
-  const now = new Date();
+  // Horloge locale rafraîchie chaque minute (le trait « maintenant » suit l'heure).
+  // `performedAt` et `now` sont tous deux convertis en heure locale (cf. apiDateToIso),
+  // donc la comparaison est cohérente quel que soit le fuseau renvoyé par l'API.
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60 * 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const isToday = isSameDay(day, now);
   const nowMin = now.getHours() * 60 + now.getMinutes();
   const nowTop = (nowMin - startHour * 60) * (HOUR_HEIGHT / 60);
   const showNow = isToday && nowMin >= startHour * 60 && nowMin <= endHour * 60;
 
-  // Au montage, on cadre sur la première séance (ou l'heure courante).
+  // Au montage / changement de jour : on cadre sur l'heure actuelle (aujourd'hui),
+  // sinon sur la première séance, avec ~1h30 de contexte au-dessus.
   useEffect(() => {
-    const target = placed.length
-      ? placed[0].start
-      : isToday
-        ? nowMin
+    const current = new Date();
+    const target = isToday
+      ? current.getHours() * 60 + current.getMinutes()
+      : placed.length
+        ? placed[0].start
         : startHour * 60;
-    const y = Math.max(0, (target - startHour * 60) * (HOUR_HEIGHT / 60) - HOUR_HEIGHT);
+    const y = Math.max(0, (target - startHour * 60) * (HOUR_HEIGHT / 60) - HOUR_HEIGHT * 1.5);
     const id = setTimeout(() => scrollRef.current?.scrollTo({ y, animated: false }), 0);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [day, placed.length]);
+  }, [day, placed.length, isToday, startHour]);
 
   const contentHeight = (endHour - startHour) * HOUR_HEIGHT;
 
@@ -123,7 +133,12 @@ export default function DayTimetable({ day, sessions, onPress }: Props) {
           const top = (h - startHour) * HOUR_HEIGHT;
           return (
             <View key={h} style={[styles.hourRow, { top }]} pointerEvents="none">
-              <ThemedText type="small" themeColor="textSecondary" style={styles.hourLabel}>
+              <ThemedText
+                type="small"
+                themeColor="textSecondary"
+                style={styles.hourLabel}
+                numberOfLines={1}
+                allowFontScaling={false}>
                 {`${String(h).padStart(2, '0')}:00`}
               </ThemedText>
               <View style={[styles.hourLine, { backgroundColor: theme.backgroundSelected }]} />

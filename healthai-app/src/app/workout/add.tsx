@@ -7,6 +7,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import Button from '@/components/ui/Button';
 import DateTimeField from '@/components/ui/DateTimeField';
+import ScreenHeader from '@/components/ui/ScreenHeader';
 import { SessionExerciseList } from '@/components/workout/SessionExerciseList';
 import { SessionSearch } from '@/components/workout/SessionSearch';
 import { SessionSummaryCard } from '@/components/workout/SessionSummaryCard';
@@ -63,6 +64,7 @@ export default function AddWorkoutScreen() {
   return (
     <ThemedView style={styles.root}>
       <SafeAreaView style={styles.safeArea}>
+        <ScreenHeader />
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
           <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
             <ThemedText type="subtitle">Planifier une séance</ThemedText>

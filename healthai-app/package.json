@@ -36,10 +36,17 @@
     "react-native-worklets": "0.8.3"
   },
   "devDependencies": {
+    "@react-native/jest-preset": "^0.86.0",
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^14.0.0",
     "@types/d3-shape": "^3.1.8",
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.2.2",
+    "cypress": "^15.17.0",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~56.0.4",
+    "jest": "^30.4.2",
+    "jest-expo": "^56.0.5",
     "patch-package": "^8.0.1",
     "postinstall-postinstall": "^2.1.0",
     "typescript": "~6.0.3"
@@ -51,7 +58,11 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run"
   },
   "private": true
 }

@@ -16,7 +16,7 @@ export default function LoginScreen() {
         <ThemedView style={styles.heroSection}>
           <AnimatedIcon />
           <ThemedText type="title" style={styles.title}>
-            Bienvenue sur&nbsp;HealthAI
+            Bienvenue sur&nbsp;HealthAI - Coach
           </ThemedText>
         </ThemedView>
       </SafeAreaView>

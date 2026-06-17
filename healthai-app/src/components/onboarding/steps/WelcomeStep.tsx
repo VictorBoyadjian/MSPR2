@@ -10,7 +10,7 @@ export default function WelcomeStep({ firstName }: { firstName?: string }) {
         <View style={styles.brandPulse} />
       </View>
       <View>
-        <Text style={styles.eyebrow}>HEALTHAI</Text>
+        <Text style={styles.eyebrow}>HEALTHAI - Coach</Text>
         <Text style={styles.title}>
           {firstName ? `Bienvenue ${firstName},\n` : ''}construisons ton profil santé.
         </Text>

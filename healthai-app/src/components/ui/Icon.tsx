@@ -31,6 +31,7 @@ export type IconName =
   | 'snack'
   | 'search'
   | 'chevron'
+  | 'back'
   | 'time'
   | 'flame'
   | 'list'
@@ -63,6 +64,7 @@ const GLYPHS: Record<IconName, IoniconName> = {
   snack: 'nutrition-outline',
   search: 'search-outline',
   chevron: 'chevron-forward',
+  back: 'chevron-back',
   time: 'time-outline',
   flame: 'flame-outline',
   list: 'list-outline',

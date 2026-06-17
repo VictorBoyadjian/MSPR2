@@ -31,9 +31,8 @@ class TestOllamaResponseSuccess:
         assert isinstance(result, OutputResponse)
         assert "pain" in result.aliments
         pain = result.aliments["pain"]
-        assert isinstance(pain, Food)
+        assert isinstance(pain, ScannedFood)
         assert pain.quantity_g == 50
-        assert pain.calories_kcal == 120
         assert pain.accuracy == 0.9  # "high" confidence
 
     def test_parses_plain_dict_keyed_by_food_name(self) -> None:
@@ -42,7 +41,6 @@ class TestOllamaResponseSuccess:
 
         assert isinstance(result, OutputResponse)
         assert result.aliments["riz"].quantity_g == 150
-        assert result.aliments["riz"].calories_kcal == 200
 
     def test_strips_markdown_code_fences_and_json_label(self) -> None:
         raw = '```json\n{"foods": [{"name_fr": "riz", "quantity_g": 150}]}\n```'
@@ -68,7 +66,6 @@ class TestOllamaResponseSuccess:
 
         pain = result.aliments["pain"]
         assert pain.quantity_g == 50
-        assert pain.calories_kcal == 120
 
     def test_recovers_entries_from_truncated_json_tail(self) -> None:
         # Trailing object is incomplete; the regex fallback recovers the valid one.

@@ -14,7 +14,7 @@ export default function AppBar() {
     <ThemedView style={[styles.container, { borderBottomColor: theme.backgroundSelected }]}>
       <SafeAreaView edges={['top', 'left', 'right']}>
         <ThemedView style={styles.bar}>
-          <ThemedText type="smallBold">HealthAI</ThemedText>
+          <ThemedText type="smallBold">HealthAI - Coach</ThemedText>
           <ProfileMenu />
         </ThemedView>
       </SafeAreaView>
