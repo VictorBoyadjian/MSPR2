@@ -2,7 +2,7 @@
   "expo": {
     "name": "healthai-app",
     "slug": "healthai-app",
-    "version": "1.0.13",
+    "version": "1.0.14",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "healthaiapp",

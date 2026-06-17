@@ -132,16 +132,15 @@ export default function DayTimetable({ day, sessions, onPress }: Props) {
         {hours.map((h) => {
           const top = (h - startHour) * HOUR_HEIGHT;
           return (
-            <View key={h} style={[styles.hourRow, { top }]} pointerEvents="none">
+            <View key={h} pointerEvents="none" style={StyleSheet.absoluteFill}>
               <ThemedText
-                type="small"
                 themeColor="textSecondary"
-                style={styles.hourLabel}
+                style={[styles.hourLabel, { top: top - 10 }]}
                 numberOfLines={1}
                 allowFontScaling={false}>
                 {`${String(h).padStart(2, '0')}:00`}
               </ThemedText>
-              <View style={[styles.hourLine, { backgroundColor: theme.backgroundSelected }]} />
+              <View style={[styles.hourLine, { top, backgroundColor: theme.backgroundSelected }]} />
             </View>
           );
         })}
@@ -202,24 +201,19 @@ export default function DayTimetable({ day, sessions, onPress }: Props) {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   content: { paddingVertical: Spacing.two },
-  hourRow: {
+  hourLabel: {
     position: 'absolute',
     left: 0,
-    right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 0,
-  },
-  hourLabel: {
     width: GUTTER - Spacing.two,
     textAlign: 'right',
     fontSize: 12,
-    transform: [{ translateY: -8 }],
+    lineHeight: 20,
   },
   hourLine: {
-    flex: 1,
+    position: 'absolute',
+    left: GUTTER,
+    right: 0,
     height: StyleSheet.hairlineWidth,
-    marginLeft: Spacing.two,
   },
   nowRow: {
     position: 'absolute',

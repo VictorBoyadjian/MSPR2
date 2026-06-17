@@ -2,6 +2,7 @@
 // - Mobile : drag tactile natif (inertie + snap).
 // - Web : drag à la souris (cliquer-glisser) + snap au relâchement.
 // - Partout : saisie manuelle en touchant la valeur.
+import * as Haptics from 'expo-haptics';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   NativeScrollEvent,
@@ -119,7 +120,10 @@ export default function RulerPicker({
     scrollX.current = e.nativeEvent.contentOffset.x;
     const i = Math.max(0, Math.min(count, Math.round(e.nativeEvent.contentOffset.x / GAP)));
     const v = +(min + i * step).toFixed(6);
-    if (v !== value) onChange(v);
+    if (v !== value) {
+      if (Platform.OS !== 'web') Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onChange(v);
+    }
   };
 
   const startEditing = () => {

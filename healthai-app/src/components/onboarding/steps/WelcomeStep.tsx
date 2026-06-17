@@ -6,9 +6,6 @@ import { accent, accentA, colors } from '../theme';
 export default function WelcomeStep({ firstName }: { firstName?: string }) {
   return (
     <View style={styles.welcome}>
-      <View style={styles.brandMark}>
-        <View style={styles.brandPulse} />
-      </View>
       <View>
         <Text style={styles.eyebrow}>HEALTHAI - Coach</Text>
         <Text style={styles.title}>

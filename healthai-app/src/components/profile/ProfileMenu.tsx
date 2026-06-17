@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal, Pressable, StyleSheet } from 'react-native';
+import { Modal, Pressable, StyleSheet, useWindowDimensions } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -15,6 +15,8 @@ export default function ProfileMenu() {
   const theme = useTheme();
   const confirm = useConfirm();
   const [open, setOpen] = useState(false);
+  const { width: screenWidth } = useWindowDimensions();
+  const popupWidth = Math.min(screenWidth - Spacing.four * 2, 280);
 
   const close = () => setOpen(false);
 
@@ -59,7 +61,7 @@ export default function ProfileMenu() {
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={close}>
         <Pressable style={styles.backdrop} onPress={close}>
-          <Pressable style={styles.sheetWrapper} onPress={() => {}}>
+          <Pressable style={[styles.sheetWrapper, { width: popupWidth }]} onPress={() => {}}>
             <ThemedView type="backgroundElement" style={styles.sheet}>
               <ThemedView type="backgroundElement" style={styles.identity}>
                 <ThemedText type="smallBold">
@@ -133,16 +135,6 @@ function ThemeSwitcher() {
                 size={16}
                 color={active ? theme.accentText : theme.textSecondary}
               />
-              <ThemedText
-                type="small"
-                numberOfLines={1}
-                style={{
-                  color: active ? theme.accentText : theme.textSecondary,
-                  fontWeight: active ? '700' : '500',
-                  textAlign: 'center',
-                }}>
-                {opt.label}
-              </ThemedText>
             </Pressable>
           );
         })}
@@ -192,14 +184,13 @@ const styles = StyleSheet.create({
     right: Spacing.four,
   },
   sheet: {
-    minWidth: 220,
     borderRadius: Spacing.three,
     padding: Spacing.two,
     gap: Spacing.half,
   },
   identity: {
     paddingHorizontal: Spacing.two,
-    paddingVertical: Spacing.two,
+    paddingVertical: Spacing.one,
     gap: Spacing.half,
   },
   separator: {
@@ -224,12 +215,9 @@ const styles = StyleSheet.create({
   },
   segmentItem: {
     flex: 1,
-    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: Spacing.one,
     paddingVertical: Spacing.two,
-    paddingHorizontal: Spacing.one,
     borderRadius: Spacing.one + Spacing.half,
   },
   item: {
@@ -237,7 +225,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.three,
     paddingHorizontal: Spacing.two,
-    paddingVertical: Spacing.three,
+    paddingVertical: Spacing.two,
     borderRadius: Spacing.two,
   },
   itemPressed: {
