@@ -118,7 +118,7 @@ services:
     ports:
       - "2021:2021"
     environment:
-      OLLAMA_HOST: "${OLLAMA_HOST:-http://ollama}"
+      OLLAMA_HOST: "${OLLAMA_HOST:-http://host.docker.internal}"
       OLLAMA_PORT: "${OLLAMA_PORT:-11434}"
       OLLAMA_MODELS: "${OLLAMA_MODELS:-['llava:7b']}"
       OLLAMA_SELECTED_MODEL: "${OLLAMA_SELECTED_MODEL:-0}"
@@ -149,10 +149,10 @@ services:
         EXPO_PUBLIC_API_URL: "${EXPO_PUBLIC_API_URL:-http://127.0.0.1:8080/api}"
         EXPO_PUBLIC_IMAGE_API_URL: "${EXPO_PUBLIC_IMAGE_API_URL:-http://127.0.0.1:2021}"
         EXPO_PUBLIC_RECO_API_URL: "${EXPO_PUBLIC_RECO_API_URL:-http://127.0.0.1:8000}"
-        EXPO_PUBLIC_AI_IMAGE_SOURCE: "${EXPO_PUBLIC_AI_IMAGE_SOURCE:-MISTRAL}"
+        EXPO_PUBLIC_AI_IMAGE_SOURCE: "${EXPO_PUBLIC_AI_IMAGE_SOURCE:-Ollama}"
     container_name: healthai-app
     ports:
-      - "3000:3000"
+      - "3005:3005"
     depends_on:
       - laravel
       - image-analysis-api

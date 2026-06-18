@@ -37,7 +37,7 @@ function RootNavigator() {
       <Stack.Screen name="meal/[id]" options={{ presentation: 'modal' }} />
       <Stack.Screen name="meal/add" options={{ presentation: 'modal' }} />
       <Stack.Screen name="meal/add-form" options={{ presentation: 'modal' }} />
-      <Stack.Screen name="meal/scan-dish" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="meal/scanDishPage" options={{ presentation: 'modal' }} />
       <Stack.Screen name="workout/add" options={{ presentation: 'modal' }} />
       <Stack.Screen name="workout/run" options={{ presentation: 'modal' }} />
     </Stack>

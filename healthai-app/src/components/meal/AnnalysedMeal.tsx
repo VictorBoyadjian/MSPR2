@@ -11,6 +11,7 @@ import { Spacing } from "@/constants/theme";
 import { useRouter } from "expo-router";
 import { CalculateDishResponse } from "@/types/calculate-dish-response";
 import { useTheme } from '@/hooks/use-theme';
+import { dismissFlow } from '@/utils/navigation';
 import Button from '@/components/ui/Button';
 
 export const AnnalysedMeal = ({ analyzed }: { analyzed: CalculateDishResponse }) => {
@@ -46,7 +47,7 @@ export const AnnalysedMeal = ({ analyzed }: { analyzed: CalculateDishResponse })
             ))}
           </ThemedView>
 
-          <Button label="OK" onPress={() => router.replace('/meals')} />
+          <Button label="OK" onPress={() => dismissFlow(router, '/meals')} />
         </ScrollView>
       </SafeAreaView>
     </ThemedView>

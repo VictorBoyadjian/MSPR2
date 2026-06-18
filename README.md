@@ -32,3 +32,9 @@ chmod +x start.sh   # la première fois
 | 🍽️ Image Analysis API | <http://localhost:2021/docs> |
 | 🤖 ML / Reco API | <http://localhost:8000/docs> |
 | 🗄️ PostgreSQL | `localhost:5433` (user `postgres` / mdp `postgres` / base `healthai`)
+
+
+### Relancer build apk
+cd healthai-app/android
+rm -rf app/.cxx app/build
+./gradlew assembleDebug

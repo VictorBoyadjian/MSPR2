@@ -217,6 +217,11 @@ export default function OnboardingFlow() {
           <View style={styles.footer}>
             {error ? <Text style={styles.error}>{error}</Text> : null}
             <PrimaryButton label={cur.footer} onPress={next} disabled={!valid} loading={loading} />
+            {cur.id === 'bpmintro' ? (
+              <Pressable onPress={() => go(INDEX.bpmcount)} style={styles.skipLink}>
+                <Text style={styles.skipLinkTx}>Saisir directement</Text>
+              </Pressable>
+            ) : null}
           </View>
         ) : null}
       </KeyboardAvoidingView>
@@ -234,5 +239,7 @@ const styles = StyleSheet.create({
   body: { paddingHorizontal: 22, paddingTop: 16, paddingBottom: 8, flexGrow: 1 },
   bodyCentered: { justifyContent: 'center' },
   footer: { paddingHorizontal: 22, paddingTop: 14, paddingBottom: 18, gap: 12 },
+  skipLink: { alignItems: 'center', paddingVertical: 4 },
+  skipLinkTx: { color: colors.tx2, fontSize: 15, fontWeight: '500' },
   error: { color: '#ff6b6b', fontSize: 14, textAlign: 'center' },
 });

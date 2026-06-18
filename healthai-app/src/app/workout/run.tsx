@@ -22,6 +22,7 @@ import Loader from '@/components/ui/Loader';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { useSessionExercises } from '@/hooks/useSessionExercises';
 import { useTheme } from '@/hooks/use-theme';
+import { dismissFlow } from '@/utils/navigation';
 import { WorkoutExercise } from '@/types/workout-exercises.type';
 import { exerciseMeta, exercisePrescription, exerciseRest } from '@/utils/exerciseFormat';
 
@@ -112,7 +113,7 @@ export default function RunWorkoutScreen() {
                   {index < total - 1 ? (
                     <Button label="Suivant" onPress={() => goTo(index + 1)} />
                   ) : (
-                    <Button label="Terminer" onPress={() => router.back()} />
+                    <Button label="Terminer" onPress={() => dismissFlow(router, '/workouts')} />
                   )}
                 </View>
               </View>

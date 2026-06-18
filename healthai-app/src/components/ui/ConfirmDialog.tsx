@@ -1,9 +1,12 @@
-// Dialogue de confirmation maison, aux couleurs de la charte, cross-platform (web + natif).
-// Remplace `Alert.alert` (bloquant, non stylé, peu fiable sur web) par une API impérative :
+// Dialogue de confirmation, exposé via une API impérative :
 //   const confirm = useConfirm();
 //   if (await confirm({ title: '…', destructive: true })) { … }
+//
+// Sur web : Modal maison stylé (Alert.alert y est peu fiable).
+// Sur natif : Alert.alert, car un <Modal> RN monté à la racine ne peut pas se
+// présenter par-dessus un écran ouvert en `presentation: 'modal'` (iOS fige).
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
-import { Modal, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -36,6 +39,25 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
   const resolver = useRef<((value: boolean) => void) | null>(null);
 
   const confirm = useCallback<ConfirmFn>((opts) => {
+    // Natif : Alert.alert se présente de façon fiable, y compris au-dessus d'un
+    // écran modal (sinon iOS fige et aucune popup n'apparaît).
+    if (Platform.OS !== 'web') {
+      return new Promise<boolean>((resolve) => {
+        Alert.alert(
+          opts.title,
+          opts.message,
+          [
+            { text: opts.cancelLabel ?? 'Annuler', style: 'cancel', onPress: () => resolve(false) },
+            {
+              text: opts.confirmLabel ?? 'Confirmer',
+              style: opts.destructive ? 'destructive' : 'default',
+              onPress: () => resolve(true),
+            },
+          ],
+          { cancelable: true, onDismiss: () => resolve(false) },
+        );
+      });
+    }
     setOptions(opts);
     return new Promise<boolean>((resolve) => {
       resolver.current = resolve;
