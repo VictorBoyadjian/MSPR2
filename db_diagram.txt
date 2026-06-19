@@ -1,0 +1,249 @@
+
+Enum "gender_enum" {
+  "male"
+  "female"
+  "other"
+}
+
+Enum "difficulty_enum" {
+  "beginner"
+  "intermediate"
+  "advanced"
+}
+
+Table "workout_exercises" {
+  "id" SERIAL [pk, increment]
+  "name" VARCHAR(255) [unique, not null]
+  "body_part" VARCHAR(100)
+  "category" VARCHAR(100)
+  "difficulty" VARCHAR(50)
+  "equipment" VARCHAR(100)
+  "description" TEXT
+  "created_at" TIMESTAMP [default: `NOW()`]
+
+  Indexes {
+    category [name: "idx_workout_exercises_category"]
+    body_part [name: "idx_workout_exercises_body_part"]
+    equipment [name: "idx_workout_exercises_equipment"]
+    difficulty [name: "idx_workout_exercises_difficulty"]
+    created_at [name: "idx_workout_exercises_created_at"]
+  }
+}
+
+Table "users" {
+  "id" SERIAL [pk, increment]
+  "email" VARCHAR(255) [unique]
+  "password" VARCHAR(255)
+  "first_name" VARCHAR(100)
+  "last_name" VARCHAR(100)
+  "age" INT
+  "gender" gender_enum
+  "weight_kg" FLOAT
+  "height_cm" FLOAT
+  "is_premium" BOOLEAN [default: false]
+  "is_active" BOOLEAN [default: true]
+  "remember_token" VARCHAR(100)
+  "goal_id" int
+  "created_at" TIMESTAMP [default: `NOW()`]
+  "updated_at" TIMESTAMP [default: `NOW()`]
+
+  Indexes {
+    email [name: "idx_users_email"]
+    created_at [name: "idx_users_created_at"]
+  }
+}
+
+Table "metrics" {
+  "id" SERIAL [pk, increment]
+  "user_id" INT [not null]
+  "recorded_at" TIMESTAMP [default: `NOW()`]
+  "weight_kg" FLOAT
+  "bmi" FLOAT
+  "body_fat_pct" FLOAT
+  "heart_rate_resting" INT
+  "calories_burned" FLOAT
+  "created_at" TIMESTAMP [default: `NOW()`]
+  "updated_at" TIMESTAMP [default: `NOW()`]
+
+  Indexes {
+    user_id [name: "idx_metrics_user_id"]
+    (user_id, recorded_at) [name: "idx_metrics_user_recorded_at"]
+    recorded_at [name: "idx_metrics_recorded_at"]
+  }
+}
+
+Table "workout_sessions" {
+  "id" SERIAL [pk, increment]
+  "name" VARCHAR(255) [not null]
+  "profile" VARCHAR(100) [not null]
+  "session_type" VARCHAR(100)
+  "total_duration_min" INTEGER
+  "difficulty" VARCHAR(50)
+  "description" TEXT
+  "objective" TEXT
+  "created_at" TIMESTAMP [default: `NOW()`]
+
+  Indexes {
+    profile [name: "idx_workout_sessions_profile"]
+    created_at [name: "idx_workout_sessions_created_at"]
+  }
+}
+
+Table "user_sessions" {
+  "id" SERIAL [pk, increment]
+  "user_id" INT
+  "workout_session_id" INT
+  "performed_at" TIMESTAMP [default: `NOW()`]
+
+  Indexes {
+    user_id [name: "idx_user_sessions_user_id"]
+    workout_session_id [name: "idx_user_sessions_workout_session_id"]
+    performed_at [name: "idx_user_sessions_performed_at"]
+  }
+}
+
+Table "session_exercises" {
+  "id" SERIAL [pk, increment]
+  "session_id" INT
+  "exercise_id" INT
+  "order_num" INT [not null]
+  "sets" INT
+  "reps" VARCHAR(100)
+  "rest_sec" INT
+  "notes" TEXT
+
+  Indexes {
+    session_id [name: "idx_session_exercises_session_id"]
+    exercise_id [name: "idx_session_exercises_exercise_id"]
+  }
+}
+
+Table "goals" {
+  "id" SERIAL [pk, increment]
+  "name" VARCHAR(255) [not null]
+  "created_at" TIMESTAMP [default: `NOW()`]
+  "updated_at" TIMESTAMP [default: `NOW()`]
+
+  Indexes {
+    name [name: "idx_goals_name"]
+  }
+}
+
+Table "dishes" {
+  "id" SERIAL [pk, increment]
+  "name" VARCHAR(255) [not null]
+  "calories_kcal" FLOAT
+  "proteins_g" FLOAT
+  "carbs_g" FLOAT
+  "fats_g" FLOAT
+  "meal_type" VARCHAR(50)
+  "is_scanned" bool
+  "user_id" INT
+  "eated_at" timestamp
+  "created_at" TIMESTAMP [default: `NOW()`]
+  "updated_at" TIMESTAMP [default: `NOW()`]
+
+  Indexes {
+    user_id [name: "idx_dishes_user_id"]
+    meal_type [name: "idx_dishes_meal_type"]
+    created_at [name: "idx_dishes_created_at"]
+    is_scanned [name: "idx_dishes_is_scanned"]
+  }
+}
+
+Table "allergies" {
+  "id" SERIAL [pk, increment]
+  "name" VARCHAR
+}
+
+Table "user_allergies" {
+  "user_id" INT [not null]
+  "allergy_id" INT [not null]
+
+  Indexes {
+    (user_id, allergy_id) [pk]
+  }
+}
+
+Table "handicaps" {
+  "id" SERIAL [pk, increment]
+  "name" VARCHAR
+}
+
+Table "user_handicaps" {
+  "user_id" INT [not null]
+  "handicap_id" INT [not null]
+
+  Indexes {
+    (user_id, handicap_id) [pk]
+  }
+}
+
+Ref:"users"."id" < "metrics"."user_id" [delete: cascade]
+
+Ref:"users"."id" < "user_sessions"."user_id" [delete: cascade]
+
+Ref:"workout_sessions"."id" < "user_sessions"."workout_session_id" [delete: cascade]
+
+Ref:"workout_sessions"."id" < "session_exercises"."session_id" [delete: cascade]
+
+Ref:"workout_exercises"."id" < "session_exercises"."exercise_id"
+
+Ref:"users"."id" < "dishes"."user_id" [delete: cascade]
+
+Ref:"users"."id" < "user_allergies"."user_id" [delete: cascade]
+
+Ref:"allergies"."id" < "user_allergies"."allergy_id" [delete: cascade]
+
+Ref:"users"."id" < "user_handicaps"."user_id" [delete: cascade]
+
+Ref:"handicaps"."id" < "user_handicaps"."handicap_id" [delete: cascade]
+
+Records allergies(name) {
+  'gluten'
+  'lactose'
+  'oeufs'
+  'fruits_a_coque'
+  'arachides'
+  'soja'
+  'poisson'
+  'crustaces'
+}
+
+Records goals(name) {
+  'prise_masse_confirme'
+  'prise_masse_debutant'
+  'perte_poids_confirme'
+  'perte_poids_debutant'
+  'amelioration_cardio'
+  'maintien_bien_etre'
+}
+
+Records handicaps(name) {
+  'bras_droit'
+  'bras_gauche'
+  'bras'
+  'jambe_droite'
+  'jambe_gauche'
+  'jambes'
+  'dos'
+  'epaules'
+  'abdominaux'
+  'pied'
+  'nuque'
+}
+
+
+Ref: "goals"."id" < "users"."goal_id"
+Table "meals" {
+  "id" integer [not null]
+  "name" "character varying(255)" [not null]
+  "meal_type" "character varying(50)" [not null]
+  "calories_kcal" doubleprecision [not null]
+  "proteins_g" doubleprecision [not null]
+  "carbs_g" doubleprecision [not null]
+  "fats_g" doubleprecision [not null]
+  "allergens" "text[]" [not null, default: `'{}'::text[]`]
+  "profiles" "text[]" [not null, default: `'{}'::text[]`]
+  "created_at" timestamp [default: `now()`]
+}
