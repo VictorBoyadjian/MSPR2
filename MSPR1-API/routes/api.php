@@ -6,10 +6,12 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UserSessionController;
 use App\Rest\Controllers\AllergyController;
+use App\Rest\Controllers\CommentController;
 use App\Rest\Controllers\DishController;
 use App\Rest\Controllers\GoalController;
 use App\Rest\Controllers\HandicapController;
 use App\Rest\Controllers\MetricController;
+use App\Rest\Controllers\PostController;
 use App\Rest\Controllers\UserController;
 use App\Rest\Controllers\WorkoutExerciseController;
 use App\Rest\Controllers\WorkoutSessionController;
@@ -24,6 +26,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Rest::resource('goals', GoalController::class);
     Rest::resource('handicaps', HandicapController::class);
     Rest::resource('metrics', MetricController::class);
+    Rest::resource('posts', PostController::class);
+    Rest::resource('comments', CommentController::class);
     Rest::resource('users', UserController::class)->only('search');
 
     Route::get('me', [UserController::class, 'me'])->name('me');

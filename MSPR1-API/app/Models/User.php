@@ -95,4 +95,36 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Handicap::class, 'user_handicaps');
     }
+
+    /**
+     * Posts rédigés par l'utilisateur.
+     */
+    public function posts(): HasMany
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    /**
+     * Commentaires rédigés par l'utilisateur.
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    /**
+     * Posts likés par l'utilisateur (pivot user_like_posts).
+     */
+    public function likedPosts(): BelongsToMany
+    {
+        return $this->belongsToMany(Post::class, 'user_like_posts', 'user_id', 'post_id');
+    }
+
+    /**
+     * Commentaires likés par l'utilisateur (pivot user_like_comments).
+     */
+    public function likedComments(): BelongsToMany
+    {
+        return $this->belongsToMany(Comment::class, 'user_like_comments', 'user_id', 'comment_id');
+    }
 }

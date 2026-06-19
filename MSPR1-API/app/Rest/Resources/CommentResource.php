@@ -2,18 +2,18 @@
 
 namespace App\Rest\Resources;
 
-use App\Models\User;
+use App\Models\Comment;
 use App\Rest\Resources\Resource;
-use Lomkit\Rest\Relations\{BelongsToMany, HasMany};
+use Lomkit\Rest\Relations\{BelongsTo, BelongsToMany};
 
-class UserResource extends Resource
+class CommentResource extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var class-string<\Illuminate\Database\Eloquent\Model>
      */
-    public static $model = User::class;
+    public static $model = Comment::class;
 
     /**
      * The exposed fields that could be provided
@@ -24,23 +24,13 @@ class UserResource extends Resource
     {
         return [
             'id',
-            'email',
-            'first_name',
-            'last_name',
-            'age',
-            'gender',
-            'weight_kg',
-            'height_cm',
-            'is_premium',
-            'is_active',
-            'remember_token',
-            'password',
-            'bodyfat',
-            'rest_bpm',
-            'sport_per_week',
-            'goal_id',
-            'target_weight',
-            'weeks_to_goal',
+            'content',
+            'user_id',
+            'post_id',
+            'created_at',
+            'updated_at',
+            'likes',
+            'hasLiked'
         ];
     }
 
@@ -52,15 +42,9 @@ class UserResource extends Resource
     public function relations(\Lomkit\Rest\Http\Requests\RestRequest $request): array
     {
         return [
-            BelongsToMany::make('workoutSessions', WorkoutSessionResource::class)
-                ->withPivotFields(['id', 'performed_at']),
-            HasMany::make('metrics', MetricResource::class),
-            BelongsToMany::make('allergies', AllergyResource::class),
-            BelongsToMany::make('handicaps', HandicapResource::class),
-            HasMany::make('posts', PostResource::class),
-            HasMany::make('comments', CommentResource::class),
-            BelongsToMany::make('likedPosts', PostResource::class),
-            BelongsToMany::make('likedComments', CommentResource::class),
+            BelongsTo::make('user', UserResource::class),
+            BelongsTo::make('post', PostResource::class),
+            BelongsToMany::make('likers', UserResource::class),
         ];
     }
 

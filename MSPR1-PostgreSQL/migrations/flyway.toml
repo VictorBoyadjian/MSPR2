@@ -31,3 +31,8 @@ url = "jdbc:postgresql://thomas.proxy.rlwy.net:14269/healthai"
 user = "postgres"
 password = "postgres"
 schemas = [ "Data" ]
+
+[environments.MSPR-Local]
+url = "jdbc:postgresql://127.0.0.1:5433/healthai"
+schemas = [ "data" ]
+displayName = "MSPR-Local"

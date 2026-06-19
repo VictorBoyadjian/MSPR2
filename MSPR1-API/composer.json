@@ -14,6 +14,7 @@
         "laravel/tinker": "^2.10.1",
         "lomkit/laravel-access-control": "^0.3.2",
         "lomkit/laravel-rest-api": "^2.19",
+        "spatie/laravel-medialibrary": "^11.23",
         "spatie/laravel-permission": "^6.24",
         "zircote/swagger-php": "^6.0"
     },

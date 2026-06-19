@@ -2,18 +2,21 @@
 
 namespace App\Rest\Resources;
 
-use App\Models\User;
+use App\Models\Post;
 use App\Rest\Resources\Resource;
-use Lomkit\Rest\Relations\{BelongsToMany, HasMany};
+use Lomkit\Rest\Http\Requests\MutateRequest;
+use Illuminate\Database\Eloquent\Model;
+use Lomkit\Rest\Relations\{BelongsTo, BelongsToMany, HasMany, MorphMany};
+use Override;
 
-class UserResource extends Resource
+class PostResource extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var class-string<\Illuminate\Database\Eloquent\Model>
      */
-    public static $model = User::class;
+    public static $model = Post::class;
 
     /**
      * The exposed fields that could be provided
@@ -24,23 +27,12 @@ class UserResource extends Resource
     {
         return [
             'id',
-            'email',
-            'first_name',
-            'last_name',
-            'age',
-            'gender',
-            'weight_kg',
-            'height_cm',
-            'is_premium',
-            'is_active',
-            'remember_token',
-            'password',
-            'bodyfat',
-            'rest_bpm',
-            'sport_per_week',
-            'goal_id',
-            'target_weight',
-            'weeks_to_goal',
+            'content',
+            'user_id',
+            'created_at',
+            'updated_at',
+            'likes',
+            'hasLiked'
         ];
     }
 
@@ -52,15 +44,10 @@ class UserResource extends Resource
     public function relations(\Lomkit\Rest\Http\Requests\RestRequest $request): array
     {
         return [
-            BelongsToMany::make('workoutSessions', WorkoutSessionResource::class)
-                ->withPivotFields(['id', 'performed_at']),
-            HasMany::make('metrics', MetricResource::class),
-            BelongsToMany::make('allergies', AllergyResource::class),
-            BelongsToMany::make('handicaps', HandicapResource::class),
-            HasMany::make('posts', PostResource::class),
+            BelongsTo::make('user', UserResource::class),
             HasMany::make('comments', CommentResource::class),
-            BelongsToMany::make('likedPosts', PostResource::class),
-            BelongsToMany::make('likedComments', CommentResource::class),
+            BelongsToMany::make('likers', UserResource::class),
+            MorphMany::make('medias', MediaResource::class)
         ];
     }
 
@@ -104,5 +91,23 @@ class UserResource extends Resource
      */
     public function instructions(\Lomkit\Rest\Http\Requests\RestRequest $request): array {
         return [];
+    }
+
+    #[Override]
+    public function mutated(MutateRequest $request, array $requestBody, Model $model): void
+    {
+        if(isset($request['medias'])){
+            foreach($request['medias'] as $media){
+                $collection = $media['collection'];
+                
+                if (!$collection || !array_key_exists($collection, $model->getRegisteredMediaCollections()->toArray())) {
+                    throw new \Exception(sprintf("This media collection '%s' is not registered on the model %s", $collection, get_class($model)));
+                }
+
+                $model
+                    ->addMedia($media['file'])
+                    ->toMediaCollection($collection);
+            }
+        }
     }
 }
