@@ -25,7 +25,10 @@ class Comment extends Model
     protected $appends = [
         'likes',
         'hasLiked'
+    ];
 
+    protected $casts = [
+        'content' => 'json'
     ];
 
     public function user(): BelongsTo

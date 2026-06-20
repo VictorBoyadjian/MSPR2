@@ -29,6 +29,10 @@ class Post extends Model implements HasMedia
         'hasLiked'
     ];
 
+    protected $casts = [
+        'content' => 'json'
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
