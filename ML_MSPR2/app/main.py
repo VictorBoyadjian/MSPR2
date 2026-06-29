@@ -1,3 +1,4 @@
+import os
 import requests as _requests
 
 from fastapi import FastAPI, Depends, HTTPException
@@ -23,9 +24,11 @@ app = FastAPI(
     version="2.0.0",
 )
 
+_ALLOWED_ORIGINS = [o.strip() for o in os.environ.get("ALLOWED_ORIGINS", "").split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_ALLOWED_ORIGINS or ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
