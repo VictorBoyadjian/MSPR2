@@ -1,3 +1,0 @@
-[environments.target2]
-user = "postgres"
-password = "${localSecret.Flyway Desktop 115a4f6a-ec9a-4970-8a5a-f4a7326962d4}"

@@ -100,6 +100,44 @@ ALTER SEQUENCE "Data".allergies_id_seq OWNED BY "Data".allergies.id;
 
 
 --
+-- Name: comments; Type: TABLE; Schema: Data; Owner: postgres
+--
+
+CREATE TABLE "Data".comments (
+    id integer NOT NULL,
+    content json NOT NULL,
+    user_id integer,
+    post_id integer,
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now()
+);
+
+
+ALTER TABLE "Data".comments OWNER TO postgres;
+
+--
+-- Name: comments_id_seq; Type: SEQUENCE; Schema: Data; Owner: postgres
+--
+
+CREATE SEQUENCE "Data".comments_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE "Data".comments_id_seq OWNER TO postgres;
+
+--
+-- Name: comments_id_seq; Type: SEQUENCE OWNED BY; Schema: Data; Owner: postgres
+--
+
+ALTER SEQUENCE "Data".comments_id_seq OWNED BY "Data".comments.id;
+
+
+--
 -- Name: dishes; Type: TABLE; Schema: Data; Owner: postgres
 --
 
@@ -283,6 +321,55 @@ ALTER SEQUENCE "Data".meals_id_seq OWNED BY "Data".meals.id;
 
 
 --
+-- Name: media; Type: TABLE; Schema: Data; Owner: postgres
+--
+
+CREATE TABLE "Data".media (
+    id bigint NOT NULL,
+    model_type character varying(255) NOT NULL,
+    model_id bigint NOT NULL,
+    uuid uuid,
+    collection_name character varying(255) NOT NULL,
+    name character varying(255) NOT NULL,
+    file_name character varying(255) NOT NULL,
+    mime_type character varying(255),
+    disk character varying(255) NOT NULL,
+    conversions_disk character varying(255),
+    size bigint NOT NULL,
+    manipulations json NOT NULL,
+    custom_properties json NOT NULL,
+    generated_conversions json NOT NULL,
+    responsive_images json NOT NULL,
+    order_column integer,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone
+);
+
+
+ALTER TABLE "Data".media OWNER TO postgres;
+
+--
+-- Name: media_id_seq; Type: SEQUENCE; Schema: Data; Owner: postgres
+--
+
+CREATE SEQUENCE "Data".media_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE "Data".media_id_seq OWNER TO postgres;
+
+--
+-- Name: media_id_seq; Type: SEQUENCE OWNED BY; Schema: Data; Owner: postgres
+--
+
+ALTER SEQUENCE "Data".media_id_seq OWNED BY "Data".media.id;
+
+
+--
 -- Name: metrics; Type: TABLE; Schema: Data; Owner: postgres
 --
 
@@ -329,6 +416,43 @@ ALTER SEQUENCE "Data".metrics_id_seq OWNER TO postgres;
 --
 
 ALTER SEQUENCE "Data".metrics_id_seq OWNED BY "Data".metrics.id;
+
+
+--
+-- Name: posts; Type: TABLE; Schema: Data; Owner: postgres
+--
+
+CREATE TABLE "Data".posts (
+    id integer NOT NULL,
+    content json NOT NULL,
+    user_id integer,
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now()
+);
+
+
+ALTER TABLE "Data".posts OWNER TO postgres;
+
+--
+-- Name: posts_id_seq; Type: SEQUENCE; Schema: Data; Owner: postgres
+--
+
+CREATE SEQUENCE "Data".posts_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER SEQUENCE "Data".posts_id_seq OWNER TO postgres;
+
+--
+-- Name: posts_id_seq; Type: SEQUENCE OWNED BY; Schema: Data; Owner: postgres
+--
+
+ALTER SEQUENCE "Data".posts_id_seq OWNED BY "Data".posts.id;
 
 
 --
@@ -442,6 +566,30 @@ CREATE TABLE "Data".user_handicaps (
 
 
 ALTER TABLE "Data".user_handicaps OWNER TO postgres;
+
+--
+-- Name: user_like_comments; Type: TABLE; Schema: Data; Owner: postgres
+--
+
+CREATE TABLE "Data".user_like_comments (
+    user_id integer NOT NULL,
+    comment_id integer NOT NULL
+);
+
+
+ALTER TABLE "Data".user_like_comments OWNER TO postgres;
+
+--
+-- Name: user_like_posts; Type: TABLE; Schema: Data; Owner: postgres
+--
+
+CREATE TABLE "Data".user_like_posts (
+    user_id integer NOT NULL,
+    post_id integer NOT NULL
+);
+
+
+ALTER TABLE "Data".user_like_posts OWNER TO postgres;
 
 --
 -- Name: user_sessions; Type: TABLE; Schema: Data; Owner: postgres
@@ -774,6 +922,23 @@ ALTER SEQUENCE "System".jobs_id_seq OWNER TO postgres;
 
 ALTER SEQUENCE "System".jobs_id_seq OWNED BY "System".jobs.id;
 
+
+--
+-- Name: logs; Type: TABLE; Schema: System; Owner: postgres
+--
+
+CREATE TABLE "System".logs (
+    id uuid NOT NULL,
+    api_name character varying(255) NOT NULL,
+    data character varying(255) NOT NULL,
+    type character varying(255) NOT NULL,
+    ip character varying(255),
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone
+);
+
+
+ALTER TABLE "System".logs OWNER TO postgres;
 
 --
 -- Name: meals; Type: TABLE; Schema: System; Owner: postgres
@@ -1148,6 +1313,13 @@ ALTER TABLE ONLY "Data".allergies ALTER COLUMN id SET DEFAULT nextval('"Data".al
 
 
 --
+-- Name: comments id; Type: DEFAULT; Schema: Data; Owner: postgres
+--
+
+ALTER TABLE ONLY "Data".comments ALTER COLUMN id SET DEFAULT nextval('"Data".comments_id_seq'::regclass);
+
+
+--
 -- Name: dishes id; Type: DEFAULT; Schema: Data; Owner: postgres
 --
 
@@ -1176,10 +1348,24 @@ ALTER TABLE ONLY "Data".meals ALTER COLUMN id SET DEFAULT nextval('"Data".meals_
 
 
 --
+-- Name: media id; Type: DEFAULT; Schema: Data; Owner: postgres
+--
+
+ALTER TABLE ONLY "Data".media ALTER COLUMN id SET DEFAULT nextval('"Data".media_id_seq'::regclass);
+
+
+--
 -- Name: metrics id; Type: DEFAULT; Schema: Data; Owner: postgres
 --
 
 ALTER TABLE ONLY "Data".metrics ALTER COLUMN id SET DEFAULT nextval('"Data".metrics_id_seq'::regclass);
+
+
+--
+-- Name: posts id; Type: DEFAULT; Schema: Data; Owner: postgres
+--
+
+ALTER TABLE ONLY "Data".posts ALTER COLUMN id SET DEFAULT nextval('"Data".posts_id_seq'::regclass);
 
 
 --
@@ -1318,12 +1504,25 @@ COPY "Data".allergies (id, name, label) FROM stdin;
 
 
 --
+-- Data for Name: comments; Type: TABLE DATA; Schema: Data; Owner: postgres
+--
+
+COPY "Data".comments (id, content, user_id, post_id, created_at, updated_at) FROM stdin;
+1	{"title":"test","message":"test"}	10	1	2026-06-20 09:09:20	2026-06-20 09:09:20
+2	{"text":"HAAAAA"}	40	1	2026-06-29 12:58:43	2026-06-29 12:58:43
+\.
+
+
+--
 -- Data for Name: dishes; Type: TABLE DATA; Schema: Data; Owner: postgres
 --
 
 COPY "Data".dishes (id, name, calories_kcal, proteins_g, carbs_g, fats_g, fiber_g, sugars_g, sodium_mg, cholesterol_mg, meal_type, is_scanned, user_id, eated_at, created_at, updated_at) FROM stdin;
 1	Poulet test	5878	86	7000	68	\N	\N	\N	\N	lunch	\N	\N	\N	2026-06-12 21:53:06	2026-06-12 21:53:06
 3	Poulet	400	40	49	40	\N	\N	\N	\N	lunch	\N	\N	\N	2026-06-13 12:35:51	2026-06-13 12:35:51
+46	Tranche de melon	34	1	8	0	\N	\N	\N	\N	breakfast	\N	7	2026-06-17 05:46:26	2026-06-17 05:46:45	2026-06-17 05:47:51
+47	Poulet aux brocolis	185	33	4	3	\N	\N	\N	\N	lunch	\N	25	2026-06-17 07:56:08	2026-06-17 08:01:30	2026-06-17 08:01:30
+48	Salade caprese avec knacki et sauce frites	380	28	12	25	\N	\N	\N	\N	lunch	\N	7	2026-06-17 10:52:02	2026-06-17 10:52:52	2026-06-17 10:52:52
 15	Poulet sauté aux brocolis et riz	580	50	70	10	\N	\N	\N	\N	lunch	\N	2	2026-06-15 13:52:27.414	2026-06-15 13:52:56	2026-06-15 13:52:56
 16	Poulet sauté avec riz et brocoli	580	55	65	12	\N	\N	\N	\N	lunch	\N	2	2026-06-15 14:05:32.555	2026-06-15 14:06:01	2026-06-15 14:06:01
 17	Poulet sauté avec riz et brocoli	420	38	50	8	\N	\N	\N	\N	lunch	\N	3	2026-06-15 14:51:23.309	2026-06-15 14:51:45	2026-06-15 14:51:45
@@ -1340,6 +1539,57 @@ COPY "Data".dishes (id, name, calories_kcal, proteins_g, carbs_g, fats_g, fiber_
 33	Collation Kinder Bueno White	222	3	20	14	\N	\N	\N	\N	lunch	\N	7	2026-06-16 08:29:25	2026-06-16 08:29:57	2026-06-16 08:29:57
 34	Salade caprese avec melon	220	12	20	12	\N	\N	\N	\N	lunch	\N	7	2026-06-16 11:01:54	2026-06-16 11:02:55	2026-06-16 11:02:55
 35	Pêche fraîche	57	1	14	0	\N	\N	\N	\N	lunch	\N	7	2026-06-16 11:12:53	2026-06-16 11:13:18	2026-06-16 11:13:18
+36	Cordons bleus avec tomates grillées à l'ail	780	60	35	45	\N	\N	\N	\N	dinner	\N	7	2026-06-16 18:48:50	2026-06-16 18:49:31	2026-06-16 18:49:53
+39	Yaourt nature	61	4	4	3	\N	\N	\N	\N	lunch	\N	11	2026-06-16 19:08:57	2026-06-16 19:09:20	2026-06-16 19:09:20
+40	Poulet rôti entier	2475	270	0	150	\N	\N	\N	\N	lunch	\N	15	2026-06-16 19:12:27	2026-06-16 19:15:52	2026-06-16 19:15:52
+41	Cochon rôti entier	130000	11500	0	9500	\N	\N	\N	\N	lunch	\N	15	2026-06-16 19:16:38	2026-06-16 19:16:48	2026-06-16 19:16:48
+37	Yaourt façon pâtissier	130	5	18	4	\N	\N	\N	\N	dinner	\N	7	2026-06-16 19:06:31	2026-06-16 19:07:07	2026-06-16 21:02:30
+42	Repas complet avec courgettes à la crème, lardons, riz, chips, rôti fouré à la tomate, yaourt nature et cerises	1050	40	120	45	\N	\N	\N	\N	dinner	\N	17	2026-06-16 21:10:21	2026-06-16 21:12:58	2026-06-16 21:12:58
+43	Salade de chou-fleur aux carottes râpées et saucisses	220	10	15	12	\N	\N	\N	\N	lunch	\N	17	2026-06-16 21:14:56	2026-06-16 21:16:09	2026-06-16 21:16:09
+44	Petit-déjeuner continental	250	4	45	6	\N	\N	\N	\N	breakfast	\N	17	2026-06-16 21:16:28	2026-06-16 21:17:12	2026-06-16 21:17:12
+45	Collation légère aux fruits et barre de céréales	180	4	35	3	\N	\N	\N	\N	lunch	\N	17	2026-06-16 21:17:25	2026-06-16 21:17:57	2026-06-16 21:17:57
+49	Salade caprese avec melon et pain	480	28	55	18	\N	\N	\N	\N	dinner	\N	7	2026-06-17 18:35:20	2026-06-17 18:36:03	2026-06-17 18:36:03
+50	Pêche fraîche	39	1	10	0	\N	\N	\N	\N	dinner	\N	7	2026-06-17 18:44:19	2026-06-17 18:44:30	2026-06-17 18:44:30
+51	Omelette nature	70	6	0	5	\N	\N	\N	\N	lunch	\N	7	2026-06-17 18:45:33	2026-06-17 18:45:47	2026-06-17 18:45:47
+52	Yaourt à la fraise façon tarte	120	4	18	3	\N	\N	\N	\N	dinner	\N	7	2026-06-17 18:49:01	2026-06-17 18:49:10	2026-06-17 18:49:10
+53	Petit-déjeuner céréales au lait	250	8	45	5	\N	\N	\N	\N	breakfast	\N	7	2026-06-17 18:49:53	2026-06-17 18:50:29	2026-06-17 18:50:29
+54	Salade préparée avec cracker	85	2	12	3	\N	\N	\N	\N	breakfast	\N	7	2026-06-18 03:39:01	2026-06-18 03:39:32	2026-06-18 03:39:32
+55	Tartine au fromage râpé	220	10	35	5	\N	\N	\N	\N	breakfast	\N	7	2026-06-18 05:37:26	2026-06-18 05:37:41	2026-06-18 05:37:41
+56	Spaghetti à la bolognaise (version simple)	580	20	110	5	\N	\N	\N	\N	lunch	\N	33	2026-06-18 09:49:42	2026-06-18 09:49:52	2026-06-18 09:49:52
+57	Œufs pochés à la tomate et saucisse	280	18	12	18	\N	\N	\N	\N	lunch	\N	7	2026-06-18 10:35:15	2026-06-18 10:35:46	2026-06-18 10:35:46
+58	Pêche fraîche	39	1	10	0	\N	\N	\N	\N	lunch	\N	7	2026-06-18 10:53:34	2026-06-18 10:53:53	2026-06-18 10:53:53
+59	Yaourt à la poire façon amandine	150	4	20	6	\N	\N	\N	\N	lunch	\N	7	2026-06-18 10:54:36	2026-06-18 10:54:53	2026-06-18 10:54:53
+60	Cordon bleu	300	25	10	18	\N	\N	\N	\N	snack	\N	7	2026-06-18 18:13:23	2026-06-18 18:13:41	2026-06-18 18:13:41
+61	Poulet sauté avec riz et brocoli	450	40	50	10	\N	\N	\N	\N	dinner	\N	34	2026-06-18 19:39:49	2026-06-18 19:40:16	2026-06-18 19:40:16
+62	Menu japonais complet	620	30	75	25	\N	\N	\N	\N	lunch	\N	7	2026-06-18 21:12:40	2026-06-18 21:13:20	2026-06-18 21:13:20
+63	Poulet aux brocolis	280	35	10	12	\N	\N	\N	\N	lunch	\N	34	2026-06-18 22:06:20	2026-06-18 22:06:37	2026-06-18 22:06:37
+65	Poulet sauté au riz et brocoli	580	48	65	12	\N	\N	\N	\N	lunch	\N	35	2026-06-18 22:59:23	2026-06-18 22:59:43	2026-06-18 22:59:43
+67	Poulet sauté avec riz et brocoli	620	58	90	12	\N	\N	\N	\N	lunch	\N	35	2026-06-19 07:18:29	2026-06-19 07:18:45	2026-06-19 07:18:45
+68	Poulet sauté avec riz et brocoli	480	40	60	8	\N	\N	\N	\N	lunch	\N	38	2026-06-19 08:42:11	2026-06-19 08:42:26	2026-06-19 08:42:26
+69	Poulet sauté avec riz et brocoli	480	40	60	8	\N	\N	\N	\N	lunch	\N	39	2026-06-19 08:49:31	2026-06-19 08:49:50	2026-06-19 08:49:50
+70	Biscuit sec	70	1	10	3	\N	\N	\N	\N	snack	\N	40	2026-06-19 09:22:09	2026-06-19 09:22:35	2026-06-19 09:22:35
+72	Pain croustillant	1400	40	280	15	\N	\N	\N	\N	lunch	\N	7	2026-06-19 11:29:00	2026-06-19 11:29:27	2026-06-19 11:29:27
+73	Pain croustillant	1755	59	351	13	\N	\N	\N	\N	lunch	\N	33	2026-06-19 12:41:16	2026-06-19 12:42:10	2026-06-19 12:42:10
+74	Boisson gazeuse sans sucre	1	0	0	0	\N	\N	\N	\N	lunch	\N	7	2026-06-19 13:54:31	2026-06-19 13:54:36	2026-06-19 13:54:36
+75	Pizza aux champignons et jambon	820	42	90	35	\N	\N	\N	\N	dinner	\N	33	2026-06-19 18:05:06	2026-06-19 18:05:34	2026-06-19 18:05:34
+76	Pizza aux champignons et jambon	780	38	85	32	\N	\N	\N	\N	dinner	\N	33	2026-06-19 18:19:04	2026-06-19 18:19:22	2026-06-19 18:19:46
+77	Collation Kinder Bueno White	130	2	12	8	\N	\N	\N	\N	snack	\N	7	2026-06-19 19:32:15	2026-06-19 19:32:47	2026-06-19 19:33:07
+78	Melon frais	53	1	13	0	\N	\N	\N	\N	breakfast	\N	7	2026-06-20 07:10:13	2026-06-20 07:10:27	2026-06-20 07:10:27
+79	Salade de céleri rémoulade aux œufs	220	12	12	14	\N	\N	\N	\N	lunch	\N	7	2026-06-20 10:50:18	2026-06-20 10:51:46	2026-06-20 10:51:46
+80	Melon frais	62	1	15	0	\N	\N	\N	\N	lunch	\N	7	2026-06-20 10:55:52	2026-06-20 10:56:11	2026-06-20 10:56:11
+81	Pêche seule	39	1	9	0	\N	\N	\N	\N	lunch	\N	7	2026-06-20 10:59:54	2026-06-20 11:00:06	2026-06-20 11:00:06
+82	Cookie	235	3	30	12	\N	\N	\N	\N	snack	\N	7	2026-06-20 15:22:16	2026-06-20 15:22:35	2026-06-20 15:22:35
+83	Collation sucrée aux fruits et biscuits	105	1	18	3	\N	\N	\N	\N	breakfast	\N	7	2026-06-21 08:57:42	2026-06-21 08:58:12	2026-06-21 08:58:12
+84	Salade verte avec levure de bière	60	4	8	3	\N	\N	\N	\N	lunch	\N	7	2026-06-21 11:00:01	2026-06-21 11:00:39	2026-06-21 11:00:39
+85	Paella aux fruits de mer	380	30	50	6	\N	\N	\N	\N	lunch	\N	7	2026-06-21 11:20:07	2026-06-21 11:20:46	2026-06-21 11:20:46
+86	Glace magnum chocolat aux amandes	250	3	22	16	\N	\N	\N	\N	lunch	\N	7	2026-06-21 12:06:23	2026-06-21 12:06:45	2026-06-21 12:06:45
+87	Paris-Brest	525	10	45	35	\N	\N	\N	\N	snack	\N	7	2026-06-21 15:55:28	2026-06-21 15:56:28	2026-06-21 15:56:28
+88	Filet de dinde grillé	135	30	0	1	\N	\N	\N	\N	lunch	\N	7	2026-06-24 18:42:10	2026-06-24 18:42:20	2026-06-24 18:42:20
+90	Crêpe au Nutella	480	8	60	22	\N	\N	\N	\N	breakfast	\N	7	2026-06-26 07:02:50	2026-06-26 07:03:01	2026-06-26 07:03:01
+91	Poulet rôti aux pâtes et tomates	580	45	65	15	\N	\N	\N	\N	lunch	\N	7	2026-06-26 10:51:15	2026-06-26 10:51:39	2026-06-26 10:51:39
+92	Pizza jambon champignons roquette	1980	95	180	95	\N	\N	\N	\N	lunch	\N	7	2026-06-27 10:51:50	2026-06-27 10:52:03	2026-06-27 10:52:03
+93	Salade grecque	85	3	18	0	\N	\N	\N	\N	lunch	\N	7	2026-06-27 18:38:13	2026-06-27 18:38:27	2026-06-27 18:38:27
+94	Croissant	406	8	46	21	\N	\N	\N	\N	breakfast	\N	7	2026-06-29 09:32:15	2026-06-29 09:32:32	2026-06-29 09:32:32
 \.
 
 
@@ -1358,7 +1608,8 @@ COPY "Data".flyway_schema_history (installed_rank, version, description, type, s
 10	0018	user weeks to goal	SQL	V0018__user_weeks_to_goal.sql	604758891	postgres	2026-06-16 02:56:27.771811	162	t
 2	0010	session exercises order	SQL	V0010__session_exercises_order.sql	-1569241708	postgres	2026-06-14 22:35:32.799226	253	t
 3	0011	session exercises pk order	SQL	V0011__session_exercises_pk_order.sql	-74803685	postgres	2026-06-14 23:50:20.10192	313	t
-11	00019	user session fix	SQL	V00019__user_session_fix.sql	1870111659	postgres	2026-06-16 08:46:24.873392	260	t
+11	00021	posts	SQL	V00021__posts.sql	567160034	postgres	2026-06-20 11:03:56.916475	267	t
+12	00022	comments	SQL	V00022__comments.sql	-1376319732	postgres	2026-06-20 11:03:57.658463	245	t
 \.
 
 
@@ -1509,11 +1760,38 @@ COPY "Data".meals (id, name, meal_type, calories_kcal, proteins_g, carbs_g, fats
 
 
 --
+-- Data for Name: media; Type: TABLE DATA; Schema: Data; Owner: postgres
+--
+
+COPY "Data".media (id, model_type, model_id, uuid, collection_name, name, file_name, mime_type, disk, conversions_disk, size, manipulations, custom_properties, generated_conversions, responsive_images, order_column, created_at, updated_at) FROM stdin;
+1	App\\Models\\Post	10	2f164b37-be3a-457b-acd1-19c5f9e652ad	post_media	channels4_profile	channels4_profile.jpg	image/jpeg	public	public	8579	[]	[]	[]	[]	1	2026-06-19 14:39:12	2026-06-19 14:39:12
+2	App\\Models\\Post	1	6413c7c5-3aab-4dd0-9bb2-36c094d58351	post_media	channels4_profile	channels4_profile.jpg	image/jpeg	public	public	8579	[]	[]	[]	[]	1	2026-06-20 09:13:45	2026-06-20 09:13:45
+3	App\\Models\\Post	6	4223d2de-64ad-42d7-99f5-254490729c7a	post_media	poulet-saute-au-brocoli-bpb1-1200	poulet-saute-au-brocoli-bpb1-1200.webp	image/webp	public	public	109904	[]	[]	[]	[]	1	2026-06-29 13:20:15	2026-06-29 13:20:15
+\.
+
+
+--
 -- Data for Name: metrics; Type: TABLE DATA; Schema: Data; Owner: postgres
 --
 
 COPY "Data".metrics (id, user_id, recorded_at, weight_kg, bmi, body_fat_pct, heart_rate_avg, heart_rate_max, heart_rate_resting, calories_burned, session_duration_h, workout_type, workout_frequency, water_intake_l, experience_level, created_at, updated_at) FROM stdin;
 1	8	2026-06-16 12:13:25	66.5	\N	\N	\N	\N	68	\N	\N	\N	\N	\N	\N	2026-06-16 12:13:25	2026-06-16 12:14:29
+2	7	2026-06-16 20:32:51	66.5	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	2026-06-16 20:32:51	2026-06-16 20:32:51
+3	18	2026-06-16 22:37:59	43.5	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	2026-06-16 22:37:59	2026-06-16 22:37:59
+4	18	2026-06-15 22:37:59	43	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	2026-06-16 22:39:08.411971	2026-06-16 22:39:08.411971
+5	20	2026-06-17 00:35:17	74.5	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	2026-06-17 00:35:17	2026-06-17 00:35:17
+6	7	2026-06-19 00:39:16	66	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	2026-06-19 00:39:16	2026-06-19 00:39:16
+7	7	2026-06-21 08:58:50	66.5	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	2026-06-21 08:58:50	2026-06-21 08:58:50
+\.
+
+
+--
+-- Data for Name: posts; Type: TABLE DATA; Schema: Data; Owner: postgres
+--
+
+COPY "Data".posts (id, content, user_id, created_at, updated_at) FROM stdin;
+1	{"title":"test","message":"test"}	10	2026-06-20 09:07:17	2026-06-20 09:07:17
+6	{"text":"Regardez g mang\\u00e9 !!"}	40	2026-06-29 13:20:15	2026-06-29 13:20:15
 \.
 
 
@@ -1666,6 +1944,14 @@ COPY "Data".user_allergies (user_id, allergy_id) FROM stdin;
 3	5
 4	3
 4	8
+25	5
+25	8
+34	9
+34	5
+35	6
+35	9
+39	6
+39	8
 \.
 
 
@@ -1679,6 +1965,29 @@ COPY "Data".user_handicaps (user_id, handicap_id) FROM stdin;
 8	3
 8	2
 8	1
+25	2
+25	5
+34	3
+35	7
+\.
+
+
+--
+-- Data for Name: user_like_comments; Type: TABLE DATA; Schema: Data; Owner: postgres
+--
+
+COPY "Data".user_like_comments (user_id, comment_id) FROM stdin;
+10	1
+\.
+
+
+--
+-- Data for Name: user_like_posts; Type: TABLE DATA; Schema: Data; Owner: postgres
+--
+
+COPY "Data".user_like_posts (user_id, post_id) FROM stdin;
+10	1
+40	1
 \.
 
 
@@ -1694,6 +2003,15 @@ COPY "Data".user_sessions (id, user_id, workout_session_id, performed_at) FROM s
 6	8	2	2026-06-16 12:03:11
 7	7	14	2026-06-16 14:30:00
 8	7	12	2026-06-16 14:51:00
+9	15	1	2026-06-16 19:17:18
+10	17	19	2026-06-16 21:20:10
+11	18	1	2026-06-16 23:07:57
+12	22	1	2026-06-17 08:01:00
+13	25	2	2026-06-17 08:10:08
+14	34	1	2026-06-18 19:40:57
+15	34	12	2026-06-18 22:06:49
+16	35	5	2026-06-18 23:01:19
+17	36	1	2026-06-19 07:29:43
 \.
 
 
@@ -1703,14 +2021,40 @@ COPY "Data".user_sessions (id, user_id, workout_session_id, performed_at) FROM s
 
 COPY "Data".users (id, email, password, first_name, last_name, age, gender, weight_kg, height_cm, is_premium, is_active, remember_token, created_at, updated_at, goal_id, bodyfat, rest_bpm, sport_per_week, target_weight, weeks_to_goal) FROM stdin;
 2	test2@test.com	$2y$12$iF.IGo49uubeMBds8UfXOOL2M5idj00dSx70bGiY683WYIFM72udG	test	test	21	\N	66	171	f	t	\N	2026-06-15 13:34:30	2026-06-15 14:13:17	\N	30	60	4	\N	12
+14	lolo@test.com	$2y$12$CQ74W9VVUGtzLTVqxUBbReVO4mIGz1wX5X9vg6glmBPOT7QkqOJLy	Lolo	Lolo	21	female	43	159	f	t	\N	2026-06-16 18:55:11	2026-06-16 18:57:15	5	11.5	64	2	45.15	12
 3	test4@test.com	$2y$12$r/pTaVaOetE.KdDXDcz9se2e4DeGpsLtNQS3BUeosQykn8YW3XnZq	test 4	test	27	\N	70	175	f	t	\N	2026-06-15 14:42:05	2026-06-15 14:43:35	\N	23.5	70	3.5	\N	12
+15	aaaa@gmail.com	$2y$12$kmbgiXekTcoHmtVuuNXonOpCyQs6SK9BX2DI1HTqYd7TK638aggHS	dfd	dfdf	27	male	70	175	f	t	\N	2026-06-16 19:01:28	2026-06-16 19:03:32	4	11.5	70	25	77	12
 5	goaltest_1781568405@test.com	$2y$12$el.VZXQ2vMuP3GFjd.VDtux.VrZmoSOfaYlr0mkxsmeyc.LEQ.YlO	T	T	\N	\N	\N	\N	f	t	\N	2026-06-16 00:06:46	2026-06-16 00:06:46	\N	\N	\N	\N	\N	12
 6	goaltest2_1781568442@test.com	$2y$12$5M7eANzQhzT4WY1mJYnlZuqDhIeQo0vPGMg1jumr91uWQgch5hTLO	T	T	30	\N	\N	\N	f	t	\N	2026-06-16 00:07:22	2026-06-16 00:07:23	\N	\N	\N	\N	\N	12
 4	test5@test.com	$2y$12$azX4M6mnqDbsDGPUOYDFoeLj.3uTjDVP16p2vd.FhVWgosPoA5lXq	test 5	test	22	male	66	172	f	t	\N	2026-06-15 22:43:05	2026-06-16 01:07:53	8	23.5	70	3	66	12
+16	test11@test.com	$2y$12$tmVbRWy/s75X618i5zDOG.Gb/FZL.EhKOhHfmO4UHB3H/CoA8GUW.	test11	test	27	male	70	175	f	t	\N	2026-06-16 20:33:42	2026-06-16 20:43:46	7	17	70	25	66.5	12
 8	test7@test.com	$2y$12$2CnHfEhVWOWqdKbynY3gY.2ju8bmG07z8QBSZSj.ot8qfeVmk94zy	test  7	test	27	male	70	175	f	t	\N	2026-06-16 09:12:09	2026-06-16 09:15:48	4	15.5	70	13	77	12
 9	test8@test.com	$2y$12$Y9daUVMUZPCiV/uHIoxUaOU4XV97Y.pOsXLgOhzQ3.A7lXttUPkpm	Tst 8	Test	20	male	55	164	f	t	\N	2026-06-16 12:31:18	2026-06-16 12:36:54	4	19.5	74	3	60.5	12
 10	admin@gmail.com	$2y$12$ZJsE0PeohBYbC3JipF19xuPYGiXwGDww49FLwu1umPuT.FwfmgonS	admin	admin	30	male	80	180	f	t	\N	2026-06-16 13:43:00	2026-06-16 13:43:00	\N	\N	\N	\N	\N	12
 7	test6@test.com	$2y$12$q3pTuoR5E.C5J27KvOK0OOJWfM3QUnMNvBDYeNAmDAZzQjKO3AMES	Test6	Test	22	male	66.5	172	f	t	\N	2026-06-16 05:57:35	2026-06-16 13:49:05	7	19.5	62	4	63.18	12
+11	test10@test.com	$2y$12$SBm3nPSM6IHuhQLW8vg4xu6zJ9Hte1oQONWcmMNPhYdkBDVvWO9te	test &à	test	\N	\N	\N	\N	f	t	\N	2026-06-16 17:52:34	2026-06-16 17:52:34	\N	\N	\N	\N	\N	12
+17	test12@test.com	$2y$12$ttyDHxcUnC1IFeRgKcOieuSH5Shu4DXpGkQkKHsPRkHnChOnA0Y/2	test12	test	21	female	43	157	f	t	\N	2026-06-16 21:05:10	2026-06-16 21:18:41	9	12	78	1.5	43	12
+18	test13@test.com	$2y$12$c/1oYrrIAA1677/k79xFHujkiv3lYfj.5c4SknvbBNNk1jpSEZUmm	test13	test	21	female	43	157	f	t	\N	2026-06-16 21:46:30	2026-06-16 21:50:11	5	12	70	1.5	45.15	12
+19	test14@test.com	$2y$12$b9RBCPauG0XjcDlH2Bq4.O2kbJad6F2sUveMMYgHEUnQf20BziN2.	test14	test	\N	\N	\N	\N	f	t	\N	2026-06-16 23:20:44	2026-06-16 23:20:44	\N	\N	\N	\N	\N	12
+20	testv@test.com	$2y$12$LHi7RXXachtUMP2M3tK1duoHho78bMZnkw/wJ9f2pjfzVk.OW15YS	Victor	Victor	27	male	69	175	f	t	\N	2026-06-16 23:46:06	2026-06-17 00:33:01	4	17	70	25	77	12
+21	test15@test.com	$2y$12$06V1wTjnzPc6RfO8ZbsbYO9nYXUrilkyVYqHUDI/lB5fHzYplbQoa	Test 15	Test	27	male	70	160	f	t	\N	2026-06-17 02:31:43	2026-06-17 02:40:29	9	17	70	3	70	12
+22	test16@test.com	$2y$12$NwNFBiGkhPt81AqIm.PmCuPPaJ/ugGP5UYDCb95dkRXHVfnMrE5ZC	Test 16	Test	27	male	70	175	f	t	\N	2026-06-17 02:44:07	2026-06-17 03:05:49	4	12	70	25	77	12
+24	test17@test.com	$2y$12$7cuPY3rTFe8gOR/CkZpSlObJ/ZmOpYn0/4BDTLKjwovNhmH3cXmoO	Test 17	Test	\N	\N	\N	\N	f	t	\N	2026-06-17 07:35:07	2026-06-17 07:35:07	\N	\N	\N	\N	\N	12
+25	test18@test.com	$2y$12$Kziyqef8MKEznpRCakDmOedx0tBdYOBECp5gTaQZb5c5AilV/ipLO	Test 18	Test	22	male	66	171	f	t	\N	2026-06-17 07:36:50	2026-06-17 07:43:55	4	17	70	4	72.6	12
+26	e@e.com	$2y$12$0VMBKZX5Bar6nwbMwcs7OuWY68R83lVsgRbdut6f2deJnF35NNwCe	Enys	Tchenar	\N	\N	\N	\N	f	t	\N	2026-06-17 08:37:26	2026-06-17 08:37:26	\N	\N	\N	\N	\N	12
+27	e.tchenar@xefi.fr	$2y$12$ysdAwHT/69cS.mEtG.SkEeDsNt1tw8kNJBuI.k5Pd7mEo01nCtB8y	Enys	Tcccc	\N	\N	\N	\N	f	t	\N	2026-06-17 09:24:07	2026-06-17 09:24:07	\N	\N	\N	\N	\N	12
+28	test19@test.com	$2y$12$VvLqU3mwtAgcnP9E0SkfTeJtCDF58VDyx0jxfAnF0kWMrrFSuDF36	Victor	Test	20	male	80	160	f	t	\N	2026-06-17 09:44:50	2026-06-17 10:02:27	4	32	70	0	93.5	12
+33	lixnew.botton@gmail.com	$2y$12$235HnLCRLW2dRLShhoPxS.D7DjTy0xVoQUA9qtgDUIjhG9yNegKx2	Gaël	BOTTON	22	male	55	164	f	t	\N	2026-06-18 09:47:52	2026-06-18 09:49:13	4	12	70	3	60.5	12
+34	victor555@gmail.com	$2y$12$PkrbI5RVT4JTEJa5C.yx.OATB7xHTSZRUKfvzXqrLtET.PcOHxONq	Victor	test	22	male	66	171	f	t	\N	2026-06-18 19:36:08	2026-06-18 21:01:26	4	17	66	4	72.6	12
+32	test20@test.com	$2y$12$QIRFragKuPs4UOZ58QJjte5VCqlD6jKkrnUWiHfnpwJaQv5u5qiJm	Sarah	Test	\N	\N	\N	\N	f	t	\N	2026-06-18 09:29:48	2026-06-18 22:47:54	9	\N	\N	\N	\N	12
+35	victor5@test.com	$2y$12$RnshUR3LbQCte9gU52n2wOrxymiDrn4FVz/ISigFIPh5abmSxhbTO	Victor	Boyadjian	22	male	66	172	f	t	\N	2026-06-18 22:56:11	2026-06-18 22:58:32	4	17	66	4	72.6	12
+36	test44@test.com	$2y$12$FSXqS3u5thYsckav4FMvPe54IXzqLG67WDUW6pcYrn/m4BlS7lzpu	Victor	test	25	male	70	175	f	t	\N	2026-06-19 07:28:34	2026-06-19 07:29:25	4	12	70	25	77	12
+38	test25@test.com	$2y$12$9VYIihWr6Y4n1Lb30lINEeSd0Wmu0WfyfSsmQ4z4KjSFvLl6zNlPe	Victor	test	27	male	70	175	f	t	\N	2026-06-19 08:40:40	2026-06-19 08:41:15	8	32	80	25	70	12
+39	testvictor@test.com	$2y$12$njdOf0OEZp6LWsyTj5i.uehMjmK3EWs50yt9sg9qrsLXoDaE3zas6	VICTOR	boyadjian	22	male	66	173	f	t	\N	2026-06-19 08:47:43	2026-06-19 08:49:05	4	17	66	5	72.6	12
+40	victor55@test.com	$2y$12$F0hXqaQSdoI7bcMuL5PpsO8mUbyyW4QnnpmM5Pufqlr5wIRXXa8I6	Victor	Boyadjian	27	male	70	168	f	t	\N	2026-06-19 09:19:51	2026-06-19 09:21:27	9	17	68	3	70	12
+41	iae@test.com	$2y$12$6yBxAS1N.jwnm9OWcRDkYOaPox.x7Y3lnh67ONvc9PEpexPya0o1y	Idma	Moaen	\N	\N	\N	\N	f	t	\N	2026-06-19 09:59:22	2026-06-19 09:59:22	\N	\N	\N	\N	\N	12
+42	doso@gmail.com	$2y$12$NC40pVdpYQX3S7LDDbwgIuLkJjRIwnx9Utzo28FL8mmqE/bp8TsxW	Dldlsm	Dispos	21	female	74	162	f	t	\N	2026-06-19 16:08:47	2026-06-19 16:11:25	7	27	82	1.5	70.3	12
+43	faustine.ozil01@orange.fr	$2y$12$WCT6ZHHvxkZhG5iWlgDaM.0ajTlCkVVqouKvMCJiegGmcNgepxTZy	Faustine	Ozil	19	female	53	153	f	t	\N	2026-06-19 17:53:27	2026-06-19 17:57:04	5	17	80	0	55.65	12
 \.
 
 
@@ -1799,70 +2143,264 @@ COPY "Data".workout_sessions (id, name, profile, session_type, total_duration_mi
 --
 
 COPY "System".cache (key, value, expiration) FROM stdin;
+laravel-cache-rest.authorization.dish_resource.update.dish.37.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781644050
 laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..4	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781595958
 laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..4	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781595958
 laravel-cache-rest.authorization.dish_resource.create.dish..3	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781561117
 laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..9	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781624504
-laravel-cache-rest.authorization.dish_resource.create.dish..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781608698
+laravel-cache-rest.authorization.dish_resource.create.dish..25	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781683590
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..17	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781645199
 laravel-cache-rest.authorization.exercise_resource.viewAny.App\\Models\\Exercise..3	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781563650
 laravel-cache-rest.authorization.sport_session_resource.viewAny.App\\Models\\SportSession..4	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781572171
-laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781631921
-laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781631921
 laravel-cache-rest.authorization.exercise_resource.viewAny.App\\Models\\Exercise..4	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781572171
 laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..5	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781568706
 laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..4	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781599920
-laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781631921
 laravel-cache-rest.authorization.dish_resource.create.dish..4	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781564890
-laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..2	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781533555
 laravel-cache-rest.authorization.sport_session_resource.viewAny.App\\Models\\SportSession..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781589755
 laravel-cache-rest.authorization.exercise_resource.viewAny.App\\Models\\Exercise..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781589755
 laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..3	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781535572
 laravel-cache-rest.authorization.dish_resource.update.dish.31.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781589907
 laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..9	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781613667
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..14	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781636515
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..14	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781636547
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..15	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781637671
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..11	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781640257
 laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..8	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781616534
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..18	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781652165
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..11	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781642242
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..18	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781652170
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..16	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781642894
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..18	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781652213
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..18	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781652214
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..17	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781644875
 laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781624645
 laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781624645
 laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..3	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781563583
-laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..2	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781533555
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..17	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781644875
 laravel-cache-rest.authorization.dish_resource.delete.dish.32.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781613241
 laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..1	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781589535
-laravel-cache-spatie.permission.cache	a:3:{s:5:"alias";a:4:{s:1:"a";s:2:"id";s:1:"b";s:4:"name";s:1:"c";s:10:"guard_name";s:1:"r";s:5:"roles";}s:11:"permissions";a:24:{i:0;a:4:{s:1:"a";i:1;s:1:"b";s:11:"view dishes";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:1;a:4:{s:1:"a";i:2;s:1:"b";s:13:"create dishes";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:2;a:4:{s:1:"a";i:3;s:1:"b";s:13:"update dishes";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:3;a:4:{s:1:"a";i:4;s:1:"b";s:13:"delete dishes";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:4;a:4:{s:1:"a";i:5;s:1:"b";s:14:"view exercises";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:5;a:4:{s:1:"a";i:6;s:1:"b";s:16:"create exercises";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:6;a:4:{s:1:"a";i:7;s:1:"b";s:16:"update exercises";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:7;a:4:{s:1:"a";i:8;s:1:"b";s:16:"delete exercises";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:8;a:4:{s:1:"a";i:9;s:1:"b";s:10:"view goals";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:9;a:4:{s:1:"a";i:10;s:1:"b";s:12:"create goals";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:10;a:4:{s:1:"a";i:11;s:1:"b";s:12:"update goals";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:11;a:4:{s:1:"a";i:12;s:1:"b";s:12:"delete goals";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:12;a:4:{s:1:"a";i:13;s:1:"b";s:12:"view metrics";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:13;a:4:{s:1:"a";i:14;s:1:"b";s:14:"create metrics";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:14;a:4:{s:1:"a";i:15;s:1:"b";s:14:"update metrics";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:15;a:4:{s:1:"a";i:16;s:1:"b";s:14:"delete metrics";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:16;a:4:{s:1:"a";i:17;s:1:"b";s:13:"view sessions";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:17;a:4:{s:1:"a";i:18;s:1:"b";s:15:"create sessions";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:18;a:4:{s:1:"a";i:19;s:1:"b";s:15:"update sessions";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:19;a:4:{s:1:"a";i:20;s:1:"b";s:15:"delete sessions";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:20;a:4:{s:1:"a";i:21;s:1:"b";s:10:"view users";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:21;a:4:{s:1:"a";i:22;s:1:"b";s:12:"create users";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:22;a:4:{s:1:"a";i:23;s:1:"b";s:12:"update users";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:23;a:4:{s:1:"a";i:24;s:1:"b";s:12:"delete users";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}}s:5:"roles";a:2:{i:0;a:3:{s:1:"a";i:1;s:1:"b";s:13:"Administrator";s:1:"c";s:3:"web";}i:1;a:3:{s:1:"a";i:2;s:1:"b";s:4:"User";s:1:"c";s:3:"web";}}}	1781684997
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782725853
 laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..9	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781613670
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..17	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781644875
 laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..4	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781599921
 laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..4	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781599921
 laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..4	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781599921
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..25	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781685452
 laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..8	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781614896
 laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..8	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781614896
+laravel-cache-rest.authorization.dish_resource.create.dish..34	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781820697
 laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..8	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781616846
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..14	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781636517
+laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..14	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781636556
+laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..14	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781636556
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..25	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781685514
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..28	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781690689
+laravel-cache-rest.authorization.dish_resource.create.dish..32	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781822648
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..15	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781637672
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..15	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781637672
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..15	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781637673
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..16	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781642911
 laravel-cache-rest.authorization.sport_session_resource.create.sport_session..1	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781474145
 laravel-cache-rest.authorization.user_resource.view.user.1.1	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781474145
 laravel-cache-rest.authorization.exercise_resource.view.exercise.1.1	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781474145
+laravel-cache-rest.authorization.comment_resource.viewAny.App\\Models\\Comment..10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781881368
 laravel-cache-rest.authorization.dish_resource.delete.dish.27.4	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781595339
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..42	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781885765
+laravel-cache-rest.authorization.dish_resource.create.dish..17	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781644678
 laravel-cache-rest.authorization.sport_session_resource.viewAny.App\\Models\\SportSession..1	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781589535
 laravel-cache-rest.authorization.exercise_resource.viewAny.App\\Models\\Exercise..1	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781589535
 laravel-cache-rest.authorization.sport_session_resource.viewAny.App\\Models\\SportSession..2	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781533558
 laravel-cache-rest.authorization.exercise_resource.viewAny.App\\Models\\Exercise..2	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781533558
 laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..1	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781561584
-laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781631919
+laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..17	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781645097
+laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..17	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781645097
 laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..3	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781563584
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782725854
 laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..4	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781601121
+laravel-cache-rest.authorization.dish_resource.update.dish.36.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781636093
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..14	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781636519
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..18	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781652157
+laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..18	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781652170
+laravel-cache-rest.authorization.dish_resource.delete.dish.38.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781637152
+laravel-cache-rest.authorization.dish_resource.create.dish..15	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781637652
+laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..15	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781637738
+laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..15	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781637739
+laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..18	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781652170
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..11	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781642242
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..16	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781642891
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..16	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781642911
 laravel-cache-rest.authorization.dish_resource.update.dish.5.1	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781356635
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..17	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781645097
 laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..1	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781561584
 laravel-cache-rest.authorization.exercise_resource.create.exercise..1	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781302674
 laravel-cache-rest.authorization.goal_resource.create.goal..1	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781304111
 laravel-cache-rest.authorization.sport_session_resource.viewAny.App\\Models\\SportSession..3	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781563650
 laravel-cache-rest.authorization.dish_resource.create.dish..2	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781532661
-laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781631921
-laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..2	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781533558
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..43	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781892127
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..25	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781685461
 laravel-cache-rest.authorization.goal_resource.view.goal.1.1	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781305186
 laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..1	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781305582
 laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..9	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781613662
 laravel-cache-rest.authorization.dish_resource.create.dish..1	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781589554
 laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..9	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781613721
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..25	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781685514
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..14	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781636535
 laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..1	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781311645
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..26	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781689759
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..28	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781690690
+laravel-cache-rest.authorization.dish_resource.create.dish..11	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781637260
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..15	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781637671
 laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..8	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781616534
 laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..8	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781616534
 laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..8	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781616534
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..11	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781642242
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..11	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781642242
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..16	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781642893
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..18	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781652214
+laravel-cache-rest.authorization.comment_resource.update.comment.1.10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781881406
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..19	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781652758
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..19	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781652760
+laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..19	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781652761
+laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..19	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781652761
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..19	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781652768
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..19	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781652768
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..19	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781652768
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..19	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781653828
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..42	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781885788
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..20	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781656663
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..20	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781656663
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..20	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781656663
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..20	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781656663
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..20	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781656811
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..20	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781662182
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..21	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781664325
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..21	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781664326
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..21	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781664327
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..21	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781664329
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..21	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781664343
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..21	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781664356
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..2	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781665743
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..2	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781665786
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..2	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781665787
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..2	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781665787
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..2	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781665787
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..2	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781665788
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..34	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781820291
+laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..25	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781685461
+laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..25	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781685461
+laravel-cache-rest.authorization.dish_resource.update.dish.46.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781675571
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..25	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781685514
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..34	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781820291
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..28	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781690691
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..28	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781690738
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..28	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781690754
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..28	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781693790
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..34	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781820291
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..42	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781891838
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..34	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781820709
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..22	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781679909
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..22	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781679909
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..22	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781679910
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..22	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781679910
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..22	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781679910
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..22	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781679911
+laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..22	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781679962
+laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..22	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781679962
+laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..43	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781892154
+laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..43	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781892154
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782725854
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..24	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781682078
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782725854
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..25	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781755789
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..43	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781892038
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..43	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781892199
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..32	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781823167
+laravel-cache-rest.authorization.post_resource.create.post..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782739515
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..34	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781820292
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782725831
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..34	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781820656
+laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..34	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781820709
+laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..34	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781820709
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..32	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781823167
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..32	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781823167
+laravel-cache-rest.authorization.post_resource.viewAny.App\\Models\\Post..10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781947131
+laravel-cache-rest.authorization.media_resource.viewAny.App\\Models\\Media..10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781947131
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781947327
+laravel-cache-rest.authorization.comment_resource.create.comment..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782738223
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..32	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781823066
+laravel-cache-rest.authorization.dish_resource.delete.dish.64.32	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781823074
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..32	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781823180
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..35	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781823827
+laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..35	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781823980
+laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..35	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781823980
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..33	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782210819
+laravel-cache-rest.authorization.dish_resource.delete.dish.89.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782471414
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..43	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781892042
+laravel-cache-rest.authorization.dish_resource.delete.dish.66.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781829764
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..32	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781852291
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..33	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781893434
+laravel-cache-rest.authorization.dish_resource.create.dish..33	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781893462
+laravel-cache-rest.authorization.dish_resource.create.dish..35	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781853825
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..35	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781853826
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..35	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781853826
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..35	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781853826
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..35	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781853826
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..35	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781853826
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..36	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781854436
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..36	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781854439
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..36	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781854440
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..36	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781854465
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..36	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781854466
+laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..36	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781854483
+laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..36	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781854483
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..38	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781858764
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..38	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781858765
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..38	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781858765
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..38	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781858776
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..38	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781858782
+laravel-cache-rest.authorization.dish_resource.create.dish..38	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781858846
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..38	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781858858
+laravel-cache-rest.authorization.post_resource.viewAny.App\\Models\\Post..13	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781947293
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..39	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781859209
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..39	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781859213
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..39	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781859229
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..39	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781859245
+laravel-cache-rest.authorization.dish_resource.create.dish..39	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781859290
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..39	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781859294
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..39	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781859299
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781861146
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781861157
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781861163
+laravel-cache-rest.authorization.dish_resource.create.dish..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781861255
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781861284
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..42	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781885760
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..43	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781892045
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..33	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781893434
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..33	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781893434
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..33	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781893434
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..41	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781868804
+laravel-cache-rest.authorization.dish_resource.update.dish.76.33	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781893486
+laravel-cache-rest.authorization.dish_resource.update.dish.77.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781897887
+laravel-cache-rest.authorization.comment_resource.create.comment..10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781946860
+laravel-cache-rest.authorization.dish_resource.delete.dish.71.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781868874
+laravel-cache-rest.authorization.comment_resource.viewAny.App\\Models\\Comment..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782739492
+laravel-cache-rest.authorization.post_resource.update.post.10.10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781881237
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..42	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781885764
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..43	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781892124
+laravel-cache-spatie.permission.cache	a:3:{s:5:"alias";a:4:{s:1:"a";s:2:"id";s:1:"b";s:4:"name";s:1:"c";s:10:"guard_name";s:1:"r";s:5:"roles";}s:11:"permissions";a:24:{i:0;a:4:{s:1:"a";i:1;s:1:"b";s:11:"view dishes";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:1;a:4:{s:1:"a";i:2;s:1:"b";s:13:"create dishes";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:2;a:4:{s:1:"a";i:3;s:1:"b";s:13:"update dishes";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:3;a:4:{s:1:"a";i:4;s:1:"b";s:13:"delete dishes";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:4;a:4:{s:1:"a";i:5;s:1:"b";s:14:"view exercises";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:5;a:4:{s:1:"a";i:6;s:1:"b";s:16:"create exercises";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:6;a:4:{s:1:"a";i:7;s:1:"b";s:16:"update exercises";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:7;a:4:{s:1:"a";i:8;s:1:"b";s:16:"delete exercises";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:8;a:4:{s:1:"a";i:9;s:1:"b";s:10:"view goals";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:9;a:4:{s:1:"a";i:10;s:1:"b";s:12:"create goals";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:10;a:4:{s:1:"a";i:11;s:1:"b";s:12:"update goals";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:11;a:4:{s:1:"a";i:12;s:1:"b";s:12:"delete goals";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:12;a:4:{s:1:"a";i:13;s:1:"b";s:12:"view metrics";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:13;a:4:{s:1:"a";i:14;s:1:"b";s:14:"create metrics";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:14;a:4:{s:1:"a";i:15;s:1:"b";s:14:"update metrics";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:15;a:4:{s:1:"a";i:16;s:1:"b";s:14:"delete metrics";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:16;a:4:{s:1:"a";i:17;s:1:"b";s:13:"view sessions";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:17;a:4:{s:1:"a";i:18;s:1:"b";s:15:"create sessions";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:18;a:4:{s:1:"a";i:19;s:1:"b";s:15:"update sessions";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:19;a:4:{s:1:"a";i:20;s:1:"b";s:15:"delete sessions";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:20;a:4:{s:1:"a";i:21;s:1:"b";s:10:"view users";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:21;a:4:{s:1:"a";i:22;s:1:"b";s:12:"create users";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:22;a:4:{s:1:"a";i:23;s:1:"b";s:12:"update users";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:23;a:4:{s:1:"a";i:24;s:1:"b";s:12:"delete users";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}}s:5:"roles";a:2:{i:0;a:3:{s:1:"a";i:1;s:1:"b";s:13:"Administrator";s:1:"c";s:3:"web";}i:1;a:3:{s:1:"a";i:2;s:1:"b";s:4:"User";s:1:"c";s:3:"web";}}}	1782811791
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..33	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781893435
+laravel-cache-rest.authorization.dish_resource.create.dish..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782725852
+laravel-cache-rest.authorization.post_resource.create.post..10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781946737
+laravel-cache-rest.authorization.user_resource.view.user.10.10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781946738
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782738211
+laravel-cache-rest.authorization.post_resource.update.post.1.10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781947123
+laravel-cache-rest.authorization.media_resource.viewAny.App\\Models\\Media..13	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781947293
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..13	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781947293
+laravel-cache-rest.authorization.post_resource.viewAny.App\\Models\\Post..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782739378
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782739378
+laravel-cache-rest.authorization.media_resource.viewAny.App\\Models\\Media..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782739378
+laravel-cache-rest.authorization.log_resource.create.log..10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782739515
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782032620
 \.
 
 
@@ -4643,6 +5181,2143 @@ COPY "System".jobs (id, queue, payload, attempts, reserved_at, available_at, cre
 
 
 --
+-- Data for Name: logs; Type: TABLE DATA; Schema: System; Owner: postgres
+--
+
+COPY "System".logs (id, api_name, data, type, ip, created_at, updated_at) FROM stdin;
+019f12b6-b3f9-714e-9255-0e3e7a623a5a	Laravel	api/me	request	79.127.178.81	2026-06-29 09:29:51	2026-06-29 09:29:51
+019f12b6-b4c3-7395-9762-6cac8d75fec7	Laravel	api/me/sessions	request	79.127.178.81	2026-06-29 09:29:51	2026-06-29 09:29:51
+019f12b6-b4d3-72aa-8556-20d6c9c12543	Laravel	api/dishes/search	request	79.127.178.81	2026-06-29 09:29:51	2026-06-29 09:29:51
+019f12b6-b50e-7112-9ab2-95ed6662afa1	Laravel	api/dishes/search	request	79.127.178.81	2026-06-29 09:29:51	2026-06-29 09:29:51
+019f12b6-b591-726d-be82-2eb73b5bf601	Laravel	api/me/sessions	request	79.127.178.81	2026-06-29 09:29:51	2026-06-29 09:29:51
+019f12b8-d7f1-72a3-9242-ae213c8be7b5	Laravel	api/me	request	79.127.178.81	2026-06-29 09:32:11	2026-06-29 09:32:11
+019f12b8-d8a3-7157-86a4-15e3a3d99a3a	Laravel	api/me/sessions	request	79.127.178.81	2026-06-29 09:32:11	2026-06-29 09:32:11
+019f12b8-d8a5-7058-bd95-c41b2386cc58	Laravel	api/me/sessions	request	79.127.178.81	2026-06-29 09:32:11	2026-06-29 09:32:11
+019f12b8-d8e7-73f6-8215-d79a717c8a7c	Laravel	api/dishes/search	request	79.127.178.81	2026-06-29 09:32:11	2026-06-29 09:32:11
+019f12b8-d8e7-73b9-aaba-52494f22b9c1	Laravel	api/dishes/search	request	79.127.178.81	2026-06-29 09:32:11	2026-06-29 09:32:11
+019f12b9-1d43-7003-9155-6f52a58c6ccf	Laravel	api/logs/mutate	request	10.148.52.67	2026-06-29 09:32:29	2026-06-29 09:32:29
+019f12b9-1d73-73ca-9142-a711bbb66f21	image-analysis-api	/dish-calculate	request	100.64.0.4	2026-06-29 09:32:29	2026-06-29 09:32:29
+019f12b9-1dc3-7058-8121-36865529c12d	Laravel	api/me	request	10.148.52.67	2026-06-29 09:32:29	2026-06-29 09:32:29
+019f12b9-27e8-7029-addd-f9230f61f217	Laravel	api/dishes/mutate	request	79.127.178.81	2026-06-29 09:32:32	2026-06-29 09:32:32
+019f12b9-2e99-707a-b6f8-e1b5603ff539	Laravel	api/dishes/search	request	79.127.178.81	2026-06-29 09:32:33	2026-06-29 09:32:33
+019f12b9-2e9a-713e-b34a-1c8e3b1e648f	Laravel	api/dishes/search	request	79.127.178.81	2026-06-29 09:32:33	2026-06-29 09:32:33
+019f12b9-2ef2-7298-9a91-c164b27e4e63	Laravel	api/goals/search	request	79.127.178.81	2026-06-29 09:32:33	2026-06-29 09:32:33
+019f12b9-2fb1-7362-9064-a892776f7301	Laravel	api/users/search	request	79.127.178.81	2026-06-29 09:32:34	2026-06-29 09:32:34
+019f12b9-331b-70dc-8d87-342bbc6a2a18	Laravel	api/me	request	152.233.12.241	2026-06-29 09:32:34	2026-06-29 09:32:34
+019f12b9-331e-7117-87eb-9242279ce974	Laravel	api/me	request	152.233.12.241	2026-06-29 09:32:34	2026-06-29 09:32:34
+019f12c1-4bdf-7185-9988-7ef4ef43210a	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:25	2026-06-29 09:41:25
+019f12c1-4d51-7362-8116-6b1e489ca86d	ml-api	/health	request	232.42.45.106	2026-06-29 09:41:25	2026-06-29 09:41:25
+019f12c1-4ea8-72c7-9875-a23e1794d545	ml-api	/recommend	request	156.249.18.80	2026-06-29 09:41:26	2026-06-29 09:41:26
+019f12c1-4f00-729f-a658-e02fd9fd4f66	Laravel	login	request	144.98.250.253	2026-06-29 09:41:26	2026-06-29 09:41:26
+019f12c1-4f59-707e-a7e8-a3f254a52b09	Laravel	register	request	65.133.216.164	2026-06-29 09:41:26	2026-06-29 09:41:26
+019f12c1-4fb2-7225-bddd-6e46ebd15e65	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:26	2026-06-29 09:41:26
+019f12c1-5009-739a-957f-322da41449eb	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:26	2026-06-29 09:41:26
+019f12c1-5064-72c4-bb93-47d160925f49	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:26	2026-06-29 09:41:26
+019f12c1-50bc-7262-991a-57eaa24b9e47	Laravel	allergies	request	242.250.58.115	2026-06-29 09:41:26	2026-06-29 09:41:26
+019f12c1-5114-7221-82d9-192b86abb06d	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:26	2026-06-29 09:41:26
+019f12c1-516b-7353-bb11-f056ff8aacaa	image-analysis-api	/analyze	request	158.211.253.43	2026-06-29 09:41:27	2026-06-29 09:41:27
+019f12c1-51c4-704b-89f8-eb2c4353e91b	image-analysis-api	/analyze	request	163.54.156.3	2026-06-29 09:41:27	2026-06-29 09:41:27
+019f12c1-521d-71be-9402-abf28a572ad7	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:27	2026-06-29 09:41:27
+019f12c1-5275-7165-948f-c58f238ecddc	Laravel	allergies	request	211.69.154.186	2026-06-29 09:41:27	2026-06-29 09:41:27
+019f12c1-52cd-7191-ac19-20e4ebe44c9b	image-analysis-api	/analyze-by-mistral	request	204.164.162.199	2026-06-29 09:41:27	2026-06-29 09:41:27
+019f12c1-5324-703a-b469-7a52e7456182	Laravel	allergies	request	128.113.172.54	2026-06-29 09:41:27	2026-06-29 09:41:27
+019f12c1-537c-7302-8306-3a15ec28f5a7	ml-api	/health	request	175.147.239.97	2026-06-29 09:41:27	2026-06-29 09:41:27
+019f12c1-53d3-7180-9adc-aa9eb00dde1c	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:27	2026-06-29 09:41:27
+019f12c1-542b-7102-9043-7c56123c647b	Laravel	login	request	49.62.4.122	2026-06-29 09:41:27	2026-06-29 09:41:27
+019f12c1-5482-7044-ae3a-3195670fd0f0	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:27	2026-06-29 09:41:27
+019f12c1-54d8-7167-bbb0-77bddb0c0884	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:27	2026-06-29 09:41:27
+019f12c1-552e-72e6-852c-df23ab266b22	Laravel	allergies	request	160.41.44.191	2026-06-29 09:41:27	2026-06-29 09:41:27
+019f12c1-5586-7156-8613-de8b4134fba5	Laravel	login	request	139.80.195.147	2026-06-29 09:41:28	2026-06-29 09:41:28
+019f12c1-55e1-704d-9d79-803f0900c614	Laravel	login	request	37.98.94.131	2026-06-29 09:41:28	2026-06-29 09:41:28
+019f12c1-5637-7227-a1c0-258908d78fe3	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:28	2026-06-29 09:41:28
+019f12c1-568d-70c7-9f5e-a920a8c0aa1a	ml-api	/health	request	28.48.101.225	2026-06-29 09:41:28	2026-06-29 09:41:28
+019f12c1-56e4-723e-98cc-2b93c9c292f4	ml-api	/health	request	127.54.167.41	2026-06-29 09:41:28	2026-06-29 09:41:28
+019f12c1-573a-7126-b58d-d78e845c26e2	Laravel	allergies	request	232.8.200.118	2026-06-29 09:41:28	2026-06-29 09:41:28
+019f12c1-5791-72d1-9a86-9c61fe531671	Laravel	login	request	133.236.34.214	2026-06-29 09:41:28	2026-06-29 09:41:28
+019f12c1-57ec-7352-a14f-fa2d5822fe13	Laravel	login	request	112.50.29.9	2026-06-29 09:41:28	2026-06-29 09:41:28
+019f12c1-5843-7083-a881-2ca144c76a2e	Laravel	register	request	14.111.77.50	2026-06-29 09:41:28	2026-06-29 09:41:28
+019f12c1-589b-70bd-a7f8-4d25f0ad4be6	Laravel	login	request	23.33.147.229	2026-06-29 09:41:28	2026-06-29 09:41:28
+019f12c1-58f2-711e-b78f-96d5b9a1aedc	Laravel	allergies	request	197.31.151.74	2026-06-29 09:41:28	2026-06-29 09:41:28
+019f12c1-594b-70fc-82d0-fea9ace08371	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:29	2026-06-29 09:41:29
+019f12c1-59a1-723c-87ee-ac79d161463d	image-analysis-api	/health/	request	29.35.130.239	2026-06-29 09:41:29	2026-06-29 09:41:29
+019f12c1-59f8-71ba-b756-0f7c7cf5c6e0	Laravel	login	request	191.88.103.43	2026-06-29 09:41:29	2026-06-29 09:41:29
+019f12c1-5a51-7383-bef6-82d4db0d59ff	Laravel	login	request	245.78.89.239	2026-06-29 09:41:29	2026-06-29 09:41:29
+019f12c1-5aa8-71be-b2cd-71237fca5149	ml-api	/recommend	request	26.180.83.83	2026-06-29 09:41:29	2026-06-29 09:41:29
+019f12c1-5b05-7373-a4b1-70f7b80dc975	image-analysis-api	/health/	request	209.138.255.31	2026-06-29 09:41:29	2026-06-29 09:41:29
+019f12c1-5b5e-7123-84d0-72d0cea99839	Laravel	register	request	110.91.214.197	2026-06-29 09:41:29	2026-06-29 09:41:29
+019f12c1-5bb5-7266-b3a1-dee24b19e357	Laravel	allergies	request	104.142.194.156	2026-06-29 09:41:29	2026-06-29 09:41:29
+019f12c1-5c0d-7178-bd4e-dff225675b21	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:29	2026-06-29 09:41:29
+019f12c1-5c65-73c2-a83d-5a2a056ef981	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:29	2026-06-29 09:41:29
+019f12c1-5cbe-7299-984b-b7ecca999979	Laravel	allergies	request	203.136.203.211	2026-06-29 09:41:29	2026-06-29 09:41:29
+019f12c1-5d14-7100-8c4f-f85420ea872d	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:30	2026-06-29 09:41:30
+019f12c1-5d6b-73ed-8b38-4ec4b11c1baa	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:30	2026-06-29 09:41:30
+019f12c1-5dc5-7216-b6b7-38cb1ae8dc6a	Laravel	allergies	request	136.106.207.169	2026-06-29 09:41:30	2026-06-29 09:41:30
+019f12c1-5e1b-7368-847c-93ebfe2e5d01	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:30	2026-06-29 09:41:30
+019f12c1-5e71-71eb-8aaf-ef952de1146e	Laravel	allergies	request	198.137.1.44	2026-06-29 09:41:30	2026-06-29 09:41:30
+019f12c1-5ec8-719b-bd4a-435b677b3469	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:30	2026-06-29 09:41:30
+019f12c1-5f1f-709f-9cd6-7883d065d654	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:30	2026-06-29 09:41:30
+019f12c1-5f75-731b-9cc3-17379426cb06	Laravel	allergies	request	231.67.249.134	2026-06-29 09:41:30	2026-06-29 09:41:30
+019f12c1-5fcb-7166-a45a-9f4bd6d94a02	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:30	2026-06-29 09:41:30
+019f12c1-6021-7204-ac79-5c25ea1c28ef	Laravel	login	request	139.101.43.182	2026-06-29 09:41:30	2026-06-29 09:41:30
+019f12c1-6077-7090-820a-c21006761a77	image-analysis-api	/analyze	request	66.194.3.157	2026-06-29 09:41:30	2026-06-29 09:41:30
+019f12c1-60cd-70e2-86d9-71a09f316b69	Laravel	register	request	31.168.253.180	2026-06-29 09:41:30	2026-06-29 09:41:30
+019f12c1-6123-716a-ac07-fd14ed19edac	Laravel	register	request	68.230.197.160	2026-06-29 09:41:31	2026-06-29 09:41:31
+019f12c1-6180-7050-8e12-ae196488f6bf	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:31	2026-06-29 09:41:31
+019f12c1-61d8-7370-a106-6b5b694fdb13	Laravel	register	request	220.130.161.218	2026-06-29 09:41:31	2026-06-29 09:41:31
+019f12c1-622f-70e9-b33a-5dc8e21d76a3	ml-api	/recommend	request	201.61.220.21	2026-06-29 09:41:31	2026-06-29 09:41:31
+019f12c1-6287-711c-959c-7a85cfcf3327	Laravel	register	request	47.72.78.0	2026-06-29 09:41:31	2026-06-29 09:41:31
+019f12c1-62de-7273-a654-6a57d13fc30b	ml-api	/profiles	request	183.4.156.216	2026-06-29 09:41:31	2026-06-29 09:41:31
+019f12c1-6334-703c-b9cd-a98bd9aac550	ml-api	/health	request	64.61.236.226	2026-06-29 09:41:31	2026-06-29 09:41:31
+019f12c1-638a-73bf-b3f3-77e0c674b86d	ml-api	/profiles	request	155.152.208.3	2026-06-29 09:41:31	2026-06-29 09:41:31
+019f12c1-63e1-7128-aaff-e49a88d5ed70	Laravel	register	request	23.99.11.25	2026-06-29 09:41:31	2026-06-29 09:41:31
+019f12c1-6437-71d7-869f-08507fe6c225	ml-api	/health	request	1.58.47.28	2026-06-29 09:41:31	2026-06-29 09:41:31
+019f12c1-648d-71a9-a0c7-451cd6c740a6	Laravel	login	request	17.146.34.213	2026-06-29 09:41:31	2026-06-29 09:41:31
+019f12c1-64e3-7179-87f7-2e942074b9f2	image-analysis-api	/analyze-by-mistral	request	6.20.190.66	2026-06-29 09:41:32	2026-06-29 09:41:32
+019f12c1-653b-707a-a1f7-ecea0bd2be9d	image-analysis-api	/health/	request	143.204.115.107	2026-06-29 09:41:32	2026-06-29 09:41:32
+019f12c1-6593-705e-a704-8fedc6a22ab3	ml-api	/health	request	17.126.27.188	2026-06-29 09:41:32	2026-06-29 09:41:32
+019f12c1-65e9-7124-8a0c-b916a3e7846a	Laravel	login	request	66.184.222.105	2026-06-29 09:41:32	2026-06-29 09:41:32
+019f12c1-6640-7332-8ea6-9a00efc44cfb	Laravel	login	request	221.13.145.57	2026-06-29 09:41:32	2026-06-29 09:41:32
+019f12c1-6697-7323-834e-b11871b29a75	ml-api	/health	request	6.78.80.217	2026-06-29 09:41:32	2026-06-29 09:41:32
+019f12c1-66ee-709f-9b1e-a0d68e2035ac	image-analysis-api	/health/	request	169.224.90.137	2026-06-29 09:41:32	2026-06-29 09:41:32
+019f12c1-6745-709f-91c6-7338f0b88042	Laravel	register	request	120.170.151.74	2026-06-29 09:41:32	2026-06-29 09:41:32
+019f12c1-679c-7286-8711-218cb7493873	image-analysis-api	/analyze	request	157.189.188.60	2026-06-29 09:41:32	2026-06-29 09:41:32
+019f12c1-67f5-700c-b884-b13bb762f47b	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:32	2026-06-29 09:41:32
+019f12c1-6850-71b9-926e-6c36928ed896	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:32	2026-06-29 09:41:32
+019f12c1-68a6-73cb-9729-a2b6e29892af	Laravel	register	request	118.140.184.184	2026-06-29 09:41:32	2026-06-29 09:41:32
+019f12c1-68fd-7148-bc8b-ca517e0a06db	Laravel	register	request	55.26.210.130	2026-06-29 09:41:33	2026-06-29 09:41:33
+019f12c1-6953-7061-878f-50a2728748c9	Laravel	login	request	176.148.121.137	2026-06-29 09:41:33	2026-06-29 09:41:33
+019f12c1-69aa-73d5-aeef-bc61af5a5b7a	ml-api	/health	request	117.187.32.246	2026-06-29 09:41:33	2026-06-29 09:41:33
+019f12c1-6a00-7067-829a-196e6543290d	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:33	2026-06-29 09:41:33
+019f12c1-6a57-72cd-af2a-f11ecf54e7f0	Laravel	login	request	67.31.237.77	2026-06-29 09:41:33	2026-06-29 09:41:33
+019f12c1-6aad-73d0-a668-9b400a3b6783	Laravel	login	request	135.46.94.14	2026-06-29 09:41:33	2026-06-29 09:41:33
+019f12c1-6b04-732b-905b-359c2ade0d6d	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:33	2026-06-29 09:41:33
+019f12c1-6b5b-71ea-b3d1-7dc041c21eae	Laravel	register	request	224.133.248.91	2026-06-29 09:41:33	2026-06-29 09:41:33
+019f12c1-6bb4-72ab-9da4-ad8761d07d9d	ml-api	/health	request	98.121.220.252	2026-06-29 09:41:33	2026-06-29 09:41:33
+019f12c1-6c0c-73cb-abbf-cc3df879bf63	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:33	2026-06-29 09:41:33
+019f12c1-6c67-71f8-baf9-76589fd1d89a	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:33	2026-06-29 09:41:33
+019f12c1-6cbe-7343-853f-cea37b3c7018	image-analysis-api	/health/	request	143.201.65.173	2026-06-29 09:41:34	2026-06-29 09:41:34
+019f12c1-6d15-71a1-a1f4-433deb94c2da	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:34	2026-06-29 09:41:34
+019f12c1-6d70-7152-8f39-95b86851b6f7	ml-api	/profiles	request	211.218.184.5	2026-06-29 09:41:34	2026-06-29 09:41:34
+019f12c1-6dc6-715a-b5e3-958e8972822e	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:34	2026-06-29 09:41:34
+019f12c1-6e1e-7228-b6b9-7a2e19624709	Laravel	register	request	12.42.26.54	2026-06-29 09:41:34	2026-06-29 09:41:34
+019f12c1-6e76-7183-8b3a-b71f5813859e	ml-api	/health	request	167.176.183.88	2026-06-29 09:41:34	2026-06-29 09:41:34
+019f12c1-6ecd-7341-b682-c78c8fbec1aa	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:34	2026-06-29 09:41:34
+019f12c1-6f25-711a-97af-10b5bcf3275d	image-analysis-api	/health/	request	34.225.139.100	2026-06-29 09:41:34	2026-06-29 09:41:34
+019f12c1-6f7b-72ad-8ad3-7ed6e04c9e1c	Laravel	login	request	48.28.189.3	2026-06-29 09:41:34	2026-06-29 09:41:34
+019f12c1-6fd2-72a9-94fe-8e79741d0a53	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:34	2026-06-29 09:41:34
+019f12c1-7028-73e6-b675-bd9a48db736e	image-analysis-api	/analyze-by-mistral	request	238.95.71.167	2026-06-29 09:41:34	2026-06-29 09:41:34
+019f12c1-7084-70c5-898e-37051c2989b2	ml-api	/recommend	request	22.227.55.3	2026-06-29 09:41:34	2026-06-29 09:41:34
+019f12c1-70da-72ff-939f-9e73de4669d6	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:35	2026-06-29 09:41:35
+019f12c1-7131-7388-926d-a74065a8af38	ml-api	/health	request	141.34.83.82	2026-06-29 09:41:35	2026-06-29 09:41:35
+019f12c1-7186-724e-a405-4d7a1d439722	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:35	2026-06-29 09:41:35
+019f12c1-71e0-73f0-b6b2-fdf9fec6cc8c	ml-api	/profiles	request	170.254.68.20	2026-06-29 09:41:35	2026-06-29 09:41:35
+019f12c1-7237-72c9-a82f-6f3361105fcf	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:35	2026-06-29 09:41:35
+019f12c1-728d-7341-b4f5-ed785e20c260	Laravel	login	request	129.134.141.31	2026-06-29 09:41:35	2026-06-29 09:41:35
+019f12c1-72e8-72dc-bf84-e62ab5f229b7	image-analysis-api	/analyze-by-mistral	request	241.223.155.198	2026-06-29 09:41:35	2026-06-29 09:41:35
+019f12c1-733e-71be-96cf-a1af3d70d919	ml-api	/health	request	121.58.90.0	2026-06-29 09:41:35	2026-06-29 09:41:35
+019f12c1-73a1-7148-a535-1dbe8a17f024	Laravel	register	request	2.234.46.47	2026-06-29 09:41:35	2026-06-29 09:41:35
+019f12c1-73f9-713d-a28c-1990cd217d11	Laravel	register	request	252.111.131.237	2026-06-29 09:41:35	2026-06-29 09:41:35
+019f12c1-7454-70e5-ae76-8b715905035e	image-analysis-api	/analyze	request	97.232.117.1	2026-06-29 09:41:35	2026-06-29 09:41:35
+019f12c1-74b0-7165-adfd-08f82c071548	ml-api	/health	request	127.119.171.110	2026-06-29 09:41:36	2026-06-29 09:41:36
+019f12c1-7509-710b-b390-a4da4fa2e342	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:36	2026-06-29 09:41:36
+019f12c1-7561-72b8-b99a-1c051c635d60	Laravel	login	request	226.63.64.125	2026-06-29 09:41:36	2026-06-29 09:41:36
+019f12c1-75b7-7272-9bbf-f859809e448d	Laravel	allergies	request	162.84.143.183	2026-06-29 09:41:36	2026-06-29 09:41:36
+019f12c1-760e-720e-931b-1756ea663537	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:36	2026-06-29 09:41:36
+019f12c1-766c-70e3-8d61-db45fcfd6da9	Laravel	login	request	175.87.203.184	2026-06-29 09:41:36	2026-06-29 09:41:36
+019f12c1-76c3-7117-9b41-54ce8bcd9d34	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:36	2026-06-29 09:41:36
+019f12c1-7719-70b3-9ae3-2150ac385760	Laravel	allergies	request	201.91.28.253	2026-06-29 09:41:36	2026-06-29 09:41:36
+019f12c1-7772-7187-b330-a24f86ec1043	ml-api	/profiles	request	227.1.16.156	2026-06-29 09:41:36	2026-06-29 09:41:36
+019f12c1-77c8-7173-9d85-6eef403e1caf	Laravel	register	request	219.114.168.251	2026-06-29 09:41:36	2026-06-29 09:41:36
+019f12c1-7826-7108-8c54-3bf9d82e1a37	image-analysis-api	/health/	request	247.226.38.137	2026-06-29 09:41:36	2026-06-29 09:41:36
+019f12c1-787c-73de-969d-d9140494ca69	ml-api	/recommend	request	171.208.89.162	2026-06-29 09:41:37	2026-06-29 09:41:37
+019f12c1-78d3-7361-9f6d-c7750359ddf5	ml-api	/recommend	request	59.172.232.241	2026-06-29 09:41:37	2026-06-29 09:41:37
+019f12c1-792a-7287-bd52-0ac83a6acf91	image-analysis-api	/analyze	request	221.178.208.184	2026-06-29 09:41:37	2026-06-29 09:41:37
+019f12c1-7980-706c-a485-73494b7b4852	Laravel	register	request	95.155.124.147	2026-06-29 09:41:37	2026-06-29 09:41:37
+019f12c1-79d8-72d2-aa67-f02db2d4d446	Laravel	login	request	4.3.142.251	2026-06-29 09:41:37	2026-06-29 09:41:37
+019f12c1-7a30-728c-aff7-6c6e1d7b88e5	Laravel	login	request	54.160.71.143	2026-06-29 09:41:37	2026-06-29 09:41:37
+019f12c1-7a88-70ab-96bf-f8f7fda5f52b	image-analysis-api	/health/	request	92.150.232.1	2026-06-29 09:41:37	2026-06-29 09:41:37
+019f12c1-7ade-7302-abc9-a5d93387e22f	image-analysis-api	/analyze	request	77.111.54.237	2026-06-29 09:41:37	2026-06-29 09:41:37
+019f12c1-7b36-72ba-bfc9-8cff3da1f600	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:37	2026-06-29 09:41:37
+019f12c1-7b8c-7222-bb10-1c8efe049d15	Laravel	allergies	request	235.132.190.243	2026-06-29 09:41:37	2026-06-29 09:41:37
+019f12c1-7be5-73f5-8f53-d0862017bca5	ml-api	/health	request	61.148.193.53	2026-06-29 09:41:37	2026-06-29 09:41:37
+019f12c1-7c3b-71de-971a-8a126bec29ae	image-analysis-api	/analyze-by-mistral	request	74.106.246.84	2026-06-29 09:41:37	2026-06-29 09:41:37
+019f12c1-7c91-7386-8b96-74355149de87	Laravel	login	request	106.203.75.10	2026-06-29 09:41:38	2026-06-29 09:41:38
+019f12c1-7cf1-736a-800f-f793183cd432	Laravel	register	request	199.86.155.97	2026-06-29 09:41:38	2026-06-29 09:41:38
+019f12c1-7d47-7078-a6f8-fde4d8101aa8	ml-api	/profiles	request	167.12.181.119	2026-06-29 09:41:38	2026-06-29 09:41:38
+019f12c1-7d9f-70b4-ac86-a3f053e80dc4	ml-api	/health	request	143.175.231.205	2026-06-29 09:41:38	2026-06-29 09:41:38
+019f12c1-7df6-73aa-a63f-755421dc6958	Laravel	register	request	243.0.156.36	2026-06-29 09:41:38	2026-06-29 09:41:38
+019f12c1-7e4c-70f1-8744-a6fd3d2f9c69	ml-api	/profiles	request	4.66.29.239	2026-06-29 09:41:38	2026-06-29 09:41:38
+019f12c1-7ea2-704d-a04d-fce3fbb3f972	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:38	2026-06-29 09:41:38
+019f12c1-7ef9-7044-837c-45d58d8218a9	image-analysis-api	/analyze	request	147.176.159.161	2026-06-29 09:41:38	2026-06-29 09:41:38
+019f12c1-7f4f-73a4-b11c-d0264d043d14	Laravel	login	request	90.242.182.178	2026-06-29 09:41:38	2026-06-29 09:41:38
+019f12c1-7faa-70b0-9fa9-6fb582bfd0ba	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:38	2026-06-29 09:41:38
+019f12c1-8000-7236-8bd4-f0dfe753e46c	Laravel	login	request	165.12.84.118	2026-06-29 09:41:38	2026-06-29 09:41:38
+019f12c1-8059-73fa-99e2-11345fbe8bc0	image-analysis-api	/analyze-by-mistral	request	208.183.218.131	2026-06-29 09:41:39	2026-06-29 09:41:39
+019f12c1-80af-72f8-9516-edbaab2a1123	ml-api	/recommend	request	142.189.28.110	2026-06-29 09:41:39	2026-06-29 09:41:39
+019f12c1-8107-71a6-99b6-f081c681268d	image-analysis-api	/analyze	request	108.66.29.178	2026-06-29 09:41:39	2026-06-29 09:41:39
+019f12c1-815f-732e-96d6-fbac89b2a2b0	ml-api	/health	request	136.230.13.125	2026-06-29 09:41:39	2026-06-29 09:41:39
+019f12c1-81b6-73a9-9d8b-d4ba82105f62	Laravel	register	request	232.204.52.58	2026-06-29 09:41:39	2026-06-29 09:41:39
+019f12c1-820c-7056-95ff-06f74e439b46	Laravel	allergies	request	202.201.69.235	2026-06-29 09:41:39	2026-06-29 09:41:39
+019f12c1-8265-735f-ac02-9f634039764f	ml-api	/health	request	98.199.84.169	2026-06-29 09:41:39	2026-06-29 09:41:39
+019f12c1-82bf-73f3-954e-02de400f8dda	Laravel	register	request	181.186.42.254	2026-06-29 09:41:39	2026-06-29 09:41:39
+019f12c1-8315-70b6-aae5-a6bda94c1ce8	Laravel	login	request	118.113.98.51	2026-06-29 09:41:39	2026-06-29 09:41:39
+019f12c1-836b-7161-9a52-1ab66849ea4a	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:39	2026-06-29 09:41:39
+019f12c1-83c5-7370-b80b-2e016d4ba3db	Laravel	register	request	255.121.46.58	2026-06-29 09:41:39	2026-06-29 09:41:39
+019f12c1-841b-700a-8def-3ff40c7ef23c	Laravel	register	request	75.31.182.132	2026-06-29 09:41:39	2026-06-29 09:41:39
+019f12c1-8471-724b-92eb-87bfc093a196	ml-api	/recommend	request	251.42.230.108	2026-06-29 09:41:40	2026-06-29 09:41:40
+019f12c1-84c8-71f3-b1d4-c1abd9705dcb	Laravel	register	request	85.95.47.52	2026-06-29 09:41:40	2026-06-29 09:41:40
+019f12c1-851e-7187-973b-ce6ac566d00a	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:40	2026-06-29 09:41:40
+019f12c1-8574-7193-b21f-5e4037f08681	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:40	2026-06-29 09:41:40
+019f12c1-85ca-707f-a407-7464712bea66	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:40	2026-06-29 09:41:40
+019f12c1-8621-71e3-8d66-341c7835b94a	Laravel	login	request	218.94.99.213	2026-06-29 09:41:40	2026-06-29 09:41:40
+019f12c1-8678-711d-8092-f7421c3e507e	Laravel	login	request	85.133.122.172	2026-06-29 09:41:40	2026-06-29 09:41:40
+019f12c1-86ce-70da-b7bd-0d1f23114fcf	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:40	2026-06-29 09:41:40
+019f12c1-8726-7239-9eda-584b7c7b9983	Laravel	register	request	162.186.140.80	2026-06-29 09:41:40	2026-06-29 09:41:40
+019f12c1-877d-7120-b64a-df04131836b5	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:40	2026-06-29 09:41:40
+019f12c1-87d4-70f4-9137-6ff2d4972287	Laravel	register	request	9.141.112.51	2026-06-29 09:41:40	2026-06-29 09:41:40
+019f12c1-882b-73da-9ab7-f309e5deb758	Laravel	login	request	53.93.55.76	2026-06-29 09:41:41	2026-06-29 09:41:41
+019f12c1-8881-73f9-a938-c7a02771c997	Laravel	allergies	request	13.83.36.81	2026-06-29 09:41:41	2026-06-29 09:41:41
+019f12c1-88d8-70e4-a46f-9f794fe02bfa	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:41	2026-06-29 09:41:41
+019f12c1-892f-735f-930d-f49fa970f9df	image-analysis-api	/analyze	request	126.63.189.59	2026-06-29 09:41:41	2026-06-29 09:41:41
+019f12c1-8985-72ca-9b5f-a3653413be6d	Laravel	register	request	129.57.196.184	2026-06-29 09:41:41	2026-06-29 09:41:41
+019f12c1-89dc-712e-9105-066af69d67c8	image-analysis-api	/health/	request	176.49.175.145	2026-06-29 09:41:41	2026-06-29 09:41:41
+019f12c1-8a33-73cf-816d-ac7127a6d22d	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:41	2026-06-29 09:41:41
+019f12c1-8a8b-7246-9d24-d8db5632d819	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:41	2026-06-29 09:41:41
+019f12c1-8ae1-71cf-b287-4769fe758cee	ml-api	/profiles	request	128.64.135.15	2026-06-29 09:41:41	2026-06-29 09:41:41
+019f12c1-8b38-7032-b23a-74de8d7e4bc9	image-analysis-api	/health/	request	147.109.225.64	2026-06-29 09:41:41	2026-06-29 09:41:41
+019f12c1-8b91-7034-8edc-b13de9e86bb5	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:41	2026-06-29 09:41:41
+019f12c1-8bea-7053-9573-64458557233a	Laravel	allergies	request	150.141.6.12	2026-06-29 09:41:41	2026-06-29 09:41:41
+019f12c1-8c41-73fd-ada0-407c078222dc	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:42	2026-06-29 09:41:42
+019f12c1-8c98-73a8-b6db-d0b0a2096954	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:42	2026-06-29 09:41:42
+019f12c1-8ced-72af-823d-b03725822482	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:42	2026-06-29 09:41:42
+019f12c1-8d44-7028-95e2-d5719321bcfd	image-analysis-api	/analyze	request	178.106.36.35	2026-06-29 09:41:42	2026-06-29 09:41:42
+019f12c1-8d9a-738c-8316-ddbc5ae4b223	Laravel	login	request	124.144.227.246	2026-06-29 09:41:42	2026-06-29 09:41:42
+019f12c1-8df1-7263-8dbe-4bdc23213c66	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:42	2026-06-29 09:41:42
+019f12c1-8e48-7022-b044-52e6a8361c3c	Laravel	register	request	73.88.91.211	2026-06-29 09:41:42	2026-06-29 09:41:42
+019f12c1-8e9f-70c3-87f0-71374b554c0e	image-analysis-api	/analyze	request	32.215.72.13	2026-06-29 09:41:42	2026-06-29 09:41:42
+019f12c1-8ef8-73ed-a72d-0e36347c08a2	ml-api	/profiles	request	150.16.199.115	2026-06-29 09:41:42	2026-06-29 09:41:42
+019f12c1-8f4f-71c5-9642-9aa38e3020b1	image-analysis-api	/health/	request	238.99.12.43	2026-06-29 09:41:42	2026-06-29 09:41:42
+019f12c1-8fa8-7214-a7ef-d8dd8531a734	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:42	2026-06-29 09:41:42
+019f12c1-8fff-738f-afe0-51e40cc33349	Laravel	allergies	request	182.111.199.198	2026-06-29 09:41:43	2026-06-29 09:41:43
+019f12c1-9056-723b-9948-8dcf659f5938	Laravel	login	request	65.171.232.95	2026-06-29 09:41:43	2026-06-29 09:41:43
+019f12c1-90ae-723f-8e26-645207c4f5ff	Laravel	login	request	155.100.241.94	2026-06-29 09:41:43	2026-06-29 09:41:43
+019f12c1-9107-716d-9da1-14597309cd25	ml-api	/recommend	request	214.238.7.38	2026-06-29 09:41:43	2026-06-29 09:41:43
+019f12c1-915e-7172-828f-420e6d7938f7	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:43	2026-06-29 09:41:43
+019f12c1-91b6-71ee-a61f-25d2bbdf9dd6	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:43	2026-06-29 09:41:43
+019f12c1-920d-739b-8585-5e96f9a97a0e	Laravel	login	request	51.177.16.42	2026-06-29 09:41:43	2026-06-29 09:41:43
+019f12c1-9267-7213-8220-1fe785f66deb	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:43	2026-06-29 09:41:43
+019f12c1-92bf-70f9-9b41-87e6bfa33437	Laravel	allergies	request	179.139.164.174	2026-06-29 09:41:43	2026-06-29 09:41:43
+019f12c1-9317-7080-bae0-465a3268ccfb	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:43	2026-06-29 09:41:43
+019f12c1-936f-722c-94c9-7627cfbc6be7	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:43	2026-06-29 09:41:43
+019f12c1-93c8-7322-9d2e-4434befcd263	Laravel	register	request	190.156.193.70	2026-06-29 09:41:44	2026-06-29 09:41:44
+019f12c1-9421-735c-b11c-0b482d771b54	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:44	2026-06-29 09:41:44
+019f12c1-9478-7134-8315-21a2acae40a6	ml-api	/profiles	request	42.163.129.59	2026-06-29 09:41:44	2026-06-29 09:41:44
+019f12c1-94ce-731c-afa5-0684d4004a22	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:44	2026-06-29 09:41:44
+019f12c1-9526-7358-bcb1-2003f2395421	ml-api	/health	request	79.67.126.43	2026-06-29 09:41:44	2026-06-29 09:41:44
+019f12c1-957c-7124-99c0-35a34b113add	Laravel	login	request	142.20.144.226	2026-06-29 09:41:44	2026-06-29 09:41:44
+019f12c1-95d2-72ef-871b-79a9661b4b48	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:44	2026-06-29 09:41:44
+019f12c1-962d-71f4-9252-4c29c6e750e8	image-analysis-api	/analyze-by-mistral	request	4.174.209.75	2026-06-29 09:41:44	2026-06-29 09:41:44
+019f12c1-9686-7200-b7ab-8a91ec6d7709	image-analysis-api	/health/	request	224.208.247.166	2026-06-29 09:41:44	2026-06-29 09:41:44
+019f12c1-96dd-712b-9fdc-04bcf16a33c7	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:44	2026-06-29 09:41:44
+019f12c1-9736-7183-a276-b280040abbe7	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:44	2026-06-29 09:41:44
+019f12c1-978e-71f6-b3cf-01823d6d46bd	image-analysis-api	/health/	request	25.133.104.6	2026-06-29 09:41:44	2026-06-29 09:41:44
+019f12c1-97e5-713c-b12f-2bbf92dba667	Laravel	login	request	11.224.104.233	2026-06-29 09:41:45	2026-06-29 09:41:45
+019f12c1-983b-71d2-9cd7-38b19364c62b	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:45	2026-06-29 09:41:45
+019f12c1-9892-7322-8aae-a5d6386d123f	image-analysis-api	/analyze-by-mistral	request	119.163.92.206	2026-06-29 09:41:45	2026-06-29 09:41:45
+019f12c1-98e8-7342-ab2b-f54fd3dde1e3	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:45	2026-06-29 09:41:45
+019f12c1-9941-7174-ac67-a632d2f1be30	ml-api	/profiles	request	10.25.205.62	2026-06-29 09:41:45	2026-06-29 09:41:45
+019f12c1-9997-7227-9c97-45414687dc61	Laravel	register	request	45.29.171.192	2026-06-29 09:41:45	2026-06-29 09:41:45
+019f12c1-99ed-732c-9d85-bf775719d9c6	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:45	2026-06-29 09:41:45
+019f12c1-9a43-70d0-a814-fe6e25a05476	Laravel	register	request	180.94.113.208	2026-06-29 09:41:45	2026-06-29 09:41:45
+019f12c1-9a9a-7361-9e33-371e0c7a3315	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:45	2026-06-29 09:41:45
+019f12c1-9af0-739f-84f0-a5b5e93a2631	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:45	2026-06-29 09:41:45
+019f12c1-9b49-72f1-9e7d-80982da97c11	ml-api	/profiles	request	117.24.68.37	2026-06-29 09:41:45	2026-06-29 09:41:45
+019f12c1-9b9f-73cb-b2bc-8df43dd690e6	image-analysis-api	/analyze	request	52.111.250.45	2026-06-29 09:41:46	2026-06-29 09:41:46
+019f12c1-9bf6-7007-b3f6-a1129f4404f0	Laravel	register	request	50.136.123.226	2026-06-29 09:41:46	2026-06-29 09:41:46
+019f12c1-9c4f-730c-8804-4c2d278cec94	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:46	2026-06-29 09:41:46
+019f12c1-9ca8-736e-9a32-b4aebd36dbd7	ml-api	/recommend	request	210.14.138.208	2026-06-29 09:41:46	2026-06-29 09:41:46
+019f12c1-9cfe-7085-a7f2-5a62869c35f5	Laravel	login	request	101.240.21.173	2026-06-29 09:41:46	2026-06-29 09:41:46
+019f12c1-9d59-71d0-bd7b-1c82d0df59c7	Laravel	login	request	164.18.233.75	2026-06-29 09:41:46	2026-06-29 09:41:46
+019f12c1-9db1-727c-9992-a500150533e0	Laravel	allergies	request	229.216.118.60	2026-06-29 09:41:46	2026-06-29 09:41:46
+019f12c1-9e08-7188-9296-5d6f5737376a	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:46	2026-06-29 09:41:46
+019f12c1-9e5f-7035-b1a0-f7211c325bd1	Laravel	allergies	request	30.19.125.84	2026-06-29 09:41:46	2026-06-29 09:41:46
+019f12c1-9eb5-7300-a839-4a05e22a9e64	Laravel	allergies	request	25.106.245.192	2026-06-29 09:41:46	2026-06-29 09:41:46
+019f12c1-9f0c-706c-8b2b-d8913a9d771f	image-analysis-api	/analyze-by-mistral	request	73.125.7.248	2026-06-29 09:41:46	2026-06-29 09:41:46
+019f12c1-9f63-718b-8560-6da558885499	image-analysis-api	/analyze	request	86.44.133.66	2026-06-29 09:41:46	2026-06-29 09:41:46
+019f12c1-9fbb-72e4-9f79-0e3788983ac4	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:47	2026-06-29 09:41:47
+019f12c1-a012-705f-a223-3c11d98683cf	image-analysis-api	/analyze	request	28.150.217.75	2026-06-29 09:41:47	2026-06-29 09:41:47
+019f12c1-a06a-7185-a79c-cb67410bca66	ml-api	/profiles	request	195.238.91.194	2026-06-29 09:41:47	2026-06-29 09:41:47
+019f12c1-a0c3-7012-98ae-4f0e7c5d9642	Laravel	register	request	136.19.136.9	2026-06-29 09:41:47	2026-06-29 09:41:47
+019f12c1-a11a-7272-8ea6-552c863ca10e	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:47	2026-06-29 09:41:47
+019f12c1-a17d-73ff-a9a9-03bea0aaa268	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:47	2026-06-29 09:41:47
+019f12c1-a1d5-710d-98be-313304c31465	ml-api	/health	request	16.120.43.192	2026-06-29 09:41:47	2026-06-29 09:41:47
+019f12c1-a22d-7237-ad35-4fa7cbf6b747	image-analysis-api	/analyze-by-mistral	request	70.149.251.173	2026-06-29 09:41:47	2026-06-29 09:41:47
+019f12c1-a286-721b-b409-e66ee567fac8	ml-api	/profiles	request	47.182.235.75	2026-06-29 09:41:47	2026-06-29 09:41:47
+019f12c1-a2dd-71b8-81e8-45fb032ca223	Laravel	allergies	request	179.112.74.92	2026-06-29 09:41:47	2026-06-29 09:41:47
+019f12c1-a335-7105-8c77-025ffdb8d07a	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:47	2026-06-29 09:41:47
+019f12c1-a38c-7140-ae60-14f2d27ce668	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:48	2026-06-29 09:41:48
+019f12c1-a3e3-7338-8d7d-073017d933e1	ml-api	/health	request	167.212.249.58	2026-06-29 09:41:48	2026-06-29 09:41:48
+019f12c1-a43a-73ca-a8c5-cd805bb93ff6	Laravel	login	request	194.234.222.205	2026-06-29 09:41:48	2026-06-29 09:41:48
+019f12c1-a49b-71b7-96ea-3be672b0c9e3	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:48	2026-06-29 09:41:48
+019f12c1-a4f5-721f-9d1c-9258fd0d0efd	ml-api	/recommend	request	155.8.89.120	2026-06-29 09:41:48	2026-06-29 09:41:48
+019f12c1-a54d-733f-9887-994b54f513d2	image-analysis-api	/analyze-by-mistral	request	42.111.180.105	2026-06-29 09:41:48	2026-06-29 09:41:48
+019f12c1-a5a5-73aa-af7a-77e9a244cbc3	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:48	2026-06-29 09:41:48
+019f12c1-a600-716d-89b8-da711a77284a	ml-api	/health	request	199.18.199.2	2026-06-29 09:41:48	2026-06-29 09:41:48
+019f12c1-a66a-707f-a9c9-4ebdc4c550bc	ml-api	/recommend	request	175.64.60.55	2026-06-29 09:41:48	2026-06-29 09:41:48
+019f12c1-a6c6-7015-ac68-d2f839520666	ml-api	/recommend	request	201.162.155.241	2026-06-29 09:41:48	2026-06-29 09:41:48
+019f12c1-a71f-713f-a957-2f41c71baff3	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:48	2026-06-29 09:41:48
+019f12c1-a776-737b-8cf0-55d7b61a03c3	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:49	2026-06-29 09:41:49
+019f12c1-a7ce-738f-b377-af8640eb2e3f	ml-api	/health	request	186.10.239.137	2026-06-29 09:41:49	2026-06-29 09:41:49
+019f12c1-a825-717b-a090-35df8fa46a25	Laravel	allergies	request	146.49.113.48	2026-06-29 09:41:49	2026-06-29 09:41:49
+019f12c1-a87d-71f2-a10c-bde4cebd3f82	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:49	2026-06-29 09:41:49
+019f12c1-a8d4-7108-b0a7-ea0699f2b831	Laravel	login	request	142.236.27.0	2026-06-29 09:41:49	2026-06-29 09:41:49
+019f12c1-a92b-71eb-86f4-da9f817bb645	Laravel	register	request	89.18.180.19	2026-06-29 09:41:49	2026-06-29 09:41:49
+019f12c1-a984-710a-b2ca-2181233d2563	Laravel	login	request	186.216.219.149	2026-06-29 09:41:49	2026-06-29 09:41:49
+019f12c1-a9db-7321-b347-bb0d97a2b655	Laravel	login	request	210.220.184.192	2026-06-29 09:41:49	2026-06-29 09:41:49
+019f12c1-aa36-7091-8390-8348d6de0341	image-analysis-api	/analyze	request	142.190.237.41	2026-06-29 09:41:49	2026-06-29 09:41:49
+019f12c1-aa8d-7018-8aaf-0cdcf4df8ae6	ml-api	/recommend	request	64.173.216.80	2026-06-29 09:41:49	2026-06-29 09:41:49
+019f12c1-aae4-73f9-9cc0-54f4fbf5a29d	ml-api	/profiles	request	25.252.208.98	2026-06-29 09:41:49	2026-06-29 09:41:49
+019f12c1-abd3-7196-8379-fd0f0f98d3a4	Laravel	register	request	201.164.128.226	2026-06-29 09:41:50	2026-06-29 09:41:50
+019f12c1-ac2b-7208-9019-6d8ab8f8525d	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:50	2026-06-29 09:41:50
+019f12c1-ac8a-723a-b31a-05430e160cfc	image-analysis-api	/health/	request	127.187.142.193	2026-06-29 09:41:50	2026-06-29 09:41:50
+019f12c1-ace0-7339-a978-af4012cd71bf	ml-api	/health	request	96.117.198.217	2026-06-29 09:41:50	2026-06-29 09:41:50
+019f12c1-ad37-71c4-a0e4-61cc011bd2a6	Laravel	register	request	78.241.20.219	2026-06-29 09:41:50	2026-06-29 09:41:50
+019f12c1-ad8e-73e2-b253-595920bacc99	Laravel	register	request	240.254.76.57	2026-06-29 09:41:50	2026-06-29 09:41:50
+019f12c1-ade9-72bb-a1e7-db08fe87622e	Laravel	register	request	202.68.54.6	2026-06-29 09:41:50	2026-06-29 09:41:50
+019f12c1-ae42-72fa-b700-ba764213c4b2	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:50	2026-06-29 09:41:50
+019f12c1-ae99-704b-b1f7-ac3b4241bf88	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:50	2026-06-29 09:41:50
+019f12c1-aef0-7171-a12a-de1604700e23	ml-api	/recommend	request	199.193.1.24	2026-06-29 09:41:50	2026-06-29 09:41:50
+019f12c1-af4e-7174-ae5c-c4897f3d1c4f	ml-api	/health	request	27.81.85.2	2026-06-29 09:41:51	2026-06-29 09:41:51
+019f12c1-afa5-7237-b9f8-f7f2056a2d7d	Laravel	allergies	request	158.114.76.221	2026-06-29 09:41:51	2026-06-29 09:41:51
+019f12c1-b001-71d6-801a-18e8ae8484eb	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:51	2026-06-29 09:41:51
+019f12c1-b059-73a4-b0da-6583b80478ad	image-analysis-api	/analyze	request	143.25.39.182	2026-06-29 09:41:51	2026-06-29 09:41:51
+019f12c1-b0b0-71e9-b284-b75576228b72	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:51	2026-06-29 09:41:51
+019f12c1-b106-724d-afe1-ac05df805a90	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:51	2026-06-29 09:41:51
+019f12c1-b163-7173-9b7a-023735a82528	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:51	2026-06-29 09:41:51
+019f12c1-b1ba-7181-99e1-ffb4bcce4813	image-analysis-api	/analyze-by-mistral	request	200.61.22.40	2026-06-29 09:41:51	2026-06-29 09:41:51
+019f12c1-b214-731e-9604-7c0411c83f6e	ml-api	/profiles	request	105.121.184.149	2026-06-29 09:41:51	2026-06-29 09:41:51
+019f12c1-b26c-72e7-aa4c-39cfa0a006fc	Laravel	allergies	request	181.213.83.87	2026-06-29 09:41:51	2026-06-29 09:41:51
+019f12c1-b2c3-7354-8d11-57a157553ff9	Laravel	login	request	154.15.27.185	2026-06-29 09:41:51	2026-06-29 09:41:51
+019f12c1-b31c-7276-95f2-4524ed0e0de0	image-analysis-api	/analyze-by-mistral	request	135.213.143.212	2026-06-29 09:41:52	2026-06-29 09:41:52
+019f12c1-b373-733e-a4dc-233424fe038e	ml-api	/profiles	request	121.113.134.100	2026-06-29 09:41:52	2026-06-29 09:41:52
+019f12c1-b3ca-722a-8c91-50642f4624da	Laravel	allergies	request	211.78.23.53	2026-06-29 09:41:52	2026-06-29 09:41:52
+019f12c1-b422-7115-a5ff-ffc742ca5d5d	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:52	2026-06-29 09:41:52
+019f12c1-b47a-719e-bb1e-9eb8b3541b77	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:52	2026-06-29 09:41:52
+019f12c1-b4d2-723e-9f24-e7369ffc8383	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:52	2026-06-29 09:41:52
+019f12c1-b529-735f-ae45-42a8e61e973d	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:52	2026-06-29 09:41:52
+019f12c1-b581-7092-98ec-19c3c8ff0173	Laravel	register	request	93.228.113.55	2026-06-29 09:41:52	2026-06-29 09:41:52
+019f12c1-b5d8-72b7-ac00-9fa237bdf3ee	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:52	2026-06-29 09:41:52
+019f12c1-b62e-7325-ba5a-b9b612f90367	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:52	2026-06-29 09:41:52
+019f12c1-b684-73c1-92d7-41ce90187c07	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:52	2026-06-29 09:41:52
+019f12c1-b6da-7078-b903-99d33c0d7b27	ml-api	/recommend	request	234.234.42.229	2026-06-29 09:41:52	2026-06-29 09:41:52
+019f12c1-b731-73aa-ae7f-2e26258ad851	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:53	2026-06-29 09:41:53
+019f12c1-b788-730f-bf52-0a303c07375a	Laravel	login	request	220.45.27.78	2026-06-29 09:41:53	2026-06-29 09:41:53
+019f12c1-b7e0-73aa-8232-c536b2364449	Laravel	register	request	187.55.1.61	2026-06-29 09:41:53	2026-06-29 09:41:53
+019f12c1-b837-717d-8f03-2b8abb4251e1	image-analysis-api	/analyze	request	81.243.217.159	2026-06-29 09:41:53	2026-06-29 09:41:53
+019f12c1-b88e-70fe-b112-04658ca9333b	image-analysis-api	/analyze	request	142.199.217.0	2026-06-29 09:41:53	2026-06-29 09:41:53
+019f12c1-b8e8-7372-b166-093d7fe8bebb	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:53	2026-06-29 09:41:53
+019f12c1-b93e-72e7-984b-dad506110e74	Laravel	register	request	95.184.226.145	2026-06-29 09:41:53	2026-06-29 09:41:53
+019f12c1-b99e-7043-b8cf-777dc70fc442	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:53	2026-06-29 09:41:53
+019f12c1-b9f6-72c7-bf35-786ce9078165	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:53	2026-06-29 09:41:53
+019f12c1-ba4d-7124-9543-ac03049ee82b	image-analysis-api	/analyze	request	9.151.70.112	2026-06-29 09:41:53	2026-06-29 09:41:53
+019f12c1-baa6-70b1-8fc3-8655c7c9e2dd	image-analysis-api	/health/	request	251.29.153.192	2026-06-29 09:41:53	2026-06-29 09:41:53
+019f12c1-bafc-73e5-b4df-e1132f10b1d5	ml-api	/recommend	request	82.139.74.240	2026-06-29 09:41:54	2026-06-29 09:41:54
+019f12c1-bb54-7320-93d5-17e93cb6556a	Laravel	login	request	249.57.204.205	2026-06-29 09:41:54	2026-06-29 09:41:54
+019f12c1-bbab-70dc-b395-ba8508192702	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:54	2026-06-29 09:41:54
+019f12c1-bc05-72cf-961d-7cd4d2b7cea2	image-analysis-api	/analyze-by-mistral	request	38.67.8.65	2026-06-29 09:41:54	2026-06-29 09:41:54
+019f12c1-bc5c-721a-a451-771c142821c3	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:54	2026-06-29 09:41:54
+019f12c1-bcb7-7272-b640-473dd4d8c8b3	image-analysis-api	/health/	request	153.7.45.22	2026-06-29 09:41:54	2026-06-29 09:41:54
+019f12c1-bd0d-701d-82ec-cb8aafa3e901	image-analysis-api	/analyze-by-mistral	request	150.98.41.9	2026-06-29 09:41:54	2026-06-29 09:41:54
+019f12c1-bd67-70de-8c88-b07f331e8844	ml-api	/recommend	request	115.94.154.47	2026-06-29 09:41:54	2026-06-29 09:41:54
+019f12c1-bdc4-716b-acf3-889a57c927a5	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:54	2026-06-29 09:41:54
+019f12c1-be1d-706e-b19f-eda68571d65c	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:54	2026-06-29 09:41:54
+019f12c1-be73-7035-a50f-3b07dea5efc2	Laravel	login	request	15.169.94.33	2026-06-29 09:41:54	2026-06-29 09:41:54
+019f12c1-becb-707c-b872-9af0afeea744	image-analysis-api	/health/	request	60.182.55.161	2026-06-29 09:41:55	2026-06-29 09:41:55
+019f12c1-bf21-713a-8f7e-6eafd91c67f3	Laravel	register	request	250.250.156.197	2026-06-29 09:41:55	2026-06-29 09:41:55
+019f12c1-bf7a-71c4-b1ae-cfb9c6152c8d	image-analysis-api	/analyze	request	36.39.162.239	2026-06-29 09:41:55	2026-06-29 09:41:55
+019f12c1-bfd2-7199-a6f7-fa2611763958	image-analysis-api	/analyze	request	47.100.129.99	2026-06-29 09:41:55	2026-06-29 09:41:55
+019f12c1-c02c-7329-ad75-073dbd381fbf	ml-api	/profiles	request	186.168.91.25	2026-06-29 09:41:55	2026-06-29 09:41:55
+019f12c1-c084-706d-b8c2-6fd2491b2aed	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:55	2026-06-29 09:41:55
+019f12c1-c0da-72b6-82f3-c68f89ff3adb	Laravel	allergies	request	69.60.206.32	2026-06-29 09:41:55	2026-06-29 09:41:55
+019f12c1-c132-725d-b67a-8455ab72384f	Laravel	allergies	request	187.28.211.101	2026-06-29 09:41:55	2026-06-29 09:41:55
+019f12c1-c189-7381-b2ac-229524947dc2	Laravel	register	request	142.139.165.27	2026-06-29 09:41:55	2026-06-29 09:41:55
+019f12c1-c1e3-70fa-b386-df0539613b19	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:55	2026-06-29 09:41:55
+019f12c1-c23a-71fd-a4ac-be6953f63f4e	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:55	2026-06-29 09:41:55
+019f12c1-c291-7064-96d1-155a1d031abb	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:55	2026-06-29 09:41:55
+019f12c1-c2ea-7313-ba47-63d69d0bd90d	Laravel	login	request	81.48.146.55	2026-06-29 09:41:56	2026-06-29 09:41:56
+019f12c1-c341-72ce-bf7d-7ab356962052	ml-api	/profiles	request	240.202.52.142	2026-06-29 09:41:56	2026-06-29 09:41:56
+019f12c1-c399-7303-b157-701b9fc8d45d	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:56	2026-06-29 09:41:56
+019f12c1-c3ef-72cc-b5fe-82fd3e8a77ca	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:56	2026-06-29 09:41:56
+019f12c1-c447-706a-809f-b6a381b8b5b0	image-analysis-api	/analyze-by-mistral	request	250.241.77.135	2026-06-29 09:41:56	2026-06-29 09:41:56
+019f12c1-c49c-70d2-8264-c502b87dc3c5	Laravel	login	request	34.50.180.0	2026-06-29 09:41:56	2026-06-29 09:41:56
+019f12c1-c4f5-7195-8f22-afc87549a042	image-analysis-api	/health/	request	235.99.64.186	2026-06-29 09:41:56	2026-06-29 09:41:56
+019f12c1-c550-7129-bd79-556a79ed2eb1	ml-api	/profiles	request	152.163.187.153	2026-06-29 09:41:56	2026-06-29 09:41:56
+019f12c1-c5a7-71fe-bb76-3dafcf235ca2	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:56	2026-06-29 09:41:56
+019f12c1-c600-73fb-8cb1-ee8db27c2142	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:56	2026-06-29 09:41:56
+019f12c1-c661-73b4-b33d-53889d6cae4e	Laravel	login	request	181.39.164.87	2026-06-29 09:41:56	2026-06-29 09:41:56
+019f12c1-c6b7-7353-a762-6cf44e0540aa	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:57	2026-06-29 09:41:57
+019f12c1-c70d-71f6-a617-f92bf60acd3b	Laravel	login	request	232.240.37.204	2026-06-29 09:41:57	2026-06-29 09:41:57
+019f12c1-c763-7235-bea7-6cc53592e1e5	ml-api	/profiles	request	243.141.7.116	2026-06-29 09:41:57	2026-06-29 09:41:57
+019f12c1-c7ba-720d-b3e9-197bb83e4441	image-analysis-api	/analyze	request	238.164.136.43	2026-06-29 09:41:57	2026-06-29 09:41:57
+019f12c1-c812-7055-a452-8a4baf554777	Laravel	register	request	72.219.248.84	2026-06-29 09:41:57	2026-06-29 09:41:57
+019f12c1-c869-721e-8803-802cda1305a7	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:57	2026-06-29 09:41:57
+019f12c1-c8bf-7090-bf00-c6d358051b8f	Laravel	register	request	98.8.38.221	2026-06-29 09:41:57	2026-06-29 09:41:57
+019f12c1-c916-73b0-b051-b2d42eb5dc9b	Laravel	register	request	114.241.247.131	2026-06-29 09:41:57	2026-06-29 09:41:57
+019f12c1-c96d-71f0-8c76-7ef359b2c34c	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:57	2026-06-29 09:41:57
+019f12c1-c9c5-7117-a11c-df84fd9687cb	ml-api	/health	request	235.150.76.57	2026-06-29 09:41:57	2026-06-29 09:41:57
+019f12c1-ca1b-7017-8a94-814e159920df	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:57	2026-06-29 09:41:57
+019f12c1-ca71-70ea-944f-fa22e3ad70ab	image-analysis-api	/health/	request	99.91.148.182	2026-06-29 09:41:58	2026-06-29 09:41:58
+019f12c1-cac8-7165-b41a-fd0d631645bd	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:58	2026-06-29 09:41:58
+019f12c1-cb1f-7348-a13a-a353bb2f232d	Laravel	allergies	request	141.16.54.3	2026-06-29 09:41:58	2026-06-29 09:41:58
+019f12c1-cb7a-73e1-82ca-fcecfaaaf42a	Laravel	login	request	188.245.165.158	2026-06-29 09:41:58	2026-06-29 09:41:58
+019f12c1-cbd0-7026-ab80-26351129c027	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:58	2026-06-29 09:41:58
+019f12c1-cc26-72a6-876e-ab8756cdcc32	Laravel	register	request	45.73.53.46	2026-06-29 09:41:58	2026-06-29 09:41:58
+019f12c1-cc7d-720b-a022-d5baf4d0e317	ml-api	/recommend	request	68.53.97.16	2026-06-29 09:41:58	2026-06-29 09:41:58
+019f12c1-ccd2-7235-bfc3-e1fc5fec9ad1	Laravel	login	request	34.179.231.136	2026-06-29 09:41:58	2026-06-29 09:41:58
+019f12c1-cd28-7161-8dfc-6a8648741b1d	ml-api	/health	request	10.216.67.152	2026-06-29 09:41:58	2026-06-29 09:41:58
+019f12c1-cd7f-7126-a0a0-37973fc0499d	Laravel	login	request	54.62.3.38	2026-06-29 09:41:58	2026-06-29 09:41:58
+019f12c1-cdd5-7238-a13d-716449d4c08e	Laravel	allergies	request	246.121.218.173	2026-06-29 09:41:58	2026-06-29 09:41:58
+019f12c1-ce2c-7152-854c-5083cb91bb5a	ml-api	/recommend	request	174.110.148.34	2026-06-29 09:41:58	2026-06-29 09:41:58
+019f12c1-ce83-70f1-925b-5d1c7f83ee8b	image-analysis-api	/health/	request	19.217.140.200	2026-06-29 09:41:59	2026-06-29 09:41:59
+019f12c1-ced9-70cb-baa9-fdb3aa8538bb	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:59	2026-06-29 09:41:59
+019f12c1-cf39-728a-aac9-9d2c54a601f3	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:59	2026-06-29 09:41:59
+019f12c1-cf90-7229-bed7-4559f687e7e0	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:59	2026-06-29 09:41:59
+019f12c1-cfe8-7344-b25f-c8744a3a3507	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:41:59	2026-06-29 09:41:59
+019f12c1-d03e-739f-b39f-3913f344c6bc	ml-api	/recommend	request	110.170.113.95	2026-06-29 09:41:59	2026-06-29 09:41:59
+019f12c1-d094-7154-a460-e9d436869a71	Laravel	register	request	27.13.65.141	2026-06-29 09:41:59	2026-06-29 09:41:59
+019f12c1-d0eb-7255-9e35-1f1954a3b8c9	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:41:59	2026-06-29 09:41:59
+019f12c1-d141-70cb-9613-de9ae70cb60e	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:41:59	2026-06-29 09:41:59
+019f12c1-d197-7189-9508-543523d5a0ae	image-analysis-api	/health/	request	143.18.105.249	2026-06-29 09:41:59	2026-06-29 09:41:59
+019f12c1-d1ef-73e0-8371-f0cf71924b93	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:41:59	2026-06-29 09:41:59
+019f12c1-d247-72cd-805c-614f45074781	ml-api	/recommend	request	52.58.246.36	2026-06-29 09:42:00	2026-06-29 09:42:00
+019f12c1-d29e-732b-8f36-c5b2f26b5af3	Laravel	login	request	145.38.12.179	2026-06-29 09:42:00	2026-06-29 09:42:00
+019f12c1-d2fa-7100-ae4f-6d3722dac930	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:00	2026-06-29 09:42:00
+019f12c1-d354-7229-b457-2a26a8968551	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:00	2026-06-29 09:42:00
+019f12c1-d3b1-73af-8e78-7a81952acc8a	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:00	2026-06-29 09:42:00
+019f12c1-d425-7241-9292-a664dcd829e9	image-analysis-api	/analyze-by-mistral	request	10.140.99.188	2026-06-29 09:42:00	2026-06-29 09:42:00
+019f12c1-d4bc-7010-bcb4-22f5395bed76	Laravel	allergies	request	82.172.171.45	2026-06-29 09:42:00	2026-06-29 09:42:00
+019f12c1-d522-7092-86ab-f16e70ce3099	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:00	2026-06-29 09:42:00
+019f12c1-d57d-7218-b2a4-f638bd9ee79e	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:00	2026-06-29 09:42:00
+019f12c1-d5d9-71b8-b187-5612f658644e	Laravel	register	request	201.149.34.132	2026-06-29 09:42:00	2026-06-29 09:42:00
+019f12c1-d62f-738a-a72a-214da221934a	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:01	2026-06-29 09:42:01
+019f12c1-d68a-7340-b6c5-39276f107d9c	ml-api	/profiles	request	36.126.57.18	2026-06-29 09:42:01	2026-06-29 09:42:01
+019f12c1-d6e2-726d-838f-c295be35b649	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:01	2026-06-29 09:42:01
+019f12c1-d740-722e-aaa5-7a5cde01b927	Laravel	register	request	24.145.175.45	2026-06-29 09:42:01	2026-06-29 09:42:01
+019f12c1-d79c-7178-8165-c0ac5e7df25f	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:01	2026-06-29 09:42:01
+019f12c1-d7fe-705a-961f-f22133465bcb	Laravel	register	request	183.41.49.62	2026-06-29 09:42:01	2026-06-29 09:42:01
+019f12c1-d857-72b3-ac4c-bd158e9345bb	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:01	2026-06-29 09:42:01
+019f12c1-d8ae-731f-ab4f-ef497d493699	Laravel	login	request	209.176.170.248	2026-06-29 09:42:01	2026-06-29 09:42:01
+019f12c1-d908-72d8-bcd6-1a2c638947a2	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:01	2026-06-29 09:42:01
+019f12c1-d95f-705b-bab3-46e5c17e6d85	Laravel	login	request	36.48.32.53	2026-06-29 09:42:01	2026-06-29 09:42:01
+019f12c1-d9b7-7093-9e4f-e70a6622ee40	Laravel	login	request	188.12.48.26	2026-06-29 09:42:01	2026-06-29 09:42:01
+019f12c1-da0d-714f-9ac3-00d4546356c4	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:01	2026-06-29 09:42:01
+019f12c1-da6e-7112-bc55-76a8486f0077	Laravel	allergies	request	2.106.124.17	2026-06-29 09:42:02	2026-06-29 09:42:02
+019f12c1-dac4-73fb-8e8c-c534c2b3d0d2	image-analysis-api	/analyze	request	32.158.225.214	2026-06-29 09:42:02	2026-06-29 09:42:02
+019f12c1-db1a-70f0-824e-d3f99b7c5366	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:02	2026-06-29 09:42:02
+019f12c1-db71-712e-8a73-2a02cccda747	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:02	2026-06-29 09:42:02
+019f12c1-dbc8-7372-b7c3-744f892c9398	ml-api	/health	request	41.141.33.50	2026-06-29 09:42:02	2026-06-29 09:42:02
+019f12c1-dc20-71d3-b7d9-c4e906264c4e	Laravel	login	request	170.52.212.122	2026-06-29 09:42:02	2026-06-29 09:42:02
+019f12c1-dc79-73e4-b42c-a0314d1a3548	Laravel	allergies	request	54.160.173.92	2026-06-29 09:42:02	2026-06-29 09:42:02
+019f12c1-dcd1-70e9-b8b7-6fc3a103a3dc	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:02	2026-06-29 09:42:02
+019f12c1-dd2c-724c-956e-151219e8c77f	Laravel	login	request	216.127.67.61	2026-06-29 09:42:02	2026-06-29 09:42:02
+019f12c1-dd87-70db-9664-8964751007a0	Laravel	register	request	67.223.96.114	2026-06-29 09:42:02	2026-06-29 09:42:02
+019f12c1-dddd-7073-b1bd-246aeee34baf	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:02	2026-06-29 09:42:02
+019f12c1-de33-70d8-8271-0d5c493c62ee	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:03	2026-06-29 09:42:03
+019f12c1-de8a-739f-b885-3a4e99daaf90	Laravel	register	request	230.232.188.41	2026-06-29 09:42:03	2026-06-29 09:42:03
+019f12c1-dee1-72a0-b422-e2741be34d74	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:03	2026-06-29 09:42:03
+019f12c1-df37-70fc-9140-17d8ac594f19	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:03	2026-06-29 09:42:03
+019f12c1-df8e-7339-9040-4e1e47bfe24c	ml-api	/recommend	request	251.119.55.35	2026-06-29 09:42:03	2026-06-29 09:42:03
+019f12c1-dfe6-7350-bb48-7c25b273ba5a	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:03	2026-06-29 09:42:03
+019f12c1-e03e-71a7-ad64-a1fb6b2d9554	image-analysis-api	/health/	request	12.171.232.144	2026-06-29 09:42:03	2026-06-29 09:42:03
+019f12c1-e096-705b-ac14-24c6cc7a4a85	Laravel	login	request	154.229.124.242	2026-06-29 09:42:03	2026-06-29 09:42:03
+019f12c1-e0ee-7028-a5ef-5879c3846eee	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:03	2026-06-29 09:42:03
+019f12c1-e145-70b2-af45-6c73f5230c92	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:03	2026-06-29 09:42:03
+019f12c1-e19d-71bb-8d52-c2d8079a7a0f	Laravel	login	request	107.70.52.216	2026-06-29 09:42:03	2026-06-29 09:42:03
+019f12c1-e1f3-7008-90e8-ced44b195ae8	Laravel	login	request	219.244.161.122	2026-06-29 09:42:04	2026-06-29 09:42:04
+019f12c1-e24b-7026-aeec-e014184d169d	image-analysis-api	/health/	request	248.63.80.174	2026-06-29 09:42:04	2026-06-29 09:42:04
+019f12c1-e2a3-7074-b82f-977398f44362	Laravel	register	request	218.98.25.107	2026-06-29 09:42:04	2026-06-29 09:42:04
+019f12c1-e2fb-70c9-9af8-334f259c4cb8	ml-api	/profiles	request	18.44.189.130	2026-06-29 09:42:04	2026-06-29 09:42:04
+019f12c1-e358-71ca-8c9e-19ed3f8fdf23	ml-api	/recommend	request	232.98.76.89	2026-06-29 09:42:04	2026-06-29 09:42:04
+019f12c1-e3b2-72d7-b905-ea09e751a4b4	Laravel	allergies	request	84.189.4.95	2026-06-29 09:42:04	2026-06-29 09:42:04
+019f12c1-e40b-70a3-9bbc-8898622ff29f	Laravel	login	request	98.67.58.224	2026-06-29 09:42:04	2026-06-29 09:42:04
+019f12c1-e465-7355-8f2e-47ecbfcf68fd	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:04	2026-06-29 09:42:04
+019f12c1-e4be-71d0-ade4-b4045a490797	image-analysis-api	/analyze	request	15.13.114.65	2026-06-29 09:42:04	2026-06-29 09:42:04
+019f12c1-e517-72e6-9386-345d36f47f62	image-analysis-api	/analyze	request	146.37.31.15	2026-06-29 09:42:04	2026-06-29 09:42:04
+019f12c1-e571-7113-9a4c-8fa392ce356b	Laravel	allergies	request	64.215.7.216	2026-06-29 09:42:04	2026-06-29 09:42:04
+019f12c1-e5c9-70d1-bdab-d0cd2c17adbe	image-analysis-api	/analyze	request	2.184.194.64	2026-06-29 09:42:05	2026-06-29 09:42:05
+019f12c1-e61e-7111-a9f4-253ecc2b074e	Laravel	allergies	request	88.152.44.123	2026-06-29 09:42:05	2026-06-29 09:42:05
+019f12c1-e674-7081-a155-16c35fbe9294	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:05	2026-06-29 09:42:05
+019f12c1-e6cf-7292-8afc-3b0dfb498f63	Laravel	login	request	122.163.202.124	2026-06-29 09:42:05	2026-06-29 09:42:05
+019f12c1-e727-72fa-b858-d008fb2a63a1	image-analysis-api	/health/	request	152.83.71.142	2026-06-29 09:42:05	2026-06-29 09:42:05
+019f12c1-e77e-71bc-b030-335cf496e3c4	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:05	2026-06-29 09:42:05
+019f12c1-e7d5-72e9-a7b3-67445e7f8e7a	ml-api	/recommend	request	223.209.109.18	2026-06-29 09:42:05	2026-06-29 09:42:05
+019f12c1-e82c-717f-a954-fa43e2c58957	Laravel	register	request	48.249.237.204	2026-06-29 09:42:05	2026-06-29 09:42:05
+019f12c1-e885-733f-9782-6db831eae068	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:05	2026-06-29 09:42:05
+019f12c1-e8dc-7095-88aa-e5722941383b	Laravel	allergies	request	142.40.126.185	2026-06-29 09:42:05	2026-06-29 09:42:05
+019f12c1-e933-7105-82e5-277735a93ae5	image-analysis-api	/analyze-by-mistral	request	150.226.111.178	2026-06-29 09:42:05	2026-06-29 09:42:05
+019f12c1-e98b-7199-b4dd-7bd0d6bdea29	Laravel	allergies	request	155.247.95.62	2026-06-29 09:42:05	2026-06-29 09:42:05
+019f12c1-e9e3-7134-a866-8dde36eabc56	Laravel	register	request	29.31.140.183	2026-06-29 09:42:06	2026-06-29 09:42:06
+019f12c1-ea39-717b-8873-4b43d8a572b2	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:06	2026-06-29 09:42:06
+019f12c1-ea91-7049-8a33-3225e2821dd1	image-analysis-api	/health/	request	107.255.18.248	2026-06-29 09:42:06	2026-06-29 09:42:06
+019f12c1-eae7-72d7-a601-ea468fb5ccac	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:06	2026-06-29 09:42:06
+019f12c1-eb3d-72b9-9432-76bc2609d2b2	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:06	2026-06-29 09:42:06
+019f12c1-eb93-729b-8c54-807165a1a536	image-analysis-api	/analyze	request	43.218.234.95	2026-06-29 09:42:06	2026-06-29 09:42:06
+019f12c1-ebec-72f4-86fc-a1591dfa3dd8	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:06	2026-06-29 09:42:06
+019f12c1-ec42-70f5-a66c-6061654e8e86	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:06	2026-06-29 09:42:06
+019f12c1-ec98-73e9-b6bc-67929c6efe96	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:06	2026-06-29 09:42:06
+019f12c1-ecee-72a0-a433-62c5b66cba62	image-analysis-api	/health/	request	17.193.121.204	2026-06-29 09:42:06	2026-06-29 09:42:06
+019f12c1-ed47-72eb-a697-f4ec809d55bb	Laravel	login	request	249.219.246.101	2026-06-29 09:42:06	2026-06-29 09:42:06
+019f12c1-ed9d-72e0-8e22-dbf1bb874ec0	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:07	2026-06-29 09:42:07
+019f12c1-edf3-71d2-9f4e-bf231adbaa68	Laravel	register	request	75.64.109.214	2026-06-29 09:42:07	2026-06-29 09:42:07
+019f12c1-ee4c-7194-b6fc-d0618fda9a09	ml-api	/recommend	request	240.243.178.116	2026-06-29 09:42:07	2026-06-29 09:42:07
+019f12c1-eea2-7038-952c-ed550ec0e5ee	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:07	2026-06-29 09:42:07
+019f12c1-eefb-71c9-8028-00e68c34cf00	ml-api	/profiles	request	124.214.185.160	2026-06-29 09:42:07	2026-06-29 09:42:07
+019f12c1-ef54-7228-adfd-7d41768a18d4	Laravel	register	request	109.127.26.137	2026-06-29 09:42:07	2026-06-29 09:42:07
+019f12c1-efac-7257-bab2-888c5bf7f99c	Laravel	register	request	104.68.202.164	2026-06-29 09:42:07	2026-06-29 09:42:07
+019f12c1-f003-73dd-aeca-0cc3ebe44d36	Laravel	register	request	177.115.92.222	2026-06-29 09:42:07	2026-06-29 09:42:07
+019f12c1-f059-711a-b656-ff9038a6ad68	ml-api	/health	request	27.172.205.13	2026-06-29 09:42:07	2026-06-29 09:42:07
+019f12c1-f0b0-71a0-940c-d970e5798b5c	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:07	2026-06-29 09:42:07
+019f12c1-f107-70ab-a37e-89278536de12	image-analysis-api	/analyze-by-mistral	request	122.211.53.159	2026-06-29 09:42:07	2026-06-29 09:42:07
+019f12c1-f15f-71dc-b9b5-fd932b389daa	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:07	2026-06-29 09:42:07
+019f12c1-f1b6-72f1-a5c6-120606057417	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:08	2026-06-29 09:42:08
+019f12c1-f20d-70b7-bbe0-969cb889e5ff	image-analysis-api	/analyze-by-mistral	request	70.117.104.12	2026-06-29 09:42:08	2026-06-29 09:42:08
+019f12c1-f264-718c-80a5-d226339b1f9e	Laravel	allergies	request	35.186.191.105	2026-06-29 09:42:08	2026-06-29 09:42:08
+019f12c1-f2bb-72b7-bac6-d3d522932a5b	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:08	2026-06-29 09:42:08
+019f12c1-f314-7331-af7b-44e5f0fd8c09	Laravel	allergies	request	173.190.174.13	2026-06-29 09:42:08	2026-06-29 09:42:08
+019f12c1-f36b-7363-a242-78d37eb6a50f	ml-api	/health	request	196.106.64.19	2026-06-29 09:42:08	2026-06-29 09:42:08
+019f12c1-f3c5-72cb-8e1f-3670d043adb0	Laravel	allergies	request	97.31.16.177	2026-06-29 09:42:08	2026-06-29 09:42:08
+019f12c1-f41b-7072-bec7-855dd01e0873	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:08	2026-06-29 09:42:08
+019f12c1-f473-71b9-92f5-257d49a02309	Laravel	allergies	request	150.219.161.120	2026-06-29 09:42:08	2026-06-29 09:42:08
+019f12c1-f4cb-7030-9cc9-599e8ffef3cc	image-analysis-api	/analyze	request	151.68.60.131	2026-06-29 09:42:08	2026-06-29 09:42:08
+019f12c1-f524-7316-b55f-5c6bb0499d25	Laravel	register	request	194.241.55.212	2026-06-29 09:42:08	2026-06-29 09:42:08
+019f12c1-f57b-7392-8645-d56ac76354ef	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:09	2026-06-29 09:42:09
+019f12c1-f5d3-7157-a361-81b55edec255	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:09	2026-06-29 09:42:09
+019f12c1-f62b-717c-a6de-1ddf807463a1	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:09	2026-06-29 09:42:09
+019f12c1-f681-7218-9a25-86368f4fd074	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:09	2026-06-29 09:42:09
+019f12c1-f6d9-7251-aeec-680cfbe95c63	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:09	2026-06-29 09:42:09
+019f12c1-f731-7005-aabf-63a7e06d6a46	ml-api	/profiles	request	189.130.30.235	2026-06-29 09:42:09	2026-06-29 09:42:09
+019f12c1-f787-729c-ba92-7642296cbf5d	ml-api	/health	request	132.241.113.132	2026-06-29 09:42:09	2026-06-29 09:42:09
+019f12c1-f7e0-7178-8319-0c339c456817	ml-api	/recommend	request	81.85.168.97	2026-06-29 09:42:09	2026-06-29 09:42:09
+019f12c1-f837-73db-bd74-65f3aed9fcfa	Laravel	register	request	116.79.89.131	2026-06-29 09:42:09	2026-06-29 09:42:09
+019f12c1-f88e-7153-b61f-fa32ab9f501c	Laravel	allergies	request	160.106.111.130	2026-06-29 09:42:09	2026-06-29 09:42:09
+019f12c1-f9e0-7324-902e-2c295b35f2df	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:10	2026-06-29 09:42:10
+019f12c1-fa36-7113-a18c-92a191e69fcb	Laravel	allergies	request	234.34.20.224	2026-06-29 09:42:10	2026-06-29 09:42:10
+019f12c1-fa8d-7117-ac11-26afa6389a7e	ml-api	/profiles	request	240.127.6.76	2026-06-29 09:42:10	2026-06-29 09:42:10
+019f12c1-fae3-72bc-8ca3-8fc788ad560f	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:10	2026-06-29 09:42:10
+019f12c1-fb3a-7383-81c2-4bef2d048173	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:10	2026-06-29 09:42:10
+019f12c1-fb95-7200-a3a0-9414eb09eb4f	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:10	2026-06-29 09:42:10
+019f12c1-fbec-707a-b9eb-4807a6046a0d	Laravel	login	request	40.218.111.182	2026-06-29 09:42:10	2026-06-29 09:42:10
+019f12c1-fc43-722e-bb9f-23f6f3ea3232	ml-api	/recommend	request	233.161.189.110	2026-06-29 09:42:10	2026-06-29 09:42:10
+019f12c1-fc9a-7186-860c-b2e28d4aaa10	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:10	2026-06-29 09:42:10
+019f12c1-fcf0-7143-853a-4767bcf4b687	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:10	2026-06-29 09:42:10
+019f12c1-fd48-7087-b84a-f3434c7e6a06	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:11	2026-06-29 09:42:11
+019f12c1-fda0-70cc-82f2-04ab81f19281	Laravel	register	request	151.57.199.190	2026-06-29 09:42:11	2026-06-29 09:42:11
+019f12c1-fdf6-7120-bedc-8ba7c3c0ab44	Laravel	allergies	request	68.110.32.81	2026-06-29 09:42:11	2026-06-29 09:42:11
+019f12c1-fe4e-7308-adc9-cad2be08e614	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:11	2026-06-29 09:42:11
+019f12c1-ffa3-70fe-80d7-7961f0392d23	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:11	2026-06-29 09:42:11
+019f12c1-fffa-7356-891a-3d22f0b035e2	Laravel	login	request	246.86.158.153	2026-06-29 09:42:11	2026-06-29 09:42:11
+019f12c2-0058-7005-9c34-bb5225f137a9	ml-api	/profiles	request	218.158.233.49	2026-06-29 09:42:11	2026-06-29 09:42:11
+019f12c2-00af-71a3-b2cf-67d536e54566	ml-api	/recommend	request	43.39.22.109	2026-06-29 09:42:11	2026-06-29 09:42:11
+019f12c2-0106-7390-9ccd-07281d5ff718	Laravel	register	request	220.230.129.61	2026-06-29 09:42:11	2026-06-29 09:42:11
+019f12c2-015e-7284-a780-dcaa9abe8f01	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:12	2026-06-29 09:42:12
+019f12c2-01b5-72e7-a39e-5241be346e1f	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:12	2026-06-29 09:42:12
+019f12c2-020b-705d-9986-13f55513b58a	Laravel	register	request	76.82.61.116	2026-06-29 09:42:12	2026-06-29 09:42:12
+019f12c2-0262-70b0-82ec-f1020835ca94	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:12	2026-06-29 09:42:12
+019f12c2-02b9-737a-b7b1-84ec1f795e5c	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:12	2026-06-29 09:42:12
+019f12c2-030f-708f-b299-2dd4234d3fa2	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:12	2026-06-29 09:42:12
+019f12c2-0365-710d-a7bd-872a01f98882	Laravel	login	request	201.222.20.165	2026-06-29 09:42:12	2026-06-29 09:42:12
+019f12c2-03bc-739d-bd77-3adcf2dc3511	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:12	2026-06-29 09:42:12
+019f12c2-0414-73d2-9139-72fac0b6f46a	Laravel	allergies	request	124.215.50.198	2026-06-29 09:42:12	2026-06-29 09:42:12
+019f12c2-046c-71c8-bb88-8b99e549dda0	Laravel	register	request	8.6.226.91	2026-06-29 09:42:12	2026-06-29 09:42:12
+019f12c2-04c2-718e-8aa2-ab0a0a5d1992	image-analysis-api	/analyze	request	58.150.133.8	2026-06-29 09:42:12	2026-06-29 09:42:12
+019f12c2-0519-702f-a723-1c9853c7feb6	Laravel	register	request	253.179.253.54	2026-06-29 09:42:13	2026-06-29 09:42:13
+019f12c2-056f-71b8-aa0d-4ac9a16abcbd	image-analysis-api	/analyze-by-mistral	request	16.223.26.249	2026-06-29 09:42:13	2026-06-29 09:42:13
+019f12c2-05c6-7239-b470-b5a3ffa38fc5	ml-api	/health	request	37.160.9.86	2026-06-29 09:42:13	2026-06-29 09:42:13
+019f12c2-061e-73c7-88b2-b35f4b9b9b6e	image-analysis-api	/analyze	request	106.26.232.192	2026-06-29 09:42:13	2026-06-29 09:42:13
+019f12c2-0674-7227-bca6-f0b493b0a664	Laravel	allergies	request	247.131.74.59	2026-06-29 09:42:13	2026-06-29 09:42:13
+019f12c2-06cb-7295-bc30-5b56cb9faafe	Laravel	login	request	203.112.48.18	2026-06-29 09:42:13	2026-06-29 09:42:13
+019f12c2-0722-705b-897e-a4300e0fce45	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:13	2026-06-29 09:42:13
+019f12c2-077b-706f-99c1-bcb04481f92c	Laravel	register	request	186.247.239.137	2026-06-29 09:42:13	2026-06-29 09:42:13
+019f12c2-07d2-72fa-8c56-e9e536cfa50c	Laravel	register	request	141.153.138.98	2026-06-29 09:42:13	2026-06-29 09:42:13
+019f12c2-0829-70b3-86c7-7fe80ba1cfb1	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:13	2026-06-29 09:42:13
+019f12c2-0884-70a3-9495-9279f7c17b89	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:13	2026-06-29 09:42:13
+019f12c2-08de-7077-bd2f-ffe3a720000b	Laravel	allergies	request	135.11.161.55	2026-06-29 09:42:13	2026-06-29 09:42:13
+019f12c2-0935-7226-9fd6-53ef3a9e43c3	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:14	2026-06-29 09:42:14
+019f12c2-098f-7239-b859-0970c035f049	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:14	2026-06-29 09:42:14
+019f12c2-09e6-739f-9d50-7b30f5a55b52	Laravel	allergies	request	191.150.172.22	2026-06-29 09:42:14	2026-06-29 09:42:14
+019f12c2-0a3c-705b-b9b6-9574ea717880	Laravel	allergies	request	158.59.84.70	2026-06-29 09:42:14	2026-06-29 09:42:14
+019f12c2-0a94-71ba-a579-927ff27fe75e	Laravel	login	request	219.145.65.226	2026-06-29 09:42:14	2026-06-29 09:42:14
+019f12c2-0aec-7119-94b9-9f9bff727e2b	image-analysis-api	/health/	request	124.213.228.94	2026-06-29 09:42:14	2026-06-29 09:42:14
+019f12c2-0b43-72be-acf9-94faa2fcde55	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:14	2026-06-29 09:42:14
+019f12c2-0b99-72fa-8610-3687d16ee093	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:14	2026-06-29 09:42:14
+019f12c2-0bf0-73b6-983f-136b5c10dbc4	Laravel	allergies	request	236.222.214.219	2026-06-29 09:42:14	2026-06-29 09:42:14
+019f12c2-0c48-72f0-b818-3b19ca2e2fb1	image-analysis-api	/health/	request	58.11.155.137	2026-06-29 09:42:14	2026-06-29 09:42:14
+019f12c2-0c9f-7392-a476-dcac6e260536	Laravel	allergies	request	124.190.81.1	2026-06-29 09:42:14	2026-06-29 09:42:14
+019f12c2-0cf8-705d-baa9-c6a7cdccbad2	image-analysis-api	/analyze	request	60.44.170.38	2026-06-29 09:42:15	2026-06-29 09:42:15
+019f12c2-0d4f-7256-92a3-21024012e9a1	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:15	2026-06-29 09:42:15
+019f12c2-0da5-730e-b633-f5c6a5be24f6	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:15	2026-06-29 09:42:15
+019f12c2-0dfd-726d-8c09-15e604fb6018	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:15	2026-06-29 09:42:15
+019f12c2-0e55-7088-a276-2fe3eecebc9d	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:15	2026-06-29 09:42:15
+019f12c2-0eae-7306-87df-ed8ffc583bff	ml-api	/health	request	152.254.87.13	2026-06-29 09:42:15	2026-06-29 09:42:15
+019f12c2-0f04-731c-9952-a7cd7c940b0f	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:15	2026-06-29 09:42:15
+019f12c2-0f5a-702f-a703-8539f1f96527	Laravel	login	request	69.213.193.198	2026-06-29 09:42:15	2026-06-29 09:42:15
+019f12c2-0fb0-724d-a399-34f063a352f5	ml-api	/profiles	request	2.152.106.116	2026-06-29 09:42:15	2026-06-29 09:42:15
+019f12c2-1007-7336-9b37-f1cdb4718ebb	Laravel	allergies	request	249.118.164.143	2026-06-29 09:42:15	2026-06-29 09:42:15
+019f12c2-105e-7127-87b6-7c70d44af7bf	ml-api	/health	request	155.234.14.248	2026-06-29 09:42:15	2026-06-29 09:42:15
+019f12c2-10b5-73b6-904b-dd65ee6471c9	Laravel	register	request	200.10.132.154	2026-06-29 09:42:15	2026-06-29 09:42:15
+019f12c2-110f-7160-905a-97b5c0b3b259	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:16	2026-06-29 09:42:16
+019f12c2-116d-713c-98e5-8a3f73e07241	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:16	2026-06-29 09:42:16
+019f12c2-11c5-728b-b530-3e7a7d68f367	ml-api	/recommend	request	207.219.224.157	2026-06-29 09:42:16	2026-06-29 09:42:16
+019f12c2-121c-7201-bad1-5a8c7e36c6a7	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:16	2026-06-29 09:42:16
+019f12c2-1273-7391-a3c3-b1b68232e029	Laravel	login	request	253.88.169.45	2026-06-29 09:42:16	2026-06-29 09:42:16
+019f12c2-12cc-72fe-9017-404e42ec21b3	Laravel	register	request	244.213.44.243	2026-06-29 09:42:16	2026-06-29 09:42:16
+019f12c2-1323-709b-b739-351234b1c94f	image-analysis-api	/health/	request	252.64.186.39	2026-06-29 09:42:16	2026-06-29 09:42:16
+019f12c2-137b-71f3-a983-0ff1b33469f0	image-analysis-api	/health/	request	227.197.154.97	2026-06-29 09:42:16	2026-06-29 09:42:16
+019f12c2-13d3-7349-a85f-9980a82a0731	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:16	2026-06-29 09:42:16
+019f12c2-142b-721b-9e2d-1ccbae888712	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:16	2026-06-29 09:42:16
+019f12c2-1485-7090-bfab-4bf51351a696	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:16	2026-06-29 09:42:16
+019f12c2-14dc-72ce-826d-a8e3bf1eb939	ml-api	/profiles	request	89.163.198.92	2026-06-29 09:42:17	2026-06-29 09:42:17
+019f12c2-1532-730c-b2cb-68bbc45360a0	ml-api	/recommend	request	183.156.184.170	2026-06-29 09:42:17	2026-06-29 09:42:17
+019f12c2-158a-731a-bc95-04f8015f30ef	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:17	2026-06-29 09:42:17
+019f12c2-15e1-7378-8c97-181aebe2c9d6	image-analysis-api	/health/	request	124.249.134.13	2026-06-29 09:42:17	2026-06-29 09:42:17
+019f12c2-163b-7117-91e3-e75e66f99db0	image-analysis-api	/analyze-by-mistral	request	81.28.15.164	2026-06-29 09:42:17	2026-06-29 09:42:17
+019f12c2-1692-7218-8e5b-f3f1b03f12b0	Laravel	login	request	202.96.88.216	2026-06-29 09:42:17	2026-06-29 09:42:17
+019f12c2-16ea-729b-b7a9-96ba67cfa3c6	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:17	2026-06-29 09:42:17
+019f12c2-1741-7356-88db-3cc81622d7e4	Laravel	allergies	request	25.57.44.8	2026-06-29 09:42:17	2026-06-29 09:42:17
+019f12c2-1799-729f-993b-6036e24b1c59	Laravel	allergies	request	229.129.197.170	2026-06-29 09:42:17	2026-06-29 09:42:17
+019f12c2-17f2-70d0-bd6f-19fbf675b4aa	image-analysis-api	/health/	request	136.100.54.12	2026-06-29 09:42:17	2026-06-29 09:42:17
+019f12c2-184b-704d-8afe-a63b6222c69f	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:17	2026-06-29 09:42:17
+019f12c2-18a2-713d-b46c-3afb643ec409	ml-api	/recommend	request	169.129.188.82	2026-06-29 09:42:18	2026-06-29 09:42:18
+019f12c2-18ff-7005-b788-a1335cd33717	Laravel	register	request	226.48.211.153	2026-06-29 09:42:18	2026-06-29 09:42:18
+019f12c2-1956-711a-b173-9f2062875f4c	Laravel	login	request	110.180.244.252	2026-06-29 09:42:18	2026-06-29 09:42:18
+019f12c2-19ae-7091-ae62-febed81ad460	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:18	2026-06-29 09:42:18
+019f12c2-1a06-736b-bac4-1edb4f6c1880	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:18	2026-06-29 09:42:18
+019f12c2-1a5c-71af-b775-f4b03838dd58	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:18	2026-06-29 09:42:18
+019f12c2-1ab2-72e1-b5d8-7c5bc9a86728	image-analysis-api	/analyze-by-mistral	request	78.59.181.178	2026-06-29 09:42:18	2026-06-29 09:42:18
+019f12c2-1b0a-739b-a173-30a89317f3e0	Laravel	allergies	request	184.229.203.151	2026-06-29 09:42:18	2026-06-29 09:42:18
+019f12c2-1b60-7043-8f25-015b924cd1a2	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:18	2026-06-29 09:42:18
+019f12c2-1bb6-72b3-98a1-36c9000fac42	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:18	2026-06-29 09:42:18
+019f12c2-1c0d-7237-9b8c-748628d0e75e	Laravel	login	request	253.102.232.151	2026-06-29 09:42:18	2026-06-29 09:42:18
+019f12c2-1c65-73ce-856b-076021c1f7be	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:18	2026-06-29 09:42:18
+019f12c2-1cbb-7057-95b1-3aa05f50946d	Laravel	login	request	121.61.69.97	2026-06-29 09:42:19	2026-06-29 09:42:19
+019f12c2-1d13-70cd-be4f-009e1d89dc62	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:19	2026-06-29 09:42:19
+019f12c2-1d6a-7218-9a50-926807494395	Laravel	login	request	77.68.187.241	2026-06-29 09:42:19	2026-06-29 09:42:19
+019f12c2-1dc0-7084-950a-845975a2de74	ml-api	/recommend	request	239.132.248.193	2026-06-29 09:42:19	2026-06-29 09:42:19
+019f12c2-1e17-732d-a8fe-7b720185cdde	Laravel	register	request	138.120.195.36	2026-06-29 09:42:19	2026-06-29 09:42:19
+019f12c2-1e6e-715b-9721-16800abb6a27	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:19	2026-06-29 09:42:19
+019f12c2-1ec6-7005-8b8c-624026e3b979	ml-api	/recommend	request	151.139.217.125	2026-06-29 09:42:19	2026-06-29 09:42:19
+019f12c2-1f1c-714c-b09d-237b29627fec	Laravel	login	request	99.181.152.132	2026-06-29 09:42:19	2026-06-29 09:42:19
+019f12c2-1f72-7205-bdd9-c744f356e12a	image-analysis-api	/analyze-by-mistral	request	37.63.180.22	2026-06-29 09:42:19	2026-06-29 09:42:19
+019f12c2-1fcc-73a6-9355-50822259b101	ml-api	/recommend	request	247.143.233.40	2026-06-29 09:42:19	2026-06-29 09:42:19
+019f12c2-2023-7093-a1b6-756dab773b0d	ml-api	/profiles	request	4.26.68.232	2026-06-29 09:42:19	2026-06-29 09:42:19
+019f12c2-207a-7008-ad80-1c11f640ce75	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:20	2026-06-29 09:42:20
+019f12c2-20d0-7303-a078-1a3370222a75	image-analysis-api	/health/	request	122.67.86.83	2026-06-29 09:42:20	2026-06-29 09:42:20
+019f12c2-2126-737c-8c29-2fba97f918f5	Laravel	login	request	223.95.26.243	2026-06-29 09:42:20	2026-06-29 09:42:20
+019f12c2-217d-73e1-be0b-335cc83efc9e	image-analysis-api	/analyze-by-mistral	request	227.35.200.155	2026-06-29 09:42:20	2026-06-29 09:42:20
+019f12c2-21d3-7196-9f35-c9969ca439f2	image-analysis-api	/analyze-by-mistral	request	247.59.204.176	2026-06-29 09:42:20	2026-06-29 09:42:20
+019f12c2-2228-7009-9705-f1e77df38501	ml-api	/recommend	request	199.81.145.6	2026-06-29 09:42:20	2026-06-29 09:42:20
+019f12c2-2280-701a-a487-3c7b84ff1f21	ml-api	/health	request	163.205.228.180	2026-06-29 09:42:20	2026-06-29 09:42:20
+019f12c2-22d6-727d-b930-cce0359ed0ea	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:20	2026-06-29 09:42:20
+019f12c2-232c-7362-835a-9ff00fef13c2	image-analysis-api	/analyze-by-mistral	request	76.76.219.30	2026-06-29 09:42:20	2026-06-29 09:42:20
+019f12c2-2383-720b-857b-7de34e040c9b	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:20	2026-06-29 09:42:20
+019f12c2-23d9-73ad-a346-8fb922bad5da	Laravel	login	request	152.194.64.152	2026-06-29 09:42:20	2026-06-29 09:42:20
+019f12c2-2430-7027-9e2e-56f076bfd47b	image-analysis-api	/analyze	request	100.229.207.217	2026-06-29 09:42:20	2026-06-29 09:42:20
+019f12c2-2488-7291-b501-66a1d32aaba3	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:21	2026-06-29 09:42:21
+019f12c2-24e0-723c-9c19-17b8cbc6b07e	ml-api	/recommend	request	190.27.192.38	2026-06-29 09:42:21	2026-06-29 09:42:21
+019f12c2-2536-739e-a89f-1632825d9771	image-analysis-api	/health/	request	225.38.111.96	2026-06-29 09:42:21	2026-06-29 09:42:21
+019f12c2-258d-71fc-b8bc-b1e1583f0421	ml-api	/recommend	request	86.168.184.30	2026-06-29 09:42:21	2026-06-29 09:42:21
+019f12c2-25e4-704f-ab2f-d9980fc68b60	Laravel	register	request	241.195.81.36	2026-06-29 09:42:21	2026-06-29 09:42:21
+019f12c2-263c-729f-9150-60ab2ea7be6c	ml-api	/recommend	request	160.226.89.22	2026-06-29 09:42:21	2026-06-29 09:42:21
+019f12c2-2694-7037-bd35-a031c28c8142	image-analysis-api	/analyze	request	65.62.114.88	2026-06-29 09:42:21	2026-06-29 09:42:21
+019f12c2-26ec-72ae-8490-b7c0d76bfa46	ml-api	/health	request	150.120.211.156	2026-06-29 09:42:21	2026-06-29 09:42:21
+019f12c2-2743-722c-9d7b-99d6723950a1	Laravel	allergies	request	225.102.97.114	2026-06-29 09:42:21	2026-06-29 09:42:21
+019f12c2-279e-737d-8c1a-0958737bd318	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:21	2026-06-29 09:42:21
+019f12c2-27f5-71de-a338-3db1f1186e7f	Laravel	allergies	request	207.210.12.83	2026-06-29 09:42:21	2026-06-29 09:42:21
+019f12c2-2850-738a-83d5-b3bebba9e142	ml-api	/recommend	request	141.161.70.27	2026-06-29 09:42:22	2026-06-29 09:42:22
+019f12c2-28a7-72b8-9bc4-f3994b38ab51	ml-api	/recommend	request	177.164.223.94	2026-06-29 09:42:22	2026-06-29 09:42:22
+019f12c2-28fe-7105-b927-62c64d0eb6f6	Laravel	login	request	172.3.67.58	2026-06-29 09:42:22	2026-06-29 09:42:22
+019f12c2-2956-720f-bab0-67dbcd797927	Laravel	login	request	165.23.177.242	2026-06-29 09:42:22	2026-06-29 09:42:22
+019f12c2-29ac-73a6-9b55-aba0bf35a5f9	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:22	2026-06-29 09:42:22
+019f12c2-2a03-7306-9c4d-ff48e55859e7	image-analysis-api	/health/	request	107.5.84.94	2026-06-29 09:42:22	2026-06-29 09:42:22
+019f12c2-2a5c-7257-99c1-0fc088fbf73c	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:22	2026-06-29 09:42:22
+019f12c2-2ab6-721a-aa59-f4c68b5d9251	Laravel	allergies	request	143.91.169.223	2026-06-29 09:42:22	2026-06-29 09:42:22
+019f12c2-2b0e-71f7-85ff-f064333aff55	Laravel	register	request	28.230.21.153	2026-06-29 09:42:22	2026-06-29 09:42:22
+019f12c2-2b66-733d-bed1-2fa8a46e5d06	image-analysis-api	/analyze-by-mistral	request	64.173.222.217	2026-06-29 09:42:22	2026-06-29 09:42:22
+019f12c2-2bc4-7065-b02f-37a2beed19dc	image-analysis-api	/analyze	request	63.188.6.95	2026-06-29 09:42:22	2026-06-29 09:42:22
+019f12c2-2c31-71a9-a769-d641e8a86a2d	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:23	2026-06-29 09:42:23
+019f12c2-2c88-732c-8f4e-f3ce923a5513	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:23	2026-06-29 09:42:23
+019f12c2-2ce1-719c-8ca2-7ea50e0cdd3c	Laravel	register	request	242.110.59.188	2026-06-29 09:42:23	2026-06-29 09:42:23
+019f12c2-2d37-7273-b7a1-a375411c90f5	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:23	2026-06-29 09:42:23
+019f12c2-2d90-7012-9a11-db426ca6e589	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:23	2026-06-29 09:42:23
+019f12c2-2de6-7143-994a-419f6a0e5b13	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:23	2026-06-29 09:42:23
+019f12c2-2e3c-726b-bf45-5e7055655edd	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:23	2026-06-29 09:42:23
+019f12c2-2e95-7169-9897-7a300dd273f6	image-analysis-api	/analyze	request	190.106.223.239	2026-06-29 09:42:23	2026-06-29 09:42:23
+019f12c2-2eea-7313-8c00-9ed271c2ff35	ml-api	/profiles	request	11.115.248.46	2026-06-29 09:42:23	2026-06-29 09:42:23
+019f12c2-2f43-7163-bfa8-1af68cdda0b7	Laravel	login	request	57.160.183.124	2026-06-29 09:42:23	2026-06-29 09:42:23
+019f12c2-2f9b-7114-93e9-d4d37747892f	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:23	2026-06-29 09:42:23
+019f12c2-2ff1-72db-805f-70fa72e7f3c3	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:23	2026-06-29 09:42:23
+019f12c2-3048-7104-bfef-3ffffd119625	image-analysis-api	/analyze	request	206.86.122.181	2026-06-29 09:42:24	2026-06-29 09:42:24
+019f12c2-309e-705f-9092-9b559e1bcd00	Laravel	login	request	234.69.93.87	2026-06-29 09:42:24	2026-06-29 09:42:24
+019f12c2-30f8-70aa-9ef7-3e2ed104fa5c	ml-api	/recommend	request	44.255.206.99	2026-06-29 09:42:24	2026-06-29 09:42:24
+019f12c2-314e-70c7-ae58-2ab646fccec5	image-analysis-api	/analyze-by-mistral	request	51.221.26.89	2026-06-29 09:42:24	2026-06-29 09:42:24
+019f12c2-31a8-729e-b88b-c145cd4154ef	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:24	2026-06-29 09:42:24
+019f12c2-31fe-70d4-a45f-4f4b609f99e1	Laravel	login	request	194.188.3.67	2026-06-29 09:42:24	2026-06-29 09:42:24
+019f12c2-3254-707a-99cc-41050ed678c9	Laravel	allergies	request	143.159.130.18	2026-06-29 09:42:24	2026-06-29 09:42:24
+019f12c2-32ae-7204-bb40-f8c1dec1d407	Laravel	register	request	4.60.98.139	2026-06-29 09:42:24	2026-06-29 09:42:24
+019f12c2-3307-706b-a43b-c23a910aad0a	image-analysis-api	/analyze-by-mistral	request	138.127.54.105	2026-06-29 09:42:24	2026-06-29 09:42:24
+019f12c2-335e-7256-9b7b-66ae7e4e2b65	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:24	2026-06-29 09:42:24
+019f12c2-33b8-7207-b500-34c2f22f7346	Laravel	allergies	request	47.238.249.110	2026-06-29 09:42:24	2026-06-29 09:42:24
+019f12c2-3412-7077-af33-e37be07b0fa2	image-analysis-api	/analyze-by-mistral	request	147.198.26.172	2026-06-29 09:42:25	2026-06-29 09:42:25
+019f12c2-3469-73ec-9306-39b322605238	Laravel	register	request	172.105.39.20	2026-06-29 09:42:25	2026-06-29 09:42:25
+019f12c2-34bf-71a5-857c-f767b9bdffbf	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:25	2026-06-29 09:42:25
+019f12c2-3516-738b-b739-4ae51ccb5d25	Laravel	login	request	193.170.117.9	2026-06-29 09:42:25	2026-06-29 09:42:25
+019f12c2-3574-738b-9983-23ce4fe051c4	Laravel	register	request	210.133.208.40	2026-06-29 09:42:25	2026-06-29 09:42:25
+019f12c2-35ca-7153-964f-799946b20f6e	Laravel	login	request	186.89.255.203	2026-06-29 09:42:25	2026-06-29 09:42:25
+019f12c2-3622-7012-bd75-8cc8a6443e51	Laravel	register	request	246.45.123.82	2026-06-29 09:42:25	2026-06-29 09:42:25
+019f12c2-3678-70dc-89c2-2548c29f9a75	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:25	2026-06-29 09:42:25
+019f12c2-36ce-70d6-954e-ec058c6cd5a2	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:25	2026-06-29 09:42:25
+019f12c2-3724-7111-b404-49a9b19a4033	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:25	2026-06-29 09:42:25
+019f12c2-377c-7208-a777-b92d15838c65	Laravel	login	request	63.180.224.63	2026-06-29 09:42:25	2026-06-29 09:42:25
+019f12c2-37d3-7108-a1f0-3b6c43a9ecc2	Laravel	register	request	7.196.156.172	2026-06-29 09:42:26	2026-06-29 09:42:26
+019f12c2-3928-71b8-91d0-22a4d2d32d9d	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:26	2026-06-29 09:42:26
+019f12c2-397e-733b-96f4-2f50fe1beee2	ml-api	/profiles	request	52.88.90.10	2026-06-29 09:42:26	2026-06-29 09:42:26
+019f12c2-39d4-70f2-bebe-fcc3d924b98f	Laravel	login	request	189.175.3.35	2026-06-29 09:42:26	2026-06-29 09:42:26
+019f12c2-3a2b-7015-ae83-2cbe7aa1dd5f	Laravel	register	request	126.237.119.108	2026-06-29 09:42:26	2026-06-29 09:42:26
+019f12c2-3a82-7167-9c35-74bb561ed8e1	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:26	2026-06-29 09:42:26
+019f12c2-3ad7-719e-adb8-2405f0e323c9	Laravel	login	request	248.242.166.242	2026-06-29 09:42:26	2026-06-29 09:42:26
+019f12c2-3b2e-73f0-afb9-97abc7ebc843	Laravel	register	request	56.245.117.70	2026-06-29 09:42:26	2026-06-29 09:42:26
+019f12c2-3c9e-70fd-92f1-6833a0bd4195	Laravel	login	request	89.179.160.79	2026-06-29 09:42:27	2026-06-29 09:42:27
+019f12c2-3d19-7094-a2e4-f3db2e7718ca	image-analysis-api	/health/	request	5.21.143.137	2026-06-29 09:42:27	2026-06-29 09:42:27
+019f12c2-3d92-7097-887f-0ce2e0c25aff	Laravel	register	request	186.118.214.140	2026-06-29 09:42:27	2026-06-29 09:42:27
+019f12c2-3df7-7392-a06f-eaf349c1bb76	Laravel	register	request	178.112.177.145	2026-06-29 09:42:27	2026-06-29 09:42:27
+019f12c2-3e50-706a-99b2-9731f8e4d91b	Laravel	login	request	87.108.138.200	2026-06-29 09:42:27	2026-06-29 09:42:27
+019f12c2-3ea6-73e6-9bcb-03fcb67977e6	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:27	2026-06-29 09:42:27
+019f12c2-3efd-739d-842b-db30b78acef9	image-analysis-api	/health/	request	254.57.87.169	2026-06-29 09:42:27	2026-06-29 09:42:27
+019f12c2-3f57-7120-8848-c0773bdfc64c	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:27	2026-06-29 09:42:27
+019f12c2-3fb1-71f2-92f7-c0374774a31f	Laravel	register	request	20.53.84.197	2026-06-29 09:42:28	2026-06-29 09:42:28
+019f12c2-4008-728d-9a62-0294f237b58a	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:28	2026-06-29 09:42:28
+019f12c2-4061-7399-965a-f5bd3282cefe	image-analysis-api	/analyze	request	199.48.169.73	2026-06-29 09:42:28	2026-06-29 09:42:28
+019f12c2-40ba-7113-a646-665c679c84aa	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:28	2026-06-29 09:42:28
+019f12c2-4113-7128-8a3b-3373779ef802	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:28	2026-06-29 09:42:28
+019f12c2-416b-7157-af7a-238903d0a129	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:28	2026-06-29 09:42:28
+019f12c2-41c2-7308-820d-b0e2b1da09f7	ml-api	/profiles	request	128.248.23.151	2026-06-29 09:42:28	2026-06-29 09:42:28
+019f12c2-421d-7356-9df9-f3304ec25eb9	Laravel	login	request	77.103.238.25	2026-06-29 09:42:28	2026-06-29 09:42:28
+019f12c2-4275-7082-994f-07d30d58d555	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:28	2026-06-29 09:42:28
+019f12c2-42cc-71fd-992f-89b0639d6600	Laravel	register	request	61.217.149.17	2026-06-29 09:42:28	2026-06-29 09:42:28
+019f12c2-4324-7210-b82d-e2c16bb658d5	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:28	2026-06-29 09:42:28
+019f12c2-437a-7102-ae05-2c2ee43ccc6d	Laravel	allergies	request	13.92.152.73	2026-06-29 09:42:28	2026-06-29 09:42:28
+019f12c2-43d1-7091-8a00-cb543f4f4099	ml-api	/profiles	request	194.147.66.211	2026-06-29 09:42:29	2026-06-29 09:42:29
+019f12c2-4428-7203-b91c-2f8660c87cfb	ml-api	/recommend	request	15.136.148.1	2026-06-29 09:42:29	2026-06-29 09:42:29
+019f12c2-4481-7390-9717-3511b204e489	ml-api	/profiles	request	38.36.251.123	2026-06-29 09:42:29	2026-06-29 09:42:29
+019f12c2-44d7-7227-a3fd-65d1d2ab4c60	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:29	2026-06-29 09:42:29
+019f12c2-4535-715c-bb8e-a9c6d6a48e02	Laravel	login	request	189.150.107.170	2026-06-29 09:42:29	2026-06-29 09:42:29
+019f12c2-4590-733a-8603-696552531a11	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:29	2026-06-29 09:42:29
+019f12c2-45e7-7027-92ba-3509a007181d	Laravel	login	request	163.187.219.81	2026-06-29 09:42:29	2026-06-29 09:42:29
+019f12c2-463e-71a1-8165-2ca45dd8b84b	ml-api	/health	request	24.74.209.14	2026-06-29 09:42:29	2026-06-29 09:42:29
+019f12c2-4694-70b3-ad22-2bdf9bc07894	Laravel	login	request	41.23.74.252	2026-06-29 09:42:29	2026-06-29 09:42:29
+019f12c2-46eb-7056-9ce0-7b0e9fb02219	Laravel	register	request	34.92.105.111	2026-06-29 09:42:29	2026-06-29 09:42:29
+019f12c2-4742-7103-8d70-91f63bd528ac	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:29	2026-06-29 09:42:29
+019f12c2-4799-72f9-9793-b273331215f2	Laravel	allergies	request	104.174.131.32	2026-06-29 09:42:30	2026-06-29 09:42:30
+019f12c2-47f0-7079-9584-27c586313424	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:30	2026-06-29 09:42:30
+019f12c2-4848-70b2-86f1-47347926712b	Laravel	allergies	request	43.191.112.10	2026-06-29 09:42:30	2026-06-29 09:42:30
+019f12c2-48a0-73ca-a28d-f29db22d8dff	image-analysis-api	/analyze-by-mistral	request	83.52.205.34	2026-06-29 09:42:30	2026-06-29 09:42:30
+019f12c2-48f8-73f4-b0a3-73a7afbefad0	ml-api	/recommend	request	232.6.210.128	2026-06-29 09:42:30	2026-06-29 09:42:30
+019f12c2-494f-72bc-8c20-d3fdd6e2785a	Laravel	register	request	7.104.26.188	2026-06-29 09:42:30	2026-06-29 09:42:30
+019f12c2-49ac-71cd-9d85-9f63a5482829	ml-api	/profiles	request	5.13.31.76	2026-06-29 09:42:30	2026-06-29 09:42:30
+019f12c2-4a02-70f5-9209-0d84080a8648	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:30	2026-06-29 09:42:30
+019f12c2-4a5b-7117-801f-00539b2c6fd3	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:30	2026-06-29 09:42:30
+019f12c2-4ab3-73aa-a5f7-2996945c9f8d	image-analysis-api	/analyze-by-mistral	request	231.52.174.135	2026-06-29 09:42:30	2026-06-29 09:42:30
+019f12c2-4b0b-7004-8ad2-cb775674f714	image-analysis-api	/health/	request	251.169.124.248	2026-06-29 09:42:30	2026-06-29 09:42:30
+019f12c2-4b61-7300-8e56-aa8af8b56e97	image-analysis-api	/analyze-by-mistral	request	15.22.87.159	2026-06-29 09:42:31	2026-06-29 09:42:31
+019f12c2-4bbd-71c7-babf-1a5c7f3fdc2a	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:31	2026-06-29 09:42:31
+019f12c2-4c1c-7320-a5fb-8bf783ef2c8a	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:31	2026-06-29 09:42:31
+019f12c2-4c75-728f-9c96-41a9db5ce7b9	ml-api	/recommend	request	178.50.251.234	2026-06-29 09:42:31	2026-06-29 09:42:31
+019f12c2-4cce-7033-adc5-ebfb70b8d316	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:31	2026-06-29 09:42:31
+019f12c2-4d25-721f-b030-6a8811a6c552	Laravel	register	request	224.211.204.94	2026-06-29 09:42:31	2026-06-29 09:42:31
+019f12c2-4d85-71fe-8132-072f0f38915e	Laravel	allergies	request	188.251.162.230	2026-06-29 09:42:31	2026-06-29 09:42:31
+019f12c2-4ddc-7160-a485-124df13bd2e8	ml-api	/health	request	222.38.145.234	2026-06-29 09:42:31	2026-06-29 09:42:31
+019f12c2-4e35-7014-b489-a8cc403d7403	Laravel	allergies	request	2.175.189.164	2026-06-29 09:42:31	2026-06-29 09:42:31
+019f12c2-4e8c-73e9-aed9-a271e0fae8d3	Laravel	allergies	request	233.30.166.177	2026-06-29 09:42:31	2026-06-29 09:42:31
+019f12c2-4ee5-7345-bde6-97b49e0b9d25	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:31	2026-06-29 09:42:31
+019f12c2-4f46-70e4-aa9b-b6d6ebfec79d	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:32	2026-06-29 09:42:32
+019f12c2-4fa0-702f-b758-b80b92edb391	Laravel	login	request	143.189.94.154	2026-06-29 09:42:32	2026-06-29 09:42:32
+019f12c2-4ff7-71b1-a739-830f269dad53	ml-api	/recommend	request	117.102.217.158	2026-06-29 09:42:32	2026-06-29 09:42:32
+019f12c2-504d-7293-a5e6-99815fbe5460	Laravel	allergies	request	84.74.226.73	2026-06-29 09:42:32	2026-06-29 09:42:32
+019f12c2-50a6-70cc-8686-0c21c601aa82	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:32	2026-06-29 09:42:32
+019f12c2-50fc-71e2-bc61-b4861968f606	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:32	2026-06-29 09:42:32
+019f12c2-5155-7133-b544-2910c96821e7	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:32	2026-06-29 09:42:32
+019f12c2-51ad-70e3-aac7-b6ad2ef36472	Laravel	login	request	102.152.216.57	2026-06-29 09:42:32	2026-06-29 09:42:32
+019f12c2-5204-719e-8eff-d8350a4e717c	Laravel	register	request	6.180.194.214	2026-06-29 09:42:32	2026-06-29 09:42:32
+019f12c2-525e-7226-9f13-b406ec70817a	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:32	2026-06-29 09:42:32
+019f12c2-52be-72aa-9796-ccfadaf7771a	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:32	2026-06-29 09:42:32
+019f12c2-531c-706b-8d83-4d92b4536aba	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:32	2026-06-29 09:42:32
+019f12c2-5376-7390-8058-dc4bca489186	Laravel	login	request	141.168.17.188	2026-06-29 09:42:33	2026-06-29 09:42:33
+019f12c2-53cd-71c0-8b40-e7f7c86be2fc	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:33	2026-06-29 09:42:33
+019f12c2-5423-72cf-bcc2-92324a6bc923	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:33	2026-06-29 09:42:33
+019f12c2-5479-71ff-8c58-5cddb91a29c9	Laravel	register	request	102.235.108.248	2026-06-29 09:42:33	2026-06-29 09:42:33
+019f12c2-54d3-71fa-b967-f83f81803e7e	Laravel	allergies	request	120.134.164.193	2026-06-29 09:42:33	2026-06-29 09:42:33
+019f12c2-552a-722c-9a88-763f947abc55	ml-api	/recommend	request	210.235.108.127	2026-06-29 09:42:33	2026-06-29 09:42:33
+019f12c2-5580-7204-bb1c-ce8f09b8a8f3	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:33	2026-06-29 09:42:33
+019f12c2-55d7-71f6-8453-eb69d0319f00	ml-api	/profiles	request	106.231.40.101	2026-06-29 09:42:33	2026-06-29 09:42:33
+019f12c2-562c-7120-a38c-e96e5da60edf	Laravel	login	request	107.147.168.112	2026-06-29 09:42:33	2026-06-29 09:42:33
+019f12c2-5683-71b3-9c05-6438070088b9	image-analysis-api	/health/	request	33.172.18.195	2026-06-29 09:42:33	2026-06-29 09:42:33
+019f12c2-56dc-7094-b0ac-af6af291d588	image-analysis-api	/analyze	request	107.15.25.225	2026-06-29 09:42:33	2026-06-29 09:42:33
+019f12c2-5735-718b-be9a-26252dd1daf6	Laravel	register	request	161.206.38.100	2026-06-29 09:42:34	2026-06-29 09:42:34
+019f12c2-5791-70a9-9abb-2f21ff1daaa7	ml-api	/recommend	request	149.161.52.210	2026-06-29 09:42:34	2026-06-29 09:42:34
+019f12c2-57f0-7220-9cbe-631deeb3d1a7	Laravel	allergies	request	192.28.140.10	2026-06-29 09:42:34	2026-06-29 09:42:34
+019f12c2-584f-71e6-8ca8-2210fa21ed1e	ml-api	/recommend	request	86.174.26.126	2026-06-29 09:42:34	2026-06-29 09:42:34
+019f12c2-58a5-7104-a567-18978f181e4e	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:34	2026-06-29 09:42:34
+019f12c2-58ff-71f6-bf3f-2fb136dd0ec5	Laravel	register	request	74.155.48.158	2026-06-29 09:42:34	2026-06-29 09:42:34
+019f12c2-5956-7051-84b8-cf37931b087a	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:34	2026-06-29 09:42:34
+019f12c2-59ae-70b9-9da7-dc5017c21e85	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:34	2026-06-29 09:42:34
+019f12c2-5a04-7242-8d56-0ec63a9766a6	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:34	2026-06-29 09:42:34
+019f12c2-5a5a-726c-816f-ff618695f02f	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:34	2026-06-29 09:42:34
+019f12c2-5ab0-711a-8827-15a70023c2fa	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:34	2026-06-29 09:42:34
+019f12c2-5b07-711d-9b32-e2ab6199e31b	Laravel	allergies	request	211.211.152.170	2026-06-29 09:42:35	2026-06-29 09:42:35
+019f12c2-5b5e-7227-b704-c117d89c3ba9	ml-api	/recommend	request	49.75.64.55	2026-06-29 09:42:35	2026-06-29 09:42:35
+019f12c2-5bb4-7199-b994-3efef05b4208	Laravel	login	request	135.135.163.126	2026-06-29 09:42:35	2026-06-29 09:42:35
+019f12c2-5c19-7348-b0be-39fae48cc19c	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:35	2026-06-29 09:42:35
+019f12c2-5c77-7316-a4e6-858955c76ef4	Laravel	login	request	77.15.195.241	2026-06-29 09:42:35	2026-06-29 09:42:35
+019f12c2-5cce-7321-a419-727f303590c8	ml-api	/recommend	request	190.123.194.83	2026-06-29 09:42:35	2026-06-29 09:42:35
+019f12c2-5d24-7192-a0ae-cfacaf7d8006	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:35	2026-06-29 09:42:35
+019f12c2-5d7a-73f1-b5b0-2cbb374bcb68	Laravel	register	request	155.178.191.118	2026-06-29 09:42:35	2026-06-29 09:42:35
+019f12c2-5dd1-702a-b540-a1ab0222f075	ml-api	/recommend	request	116.60.35.39	2026-06-29 09:42:35	2026-06-29 09:42:35
+019f12c2-5e27-716c-836b-c99c53875322	image-analysis-api	/health/	request	160.34.56.179	2026-06-29 09:42:35	2026-06-29 09:42:35
+019f12c2-5e7d-70dc-9720-ac7b6fd49aa0	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:35	2026-06-29 09:42:35
+019f12c2-5ed3-705f-a7b1-6ba9e23e879c	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:35	2026-06-29 09:42:35
+019f12c2-5f2a-711e-a3f5-4d1ee524f436	Laravel	allergies	request	231.147.67.118	2026-06-29 09:42:36	2026-06-29 09:42:36
+019f12c2-5f82-707a-a41d-da3feb6fcf60	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:36	2026-06-29 09:42:36
+019f12c2-5fe6-7381-a848-bae9413a5f2f	Laravel	login	request	89.52.16.50	2026-06-29 09:42:36	2026-06-29 09:42:36
+019f12c2-603c-7139-a57b-eb18660acddc	Laravel	allergies	request	44.21.60.95	2026-06-29 09:42:36	2026-06-29 09:42:36
+019f12c2-6094-715b-8b3b-805167c65edf	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:36	2026-06-29 09:42:36
+019f12c2-60eb-73af-b6ba-47af8d221db0	ml-api	/health	request	31.54.202.117	2026-06-29 09:42:36	2026-06-29 09:42:36
+019f12c2-6142-723f-8ae8-c3f40e8d4dbd	ml-api	/recommend	request	160.16.103.178	2026-06-29 09:42:36	2026-06-29 09:42:36
+019f12c2-6199-73f3-9553-5a7cb1a67964	Laravel	register	request	179.76.41.31	2026-06-29 09:42:36	2026-06-29 09:42:36
+019f12c2-61fe-728a-a73f-c25b143581a8	image-analysis-api	/analyze-by-mistral	request	47.229.126.112	2026-06-29 09:42:36	2026-06-29 09:42:36
+019f12c2-6255-712f-9254-1db619af5880	ml-api	/health	request	145.229.36.184	2026-06-29 09:42:36	2026-06-29 09:42:36
+019f12c2-62ad-72d2-95c1-284f04edfb91	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:36	2026-06-29 09:42:36
+019f12c2-630a-72b2-8659-cbe7387247bf	ml-api	/recommend	request	154.200.39.118	2026-06-29 09:42:37	2026-06-29 09:42:37
+019f12c2-6361-72b2-8a16-81b4fcd6debe	ml-api	/profiles	request	224.147.119.54	2026-06-29 09:42:37	2026-06-29 09:42:37
+019f12c2-63b7-7196-a5d4-85995e8ef52b	Laravel	login	request	215.232.211.139	2026-06-29 09:42:37	2026-06-29 09:42:37
+019f12c2-6417-7162-8708-a21e27e03350	image-analysis-api	/health/	request	247.6.147.46	2026-06-29 09:42:37	2026-06-29 09:42:37
+019f12c2-646e-73d3-abaf-92b1af27c4da	Laravel	allergies	request	109.108.224.38	2026-06-29 09:42:37	2026-06-29 09:42:37
+019f12c2-64c4-707c-9fdf-a0eaf8f4cea5	Laravel	register	request	207.125.101.212	2026-06-29 09:42:37	2026-06-29 09:42:37
+019f12c2-651b-70f4-bdff-f7236ba505f5	ml-api	/health	request	26.4.51.49	2026-06-29 09:42:37	2026-06-29 09:42:37
+019f12c2-6573-70eb-aef6-cb9ac1ec4c92	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:37	2026-06-29 09:42:37
+019f12c2-65ca-73bd-9982-db3ded98121e	ml-api	/recommend	request	241.236.243.170	2026-06-29 09:42:37	2026-06-29 09:42:37
+019f12c2-6620-714b-a472-f74d346adf46	Laravel	register	request	224.140.129.188	2026-06-29 09:42:37	2026-06-29 09:42:37
+019f12c2-6677-71c9-9144-dfa9684f9e92	Laravel	allergies	request	18.83.255.212	2026-06-29 09:42:37	2026-06-29 09:42:37
+019f12c2-66d2-70c6-8ad8-2166691453c8	ml-api	/health	request	57.158.34.224	2026-06-29 09:42:38	2026-06-29 09:42:38
+019f12c2-672a-7053-ad48-8a07f02b6a89	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:38	2026-06-29 09:42:38
+019f12c2-6780-7048-a521-67df2fb84a44	Laravel	register	request	149.255.243.53	2026-06-29 09:42:38	2026-06-29 09:42:38
+019f12c2-67d8-7385-a60e-e4bd669ac7cf	image-analysis-api	/analyze	request	4.27.123.30	2026-06-29 09:42:38	2026-06-29 09:42:38
+019f12c2-682f-71ce-b2ab-25ee9bd3f341	ml-api	/health	request	102.28.185.164	2026-06-29 09:42:38	2026-06-29 09:42:38
+019f12c2-6887-73af-a51b-ab00a3621666	ml-api	/profiles	request	202.121.173.42	2026-06-29 09:42:38	2026-06-29 09:42:38
+019f12c2-68e2-7079-aacc-422d828724c2	image-analysis-api	/health/	request	241.104.87.251	2026-06-29 09:42:38	2026-06-29 09:42:38
+019f12c2-693a-72fa-873a-7b59e083f49b	image-analysis-api	/analyze	request	143.200.41.216	2026-06-29 09:42:38	2026-06-29 09:42:38
+019f12c2-6993-7329-99b9-4f4d4aefd8e6	image-analysis-api	/analyze-by-mistral	request	209.167.217.140	2026-06-29 09:42:38	2026-06-29 09:42:38
+019f12c2-69ed-72fd-89fe-24797a023286	Laravel	login	request	91.202.46.99	2026-06-29 09:42:38	2026-06-29 09:42:38
+019f12c2-6a47-7081-8084-b284569919a3	image-analysis-api	/analyze	request	20.113.119.185	2026-06-29 09:42:38	2026-06-29 09:42:38
+019f12c2-6aa1-706b-992b-22f2da2675a8	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:39	2026-06-29 09:42:39
+019f12c2-6af8-72d7-9548-606c05f112f1	Laravel	allergies	request	171.242.67.45	2026-06-29 09:42:39	2026-06-29 09:42:39
+019f12c2-6b51-7218-8b27-d60dc90dc06e	Laravel	register	request	154.52.184.251	2026-06-29 09:42:39	2026-06-29 09:42:39
+019f12c2-6ba7-7295-834a-ccdcd2be9dfe	Laravel	register	request	33.187.111.143	2026-06-29 09:42:39	2026-06-29 09:42:39
+019f12c2-6bff-727c-9c8b-6db08316f26b	ml-api	/profiles	request	228.87.254.12	2026-06-29 09:42:39	2026-06-29 09:42:39
+019f12c2-6c55-72d9-8856-22d73db63bf7	image-analysis-api	/analyze-by-mistral	request	19.84.60.24	2026-06-29 09:42:39	2026-06-29 09:42:39
+019f12c2-6cb2-71b7-819d-5ed105ef5c56	Laravel	login	request	137.82.183.49	2026-06-29 09:42:39	2026-06-29 09:42:39
+019f12c2-6d0a-72ed-adc5-002a4f151a6b	Laravel	allergies	request	238.134.217.121	2026-06-29 09:42:39	2026-06-29 09:42:39
+019f12c2-6d60-71a7-b13b-f496612a4de4	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:39	2026-06-29 09:42:39
+019f12c2-6db7-7196-ad77-f39bcd59b54a	image-analysis-api	/analyze	request	20.198.253.205	2026-06-29 09:42:39	2026-06-29 09:42:39
+019f12c2-6e0e-736b-9533-b4a4b598b2e3	image-analysis-api	/analyze	request	64.245.202.9	2026-06-29 09:42:39	2026-06-29 09:42:39
+019f12c2-6e64-726f-934d-66a587f27fc9	Laravel	login	request	224.167.235.23	2026-06-29 09:42:39	2026-06-29 09:42:39
+019f12c2-6ebe-7150-a5c9-cb11413e988c	image-analysis-api	/analyze	request	126.142.137.112	2026-06-29 09:42:40	2026-06-29 09:42:40
+019f12c2-6f1c-724c-b789-cde381228a8b	ml-api	/profiles	request	148.103.173.63	2026-06-29 09:42:40	2026-06-29 09:42:40
+019f12c2-6f78-70c4-9629-bb79c4aafc09	ml-api	/recommend	request	9.30.34.246	2026-06-29 09:42:40	2026-06-29 09:42:40
+019f12c2-6fd2-70e1-9f64-321a76015038	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:40	2026-06-29 09:42:40
+019f12c2-7028-73a6-81d5-76a7086c3f32	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:40	2026-06-29 09:42:40
+019f12c2-7080-71d0-9212-64a209b07c87	image-analysis-api	/analyze-by-mistral	request	14.125.113.15	2026-06-29 09:42:40	2026-06-29 09:42:40
+019f12c2-70d9-70f7-97dd-46c9bfc1d0e7	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:40	2026-06-29 09:42:40
+019f12c2-7130-73a9-814c-2c764eccd056	Laravel	allergies	request	100.196.94.113	2026-06-29 09:42:40	2026-06-29 09:42:40
+019f12c2-7188-70bb-b243-025d143502d6	image-analysis-api	/health/	request	212.139.41.9	2026-06-29 09:42:40	2026-06-29 09:42:40
+019f12c2-71e4-718f-acda-d1999b1a4e45	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:40	2026-06-29 09:42:40
+019f12c2-723c-7287-af4c-e56ab3527717	Laravel	allergies	request	230.173.28.24	2026-06-29 09:42:40	2026-06-29 09:42:40
+019f12c2-7293-7364-8ce8-cb5cdd895c9f	Laravel	register	request	214.14.60.205	2026-06-29 09:42:41	2026-06-29 09:42:41
+019f12c2-72ea-73ab-b7f1-7afbc6b15d17	Laravel	allergies	request	171.202.147.173	2026-06-29 09:42:41	2026-06-29 09:42:41
+019f12c2-7343-71d8-a003-5e44afb51f8b	image-analysis-api	/analyze	request	151.153.5.205	2026-06-29 09:42:41	2026-06-29 09:42:41
+019f12c2-739a-7048-9f34-2c39961bcafc	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:41	2026-06-29 09:42:41
+019f12c2-73f2-71fa-b161-b811ed43e70a	image-analysis-api	/health/	request	26.79.216.206	2026-06-29 09:42:41	2026-06-29 09:42:41
+019f12c2-744a-7115-8419-436c5dbad55f	Laravel	allergies	request	54.195.207.223	2026-06-29 09:42:41	2026-06-29 09:42:41
+019f12c2-74a1-7042-b6c2-2e8eb0df91cb	Laravel	register	request	160.174.164.145	2026-06-29 09:42:41	2026-06-29 09:42:41
+019f12c2-74f8-734c-bd30-5696af648ed4	ml-api	/profiles	request	29.249.180.107	2026-06-29 09:42:41	2026-06-29 09:42:41
+019f12c2-754d-7171-bc78-47fb793e0606	Laravel	allergies	request	215.126.14.50	2026-06-29 09:42:41	2026-06-29 09:42:41
+019f12c2-75a7-7275-99a9-ff203c98e177	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:41	2026-06-29 09:42:41
+019f12c2-75fe-7031-a275-cc1e66cf6257	ml-api	/recommend	request	82.71.48.57	2026-06-29 09:42:41	2026-06-29 09:42:41
+019f12c2-7654-7248-8841-37c11f486069	ml-api	/health	request	35.223.74.55	2026-06-29 09:42:42	2026-06-29 09:42:42
+019f12c2-76aa-728f-8e0f-b49653954f2b	image-analysis-api	/analyze-by-mistral	request	199.133.133.107	2026-06-29 09:42:42	2026-06-29 09:42:42
+019f12c2-7706-71c7-9c6f-8af823d3133b	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:42	2026-06-29 09:42:42
+019f12c2-7764-73f1-9b63-847a8d165829	Laravel	login	request	157.222.186.91	2026-06-29 09:42:42	2026-06-29 09:42:42
+019f12c2-77bb-730c-8bc3-eed0b0847f19	Laravel	allergies	request	117.232.17.150	2026-06-29 09:42:42	2026-06-29 09:42:42
+019f12c2-7816-7030-a6a2-01c74acac0e3	Laravel	register	request	100.158.248.187	2026-06-29 09:42:42	2026-06-29 09:42:42
+019f12c2-786e-72ba-9590-903fb70f52ae	Laravel	allergies	request	45.197.53.35	2026-06-29 09:42:42	2026-06-29 09:42:42
+019f12c2-78c5-72b8-8cda-271a57a4863d	Laravel	register	request	230.32.118.158	2026-06-29 09:42:42	2026-06-29 09:42:42
+019f12c2-7922-72c5-b656-7279da40dc9d	image-analysis-api	/analyze-by-mistral	request	37.37.33.173	2026-06-29 09:42:42	2026-06-29 09:42:42
+019f12c2-797c-72e2-8f74-69633833ae21	Laravel	allergies	request	61.223.65.237	2026-06-29 09:42:42	2026-06-29 09:42:42
+019f12c2-79d3-705a-a5a6-1c86506a3f50	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:42	2026-06-29 09:42:42
+019f12c2-7a2d-7182-b212-0b065c8cf34f	Laravel	login	request	148.187.196.175	2026-06-29 09:42:42	2026-06-29 09:42:42
+019f12c2-7a84-72cc-85fa-20aa5dce5e26	Laravel	register	request	190.176.222.254	2026-06-29 09:42:43	2026-06-29 09:42:43
+019f12c2-7add-730d-90b1-3a411bd1abc0	ml-api	/profiles	request	49.146.200.134	2026-06-29 09:42:43	2026-06-29 09:42:43
+019f12c2-7b37-71d9-b161-fa7a4e9a317a	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:43	2026-06-29 09:42:43
+019f12c2-7b8d-717c-9923-b9d7819368eb	Laravel	allergies	request	255.6.76.163	2026-06-29 09:42:43	2026-06-29 09:42:43
+019f12c2-7be4-7211-91b4-f1c7652b62dd	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:43	2026-06-29 09:42:43
+019f12c2-7c3b-725b-b778-cf87c2b72a05	Laravel	login	request	188.230.227.103	2026-06-29 09:42:43	2026-06-29 09:42:43
+019f12c2-7c98-724b-a230-c4c53e4d9d13	ml-api	/health	request	9.34.22.144	2026-06-29 09:42:43	2026-06-29 09:42:43
+019f12c2-7cf4-7030-99d6-9c86b7a46ba5	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:43	2026-06-29 09:42:43
+019f12c2-7d4c-7003-80ab-a0eb2cfe69f7	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:43	2026-06-29 09:42:43
+019f12c2-7da3-725f-9dfb-4c22cb9c7aef	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:43	2026-06-29 09:42:43
+019f12c2-7dfa-7006-b88f-10f82bcc1716	ml-api	/recommend	request	118.144.75.149	2026-06-29 09:42:43	2026-06-29 09:42:43
+019f12c2-7e52-717d-bb3d-c5779159a420	image-analysis-api	/analyze-by-mistral	request	4.124.160.104	2026-06-29 09:42:44	2026-06-29 09:42:44
+019f12c2-7ec1-7398-9463-a338727d12b7	Laravel	allergies	request	95.254.23.63	2026-06-29 09:42:44	2026-06-29 09:42:44
+019f12c2-7f18-7376-b748-50e3b6ef97eb	ml-api	/profiles	request	251.56.101.85	2026-06-29 09:42:44	2026-06-29 09:42:44
+019f12c2-7f6f-72b3-a739-e3f40ce471a5	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:44	2026-06-29 09:42:44
+019f12c2-7fc5-70f8-b9ad-b67953750e4e	ml-api	/recommend	request	151.244.24.31	2026-06-29 09:42:44	2026-06-29 09:42:44
+019f12c2-801c-7317-9bc9-f5346e6f55cd	Laravel	register	request	43.221.149.68	2026-06-29 09:42:44	2026-06-29 09:42:44
+019f12c2-8073-71cb-97ae-38494856f34a	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:44	2026-06-29 09:42:44
+019f12c2-80ca-7336-89f5-2b5ba0e2156f	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:44	2026-06-29 09:42:44
+019f12c2-8121-7337-9da3-a5c8b375c9b3	Laravel	login	request	197.71.115.129	2026-06-29 09:42:44	2026-06-29 09:42:44
+019f12c2-817a-723a-8044-e667978d5357	image-analysis-api	/analyze-by-mistral	request	226.23.163.150	2026-06-29 09:42:44	2026-06-29 09:42:44
+019f12c2-81e1-71d6-aab7-1bbd8c2913fd	Laravel	allergies	request	148.224.136.43	2026-06-29 09:42:44	2026-06-29 09:42:44
+019f12c2-8245-700f-bd03-bd7747ad5719	Laravel	allergies	request	106.247.158.45	2026-06-29 09:42:45	2026-06-29 09:42:45
+019f12c2-829d-72c9-932b-57d26aba5208	ml-api	/profiles	request	118.48.219.11	2026-06-29 09:42:45	2026-06-29 09:42:45
+019f12c2-82fa-73ff-82ad-26f4efa67786	Laravel	allergies	request	227.247.74.239	2026-06-29 09:42:45	2026-06-29 09:42:45
+019f12c2-8351-723e-afcd-6f8de1d0c1bc	Laravel	allergies	request	81.30.72.169	2026-06-29 09:42:45	2026-06-29 09:42:45
+019f12c2-83ac-734e-840a-4fd701b1ee6a	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:45	2026-06-29 09:42:45
+019f12c2-8406-70c9-b1fd-0c0ccbfc0348	Laravel	allergies	request	142.30.47.208	2026-06-29 09:42:45	2026-06-29 09:42:45
+019f12c2-845f-7301-b812-d1e83cb0a8e8	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:45	2026-06-29 09:42:45
+019f12c2-84b9-7184-896e-9ac351b02e7f	Laravel	login	request	112.121.54.57	2026-06-29 09:42:45	2026-06-29 09:42:45
+019f12c2-8513-7172-87c9-bdb2b0f1265d	image-analysis-api	/analyze-by-mistral	request	145.4.201.235	2026-06-29 09:42:45	2026-06-29 09:42:45
+019f12c2-856a-703c-b739-5dffbdd79bab	ml-api	/profiles	request	168.87.146.48	2026-06-29 09:42:45	2026-06-29 09:42:45
+019f12c2-85c1-73ee-bd51-551ab3009203	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:45	2026-06-29 09:42:45
+019f12c2-861a-724f-9b7a-3c522790541f	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:46	2026-06-29 09:42:46
+019f12c2-8670-7262-9f6a-9eceedccfc5a	Laravel	login	request	73.34.107.240	2026-06-29 09:42:46	2026-06-29 09:42:46
+019f12c2-86c8-7355-b77d-93f9f049d5ca	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:46	2026-06-29 09:42:46
+019f12c2-871f-73e5-bb6b-3844a84eb2dd	Laravel	register	request	65.57.218.61	2026-06-29 09:42:46	2026-06-29 09:42:46
+019f12c2-8775-7324-a571-19b3d1abccc6	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:46	2026-06-29 09:42:46
+019f12c2-87cc-7012-8da0-a1a949f68b47	Laravel	register	request	118.177.162.146	2026-06-29 09:42:46	2026-06-29 09:42:46
+019f12c2-8827-7219-bedd-d9af26707157	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:46	2026-06-29 09:42:46
+019f12c2-8880-7189-8ed2-42a5e483f38c	Laravel	allergies	request	145.73.11.100	2026-06-29 09:42:46	2026-06-29 09:42:46
+019f12c2-88d6-70ba-a482-6950fdddb865	ml-api	/profiles	request	158.33.221.248	2026-06-29 09:42:46	2026-06-29 09:42:46
+019f12c2-892d-71b8-9a07-82c35a9eb3d6	image-analysis-api	/analyze-by-mistral	request	135.201.179.88	2026-06-29 09:42:46	2026-06-29 09:42:46
+019f12c2-8984-70c0-a2b8-398f3e23254c	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:46	2026-06-29 09:42:46
+019f12c2-89dc-710c-8df0-6408e90ca5da	ml-api	/health	request	241.61.147.230	2026-06-29 09:42:47	2026-06-29 09:42:47
+019f12c2-8a3c-71a3-b3e0-e2464c3067dc	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:47	2026-06-29 09:42:47
+019f12c2-8a92-71cf-b8fe-bda0cb6ffa05	Laravel	allergies	request	25.53.152.14	2026-06-29 09:42:47	2026-06-29 09:42:47
+019f12c2-8aec-7035-9d33-1f01379c3886	Laravel	allergies	request	9.239.87.88	2026-06-29 09:42:47	2026-06-29 09:42:47
+019f12c2-8b42-7342-ba76-53adfa8bb835	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:47	2026-06-29 09:42:47
+019f12c2-8b9c-710d-a7f4-b7ab26d99057	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:47	2026-06-29 09:42:47
+019f12c2-8bf3-72c7-ae28-e636b7abb852	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:47	2026-06-29 09:42:47
+019f12c2-8c4a-73ba-88fd-7926ec818337	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:47	2026-06-29 09:42:47
+019f12c2-8ca3-72d1-a216-c224a7ccceb3	Laravel	register	request	102.4.25.218	2026-06-29 09:42:47	2026-06-29 09:42:47
+019f12c2-8cf9-70de-9e48-8533ec4778fa	Laravel	register	request	188.194.117.156	2026-06-29 09:42:47	2026-06-29 09:42:47
+019f12c2-8d4f-73a3-9fe9-5069a7b9e8f7	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:47	2026-06-29 09:42:47
+019f12c2-8db8-70bb-a4c0-21d71b62c454	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:47	2026-06-29 09:42:47
+019f12c2-8e0e-73b4-a9b4-9dd0ad74245c	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:48	2026-06-29 09:42:48
+019f12c2-8e75-7110-b6e1-06f4515cc8f5	Laravel	login	request	67.239.14.104	2026-06-29 09:42:48	2026-06-29 09:42:48
+019f12c2-8ed0-72b7-9278-7e6c8fd32feb	Laravel	allergies	request	183.192.215.210	2026-06-29 09:42:48	2026-06-29 09:42:48
+019f12c2-8f26-7228-8c54-2deb7fd9c272	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:48	2026-06-29 09:42:48
+019f12c2-8f7f-7107-bcd4-6cf2f98545eb	Laravel	allergies	request	104.5.59.102	2026-06-29 09:42:48	2026-06-29 09:42:48
+019f12c2-8fd7-7373-81d6-c3b1587acae2	Laravel	login	request	147.21.158.224	2026-06-29 09:42:48	2026-06-29 09:42:48
+019f12c2-902e-7325-be51-268b9a89f516	image-analysis-api	/health/	request	56.54.54.199	2026-06-29 09:42:48	2026-06-29 09:42:48
+019f12c2-9085-70ca-86dd-904a49f4102e	image-analysis-api	/analyze	request	136.193.9.110	2026-06-29 09:42:48	2026-06-29 09:42:48
+019f12c2-90dd-738a-8170-7f6b68d9f070	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:48	2026-06-29 09:42:48
+019f12c2-9137-73a5-90c8-2e25a41e483d	Laravel	register	request	87.5.47.17	2026-06-29 09:42:48	2026-06-29 09:42:48
+019f12c2-9192-7230-b979-684559c23905	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:48	2026-06-29 09:42:48
+019f12c2-91e9-718a-8cbc-9b71321aea56	ml-api	/profiles	request	254.146.193.125	2026-06-29 09:42:49	2026-06-29 09:42:49
+019f12c2-9240-705c-b863-35c5db0e5a01	Laravel	login	request	175.66.14.85	2026-06-29 09:42:49	2026-06-29 09:42:49
+019f12c2-9296-7162-95a2-cbea55d802b1	Laravel	login	request	225.112.52.211	2026-06-29 09:42:49	2026-06-29 09:42:49
+019f12c2-92ed-701d-ab9a-cb3adefe42d4	ml-api	/recommend	request	88.202.223.121	2026-06-29 09:42:49	2026-06-29 09:42:49
+019f12c2-9343-7298-927b-9e2ad86448d6	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:49	2026-06-29 09:42:49
+019f12c2-93a0-7216-b110-684f6d6cf40f	Laravel	allergies	request	204.215.245.113	2026-06-29 09:42:49	2026-06-29 09:42:49
+019f12c2-93f6-73fa-8dbe-b08455549b1f	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:49	2026-06-29 09:42:49
+019f12c2-944d-71ed-92fd-3cc05ab41158	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:49	2026-06-29 09:42:49
+019f12c2-94a6-71d9-b556-41fba8dabcdd	Laravel	register	request	68.96.29.157	2026-06-29 09:42:49	2026-06-29 09:42:49
+019f12c2-94fc-7231-9252-15eead7e1ad6	Laravel	login	request	217.193.225.202	2026-06-29 09:42:49	2026-06-29 09:42:49
+019f12c2-9558-7393-889c-f70cc0bf4e97	Laravel	allergies	request	159.231.255.53	2026-06-29 09:42:49	2026-06-29 09:42:49
+019f12c2-95ae-73c6-b234-5ef946c8f699	Laravel	allergies	request	48.116.29.205	2026-06-29 09:42:50	2026-06-29 09:42:50
+019f12c2-9604-7204-b411-f23cf270405b	Laravel	register	request	54.81.178.206	2026-06-29 09:42:50	2026-06-29 09:42:50
+019f12c2-965c-71f0-9aff-cdd4f5aa76f2	image-analysis-api	/health/	request	139.179.19.234	2026-06-29 09:42:50	2026-06-29 09:42:50
+019f12c2-96b4-7089-bada-1be8726a8d42	Laravel	login	request	35.76.150.8	2026-06-29 09:42:50	2026-06-29 09:42:50
+019f12c2-970a-73aa-9b3d-9f21b970c3c9	image-analysis-api	/analyze-by-mistral	request	183.35.204.99	2026-06-29 09:42:50	2026-06-29 09:42:50
+019f12c2-9760-7087-b743-48b10cd74347	Laravel	allergies	request	190.147.141.8	2026-06-29 09:42:50	2026-06-29 09:42:50
+019f12c2-97b6-7223-80e5-7cd668ebbdb6	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:50	2026-06-29 09:42:50
+019f12c2-980d-73d4-a46f-0dd01bcd3fd4	image-analysis-api	/analyze-by-mistral	request	76.103.10.181	2026-06-29 09:42:50	2026-06-29 09:42:50
+019f12c2-9864-730a-a45e-c4129277f3af	ml-api	/health	request	207.113.108.54	2026-06-29 09:42:50	2026-06-29 09:42:50
+019f12c2-98bb-7231-adbc-d8e0986b1cbd	Laravel	login	request	36.210.34.75	2026-06-29 09:42:50	2026-06-29 09:42:50
+019f12c2-9913-73bf-84c7-53999a69b02d	image-analysis-api	/analyze	request	112.242.151.245	2026-06-29 09:42:50	2026-06-29 09:42:50
+019f12c2-9969-71e5-b67a-6a7f4945c446	image-analysis-api	/health/	request	130.99.198.81	2026-06-29 09:42:50	2026-06-29 09:42:50
+019f12c2-99c0-72d1-8999-b2d21bd34efe	image-analysis-api	/health/	request	168.146.203.60	2026-06-29 09:42:51	2026-06-29 09:42:51
+019f12c2-9a16-71ec-bb79-e38c8928b0db	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:51	2026-06-29 09:42:51
+019f12c2-9a6c-72b6-a8b7-64f0925ba904	ml-api	/recommend	request	74.226.244.254	2026-06-29 09:42:51	2026-06-29 09:42:51
+019f12c2-9ac3-7258-8698-caed5b9c152b	image-analysis-api	/analyze	request	135.131.197.224	2026-06-29 09:42:51	2026-06-29 09:42:51
+019f12c2-9b19-7371-adfb-33999f128556	ml-api	/recommend	request	17.219.223.49	2026-06-29 09:42:51	2026-06-29 09:42:51
+019f12c2-9b72-7356-9847-63c1de832d47	Laravel	login	request	193.88.177.59	2026-06-29 09:42:51	2026-06-29 09:42:51
+019f12c2-9bc8-7264-a2f1-79c4a7c7835f	ml-api	/health	request	203.225.62.17	2026-06-29 09:42:51	2026-06-29 09:42:51
+019f12c2-9c21-7386-8d2a-9ec394f73ddc	Laravel	allergies	request	16.40.185.243	2026-06-29 09:42:51	2026-06-29 09:42:51
+019f12c2-9c78-719b-849b-25348587d46f	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:51	2026-06-29 09:42:51
+019f12c2-9ccf-71bd-9925-775f47fb18c0	image-analysis-api	/health/	request	203.13.123.71	2026-06-29 09:42:51	2026-06-29 09:42:51
+019f12c2-9d26-7148-a1d4-92499c49c3e6	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:51	2026-06-29 09:42:51
+019f12c2-9d7e-7247-b0a7-bebd616c5de4	Laravel	allergies	request	58.146.232.222	2026-06-29 09:42:52	2026-06-29 09:42:52
+019f12c2-9dd4-7376-8b11-2f31654f99cd	Laravel	register	request	141.137.153.136	2026-06-29 09:42:52	2026-06-29 09:42:52
+019f12c2-9e2b-700a-bd6b-0b69cb7ebfc5	image-analysis-api	/analyze	request	45.113.134.141	2026-06-29 09:42:52	2026-06-29 09:42:52
+019f12c2-9e81-73d2-b32e-ac1e794401f7	Laravel	allergies	request	17.106.244.178	2026-06-29 09:42:52	2026-06-29 09:42:52
+019f12c2-9ed7-70b2-9134-1e2ef3ccf3dc	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:52	2026-06-29 09:42:52
+019f12c2-9f3f-7217-b527-58ff931a561b	Laravel	register	request	106.30.189.67	2026-06-29 09:42:52	2026-06-29 09:42:52
+019f12c2-9f97-7153-9903-2933b300707e	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:52	2026-06-29 09:42:52
+019f12c2-9fef-70be-9ac7-d60197046ce2	Laravel	allergies	request	30.47.116.110	2026-06-29 09:42:52	2026-06-29 09:42:52
+019f12c2-a047-7303-8fed-ec310949ffc2	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:52	2026-06-29 09:42:52
+019f12c2-a0ab-733b-9b68-3dc4d2d69d2b	Laravel	allergies	request	254.221.224.82	2026-06-29 09:42:52	2026-06-29 09:42:52
+019f12c2-a104-72aa-b721-9e5efadd78bc	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:52	2026-06-29 09:42:52
+019f12c2-a163-724d-8c4b-b0b8539723cc	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:53	2026-06-29 09:42:53
+019f12c2-a1b9-706c-b660-1f062e4cc774	ml-api	/health	request	84.47.195.34	2026-06-29 09:42:53	2026-06-29 09:42:53
+019f12c2-a210-72d4-847b-ebbae56b9ffd	Laravel	register	request	125.77.100.153	2026-06-29 09:42:53	2026-06-29 09:42:53
+019f12c2-a268-70e5-960e-42edbce00423	image-analysis-api	/health/	request	40.187.32.137	2026-06-29 09:42:53	2026-06-29 09:42:53
+019f12c2-a2be-7371-8025-4a667482bb2e	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:53	2026-06-29 09:42:53
+019f12c2-a314-7366-a18a-ce4aecb2d3fa	ml-api	/recommend	request	33.118.228.148	2026-06-29 09:42:53	2026-06-29 09:42:53
+019f12c2-a36a-7127-a5e6-c35edb534402	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:53	2026-06-29 09:42:53
+019f12c2-a3c1-7364-ae00-210c154563ce	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:53	2026-06-29 09:42:53
+019f12c2-a42e-705b-942b-679d82c3e5fd	Laravel	login	request	179.39.133.88	2026-06-29 09:42:53	2026-06-29 09:42:53
+019f12c2-a485-71f3-aaf2-4db231138674	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:53	2026-06-29 09:42:53
+019f12c2-a4dd-70e4-9eb3-2a5adf46e22a	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:53	2026-06-29 09:42:53
+019f12c2-a537-7192-85ab-4fe4a0bd283d	ml-api	/recommend	request	192.25.23.248	2026-06-29 09:42:54	2026-06-29 09:42:54
+019f12c2-a58c-70c6-bc44-ec0dd9e6bc2c	Laravel	login	request	56.135.10.251	2026-06-29 09:42:54	2026-06-29 09:42:54
+019f12c2-a5e3-732c-922f-aec80beed634	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:54	2026-06-29 09:42:54
+019f12c2-a63b-7267-9810-1e7b8a976f39	ml-api	/profiles	request	162.44.12.49	2026-06-29 09:42:54	2026-06-29 09:42:54
+019f12c2-a692-710a-ac35-7c432b523c14	Laravel	allergies	request	210.184.161.240	2026-06-29 09:42:54	2026-06-29 09:42:54
+019f12c2-a6ea-7397-8b9b-6257ba9303ea	image-analysis-api	/health/	request	220.162.56.246	2026-06-29 09:42:54	2026-06-29 09:42:54
+019f12c2-a742-730d-ad15-f0af1ef85753	ml-api	/recommend	request	197.244.96.88	2026-06-29 09:42:54	2026-06-29 09:42:54
+019f12c2-a7a7-73bd-877b-962673194433	Laravel	register	request	185.46.102.54	2026-06-29 09:42:54	2026-06-29 09:42:54
+019f12c2-a7fe-709b-a572-38fa0e06967e	image-analysis-api	/health/	request	66.21.249.30	2026-06-29 09:42:54	2026-06-29 09:42:54
+019f12c2-a857-70e1-b24a-f1080b5a10ed	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:54	2026-06-29 09:42:54
+019f12c2-a8af-7371-9ffa-89449cc9fc3d	Laravel	register	request	109.136.105.158	2026-06-29 09:42:54	2026-06-29 09:42:54
+019f12c2-a908-71a6-b159-5faede55b17a	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:54	2026-06-29 09:42:54
+019f12c2-a95e-7066-9f57-6cdd2919db86	Laravel	login	request	42.177.15.208	2026-06-29 09:42:55	2026-06-29 09:42:55
+019f12c2-a9b5-71c5-bbaf-342aa26395e3	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:55	2026-06-29 09:42:55
+019f12c2-aa0d-716d-ac33-92a249bf86f2	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:55	2026-06-29 09:42:55
+019f12c2-aa67-737c-8c0b-d8f6ab832924	Laravel	register	request	152.110.117.226	2026-06-29 09:42:55	2026-06-29 09:42:55
+019f12c2-aabf-7148-a7e9-1aab4ab88cd7	ml-api	/recommend	request	239.250.65.222	2026-06-29 09:42:55	2026-06-29 09:42:55
+019f12c2-ab18-721e-bc95-8d5ddbbae133	ml-api	/health	request	251.4.144.241	2026-06-29 09:42:55	2026-06-29 09:42:55
+019f12c2-ab72-7350-ab52-f2da5a6c24d2	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:55	2026-06-29 09:42:55
+019f12c2-abca-7061-86aa-8b88e4f57665	Laravel	register	request	74.169.2.172	2026-06-29 09:42:55	2026-06-29 09:42:55
+019f12c2-ac21-73dc-992b-cdc23b772acb	image-analysis-api	/analyze	request	17.251.9.201	2026-06-29 09:42:55	2026-06-29 09:42:55
+019f12c2-ac78-72d0-ac75-8d129a9442e4	ml-api	/profiles	request	120.190.225.116	2026-06-29 09:42:55	2026-06-29 09:42:55
+019f12c2-accf-7127-972f-e65381dece30	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:55	2026-06-29 09:42:55
+019f12c2-ad26-7086-b410-8811e9139d7f	Laravel	allergies	request	105.62.140.231	2026-06-29 09:42:56	2026-06-29 09:42:56
+019f12c2-ad7d-721a-834a-948b52b4e4cd	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:56	2026-06-29 09:42:56
+019f12c2-add4-7205-8e3b-9d0c39921264	Laravel	login	request	119.92.135.185	2026-06-29 09:42:56	2026-06-29 09:42:56
+019f12c2-ae2b-7015-8289-0ac0ca4dc046	Laravel	register	request	78.243.147.182	2026-06-29 09:42:56	2026-06-29 09:42:56
+019f12c2-ae82-7370-853e-eeddd2e70792	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:56	2026-06-29 09:42:56
+019f12c2-aedc-71d8-991d-cd4d509bca63	Laravel	register	request	248.220.183.143	2026-06-29 09:42:56	2026-06-29 09:42:56
+019f12c2-af3e-7132-8be1-58d0b35eb36c	ml-api	/recommend	request	117.154.1.13	2026-06-29 09:42:56	2026-06-29 09:42:56
+019f12c2-af99-7236-b874-75422fcfed21	Laravel	login	request	29.88.180.115	2026-06-29 09:42:56	2026-06-29 09:42:56
+019f12c2-aff3-72e1-bcd6-0a2962ee03d5	Laravel	register	request	117.251.194.48	2026-06-29 09:42:56	2026-06-29 09:42:56
+019f12c2-b04f-71d1-845f-afe00f92e6f1	Laravel	register	request	24.189.157.39	2026-06-29 09:42:56	2026-06-29 09:42:56
+019f12c2-b0a5-71fb-af08-321aca8f98e0	ml-api	/health	request	61.232.73.59	2026-06-29 09:42:56	2026-06-29 09:42:56
+019f12c2-b0fb-72b7-8ecc-01f304226da3	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:57	2026-06-29 09:42:57
+019f12c2-b151-7061-b177-eead5c6c20bf	Laravel	allergies	request	126.68.212.23	2026-06-29 09:42:57	2026-06-29 09:42:57
+019f12c2-b1a8-73f1-85f3-68f88cf1cef6	Laravel	allergies	request	109.84.227.133	2026-06-29 09:42:57	2026-06-29 09:42:57
+019f12c2-b1fe-7298-91c5-3803227f7344	ml-api	/recommend	request	223.56.92.160	2026-06-29 09:42:57	2026-06-29 09:42:57
+019f12c2-b254-735f-bdbf-d6bcabc819d4	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:57	2026-06-29 09:42:57
+019f12c2-b2ad-70e0-9534-fe62160f14fb	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:57	2026-06-29 09:42:57
+019f12c2-b303-736b-98ca-bf28ebb8b00f	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:57	2026-06-29 09:42:57
+019f12c2-b35b-73f1-a96a-c9f19230cc26	Laravel	register	request	15.2.239.54	2026-06-29 09:42:57	2026-06-29 09:42:57
+019f12c2-b3b2-7279-84ad-6b841de02bec	Laravel	register	request	30.31.195.71	2026-06-29 09:42:57	2026-06-29 09:42:57
+019f12c2-b40a-71a7-8a6c-86a19b794128	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:57	2026-06-29 09:42:57
+019f12c2-b463-73b9-84a8-32914bd3e7c9	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:57	2026-06-29 09:42:57
+019f12c2-b4ba-7198-b1ab-251ea31f8890	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:57	2026-06-29 09:42:57
+019f12c2-b510-7364-babb-17123b28b46a	image-analysis-api	/analyze	request	85.214.191.104	2026-06-29 09:42:58	2026-06-29 09:42:58
+019f12c2-b567-737f-9e48-731fe911f1bb	image-analysis-api	/analyze	request	213.201.201.45	2026-06-29 09:42:58	2026-06-29 09:42:58
+019f12c2-b5c0-7197-9288-ead2c9ef3db4	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:42:58	2026-06-29 09:42:58
+019f12c2-b616-7115-bb32-b4096f0a113b	ml-api	/health	request	139.120.119.36	2026-06-29 09:42:58	2026-06-29 09:42:58
+019f12c2-b66d-712c-ac76-edec59058cc5	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:58	2026-06-29 09:42:58
+019f12c2-b6c4-722f-9768-c0581560875e	image-analysis-api	/health/	request	160.129.57.57	2026-06-29 09:42:58	2026-06-29 09:42:58
+019f12c2-b71d-7190-80a0-7963cebd4330	image-analysis-api	/analyze	request	218.67.119.153	2026-06-29 09:42:58	2026-06-29 09:42:58
+019f12c2-b775-7093-bcb8-0392b32277be	ml-api	/profiles	request	239.118.46.210	2026-06-29 09:42:58	2026-06-29 09:42:58
+019f12c2-b7ce-73cd-bb8a-e0eceee30e6c	Laravel	login	request	194.206.2.27	2026-06-29 09:42:58	2026-06-29 09:42:58
+019f12c2-b826-7121-abd1-6b500c94bb84	Laravel	allergies	request	56.163.218.154	2026-06-29 09:42:58	2026-06-29 09:42:58
+019f12c2-b884-7055-91fb-79072e94194d	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:58	2026-06-29 09:42:58
+019f12c2-b8de-7094-a30a-0434a7029868	ml-api	/recommend	request	213.13.62.145	2026-06-29 09:42:59	2026-06-29 09:42:59
+019f12c2-b939-713a-8089-0a4142fb1471	Laravel	allergies	request	156.251.99.159	2026-06-29 09:42:59	2026-06-29 09:42:59
+019f12c2-b997-7021-b80c-8b1b0ba84705	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:59	2026-06-29 09:42:59
+019f12c2-b9f2-72c4-96a2-edc9a21639d2	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:59	2026-06-29 09:42:59
+019f12c2-ba4a-7045-b7f5-b4040d3e7fac	Laravel	login	request	197.75.177.47	2026-06-29 09:42:59	2026-06-29 09:42:59
+019f12c2-ba9f-7102-8cdb-4bd36e220d08	image-analysis-api	/analyze-by-mistral	request	188.37.233.104	2026-06-29 09:42:59	2026-06-29 09:42:59
+019f12c2-bafb-7228-82c8-49a26189e0e6	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:42:59	2026-06-29 09:42:59
+019f12c2-bb52-7321-b109-cdacec6ef983	Laravel	login	request	180.175.77.135	2026-06-29 09:42:59	2026-06-29 09:42:59
+019f12c2-bba8-7082-867a-0ea8430674e0	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:42:59	2026-06-29 09:42:59
+019f12c2-bc01-7221-9139-a218dec05dd3	Laravel	login	request	185.207.152.198	2026-06-29 09:42:59	2026-06-29 09:42:59
+019f12c2-bc59-7097-9169-f92876a24642	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:42:59	2026-06-29 09:42:59
+019f12c2-bcb1-7321-b974-ea305fd95033	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:00	2026-06-29 09:43:00
+019f12c2-bd09-7063-ae1e-8d5b65839375	ml-api	/health	request	21.40.116.151	2026-06-29 09:43:00	2026-06-29 09:43:00
+019f12c2-bd5f-72b0-a764-1f280f64035a	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:00	2026-06-29 09:43:00
+019f12c2-bdb7-7135-90ab-1dadd721aba5	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:00	2026-06-29 09:43:00
+019f12c2-be11-708b-81fc-fbe747b3412e	image-analysis-api	/analyze-by-mistral	request	51.178.251.106	2026-06-29 09:43:00	2026-06-29 09:43:00
+019f12c2-be6b-7171-94a1-98d8f515586b	image-analysis-api	/analyze	request	248.176.60.7	2026-06-29 09:43:00	2026-06-29 09:43:00
+019f12c2-bec3-726e-8a4c-ba13acc7695f	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:00	2026-06-29 09:43:00
+019f12c2-bf1b-7219-9bed-d2e624b43f7a	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:00	2026-06-29 09:43:00
+019f12c2-bf71-7270-be96-453afa63a73f	ml-api	/health	request	170.149.91.47	2026-06-29 09:43:00	2026-06-29 09:43:00
+019f12c2-bfca-7296-b01b-745494996852	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:00	2026-06-29 09:43:00
+019f12c2-c024-72a1-a09f-e36b5c8d2b24	ml-api	/health	request	31.135.175.236	2026-06-29 09:43:00	2026-06-29 09:43:00
+019f12c2-c07c-70d1-8ae0-038c9d86d323	image-analysis-api	/health/	request	8.189.217.46	2026-06-29 09:43:00	2026-06-29 09:43:00
+019f12c2-c0d3-72ff-9a27-e990bf0feed4	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:01	2026-06-29 09:43:01
+019f12c2-c129-711a-879f-2b4913b9d352	Laravel	login	request	70.37.139.111	2026-06-29 09:43:01	2026-06-29 09:43:01
+019f12c2-c186-7193-99be-ca9730d09b46	ml-api	/recommend	request	160.152.91.237	2026-06-29 09:43:01	2026-06-29 09:43:01
+019f12c2-c1f2-7342-a092-7ebe8dc48d1f	Laravel	register	request	194.207.18.208	2026-06-29 09:43:01	2026-06-29 09:43:01
+019f12c2-c24b-72eb-80e3-8f4dd76f361b	ml-api	/recommend	request	255.45.25.187	2026-06-29 09:43:01	2026-06-29 09:43:01
+019f12c2-c2a2-7345-9a40-a2388461f18e	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:01	2026-06-29 09:43:01
+019f12c2-c2fe-72d9-acef-5afa947f5181	Laravel	register	request	210.240.136.160	2026-06-29 09:43:01	2026-06-29 09:43:01
+019f12c2-c357-70cd-8499-a2a31ce4f076	Laravel	register	request	183.115.90.107	2026-06-29 09:43:01	2026-06-29 09:43:01
+019f12c2-c3ad-714c-84fb-7fef2a725c8f	image-analysis-api	/health/	request	40.79.159.2	2026-06-29 09:43:01	2026-06-29 09:43:01
+019f12c2-c40a-733c-810f-4ae42a52a5e5	ml-api	/profiles	request	62.89.79.154	2026-06-29 09:43:01	2026-06-29 09:43:01
+019f12c2-c461-724d-82bc-949def306b19	Laravel	login	request	151.44.85.174	2026-06-29 09:43:01	2026-06-29 09:43:01
+019f12c2-c4ba-7154-acfe-7e783ba668b4	ml-api	/profiles	request	92.237.168.55	2026-06-29 09:43:02	2026-06-29 09:43:02
+019f12c2-c510-7232-bab1-b6d93f69d5cc	Laravel	register	request	16.42.82.79	2026-06-29 09:43:02	2026-06-29 09:43:02
+019f12c2-c569-72f0-a23f-6432adf4d0c9	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:02	2026-06-29 09:43:02
+019f12c2-c5c0-721f-aed1-cd3356da0c77	ml-api	/recommend	request	9.12.187.146	2026-06-29 09:43:02	2026-06-29 09:43:02
+019f12c2-c616-70c0-a5dd-e9856b1cb3fe	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:02	2026-06-29 09:43:02
+019f12c2-c66e-72c0-a5d4-046029d48308	image-analysis-api	/analyze-by-mistral	request	112.134.16.77	2026-06-29 09:43:02	2026-06-29 09:43:02
+019f12c2-c6c5-723f-832f-dc315da9c2ce	ml-api	/recommend	request	119.49.9.243	2026-06-29 09:43:02	2026-06-29 09:43:02
+019f12c2-c71e-7245-a420-6997ad134874	Laravel	login	request	224.220.213.198	2026-06-29 09:43:02	2026-06-29 09:43:02
+019f12c2-c777-736b-93e5-ea5b1a5ecfe1	Laravel	register	request	246.79.6.236	2026-06-29 09:43:02	2026-06-29 09:43:02
+019f12c2-c7ce-71b1-bab2-089faaf7dc15	Laravel	login	request	33.30.210.76	2026-06-29 09:43:02	2026-06-29 09:43:02
+019f12c2-c824-739f-aad0-e2294f4db4d2	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:02	2026-06-29 09:43:02
+019f12c2-c87b-700e-8fca-0b1ea4657f06	Laravel	allergies	request	3.169.239.140	2026-06-29 09:43:03	2026-06-29 09:43:03
+019f12c2-c8d4-7289-9042-c3646765ec82	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:03	2026-06-29 09:43:03
+019f12c2-c92c-7356-8bff-6eb29a9dab3a	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:03	2026-06-29 09:43:03
+019f12c2-c985-7259-823e-fe2d8ad5937f	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:03	2026-06-29 09:43:03
+019f12c2-c9e3-7359-bd3f-c0979e7b57cf	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:03	2026-06-29 09:43:03
+019f12c2-ca38-7342-b72a-7d4608304c4e	Laravel	login	request	4.16.255.141	2026-06-29 09:43:03	2026-06-29 09:43:03
+019f12c2-ca92-715b-a49f-a77a003df3ef	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:03	2026-06-29 09:43:03
+019f12c2-cae9-735f-b9eb-3d01807ef959	Laravel	allergies	request	227.177.57.12	2026-06-29 09:43:03	2026-06-29 09:43:03
+019f12c2-cb3f-7085-9798-cbdb9f455e7f	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:03	2026-06-29 09:43:03
+019f12c2-cba3-7037-949c-61420366e28c	Laravel	register	request	15.85.158.118	2026-06-29 09:43:03	2026-06-29 09:43:03
+019f12c2-cbfb-710c-9050-acbea885ee5a	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:03	2026-06-29 09:43:03
+019f12c2-cc51-72bb-aa73-354a38c67692	Laravel	register	request	243.116.103.121	2026-06-29 09:43:04	2026-06-29 09:43:04
+019f12c2-cca7-7107-b351-638794477974	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:04	2026-06-29 09:43:04
+019f12c2-ccfd-71e8-aa9c-1257078ede9c	image-analysis-api	/analyze-by-mistral	request	230.77.99.182	2026-06-29 09:43:04	2026-06-29 09:43:04
+019f12c2-cd57-7303-aa8a-37c7711f1a7f	ml-api	/recommend	request	111.183.231.186	2026-06-29 09:43:04	2026-06-29 09:43:04
+019f12c2-cdad-73d8-b6ad-4df25e271eff	ml-api	/profiles	request	106.175.12.217	2026-06-29 09:43:04	2026-06-29 09:43:04
+019f12c2-ce07-7395-bf95-c873f74852b5	ml-api	/health	request	22.25.29.190	2026-06-29 09:43:04	2026-06-29 09:43:04
+019f12c2-ce5e-7228-bd58-821dd364e471	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:04	2026-06-29 09:43:04
+019f12c2-ceb5-719a-8012-87eeed6a2954	Laravel	login	request	252.155.9.160	2026-06-29 09:43:04	2026-06-29 09:43:04
+019f12c2-d00a-7067-8cfd-b11bb884978c	Laravel	allergies	request	26.142.216.212	2026-06-29 09:43:04	2026-06-29 09:43:04
+019f12c2-d062-71e1-8ba9-3713e8f7f6ce	image-analysis-api	/analyze	request	244.130.255.82	2026-06-29 09:43:05	2026-06-29 09:43:05
+019f12c2-d0b9-7320-8ea0-bc246dbe4ef4	Laravel	register	request	171.142.73.215	2026-06-29 09:43:05	2026-06-29 09:43:05
+019f12c2-d10f-71f8-b310-28e0010dfadb	Laravel	register	request	95.252.74.121	2026-06-29 09:43:05	2026-06-29 09:43:05
+019f12c2-d166-726e-a1e0-a9efcab34355	Laravel	register	request	107.88.138.20	2026-06-29 09:43:05	2026-06-29 09:43:05
+019f12c2-d1be-7174-be05-e7e2db1944e1	image-analysis-api	/health/	request	188.184.113.19	2026-06-29 09:43:05	2026-06-29 09:43:05
+019f12c2-d215-7300-bb00-00079a6b66a2	Laravel	allergies	request	234.199.64.54	2026-06-29 09:43:05	2026-06-29 09:43:05
+019f12c2-d26d-725e-a940-3d3292680058	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:05	2026-06-29 09:43:05
+019f12c2-d2c5-7172-95de-add2e03e2965	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:05	2026-06-29 09:43:05
+019f12c2-d31c-7243-89d9-59649d22a83d	Laravel	allergies	request	126.157.226.203	2026-06-29 09:43:05	2026-06-29 09:43:05
+019f12c2-d372-71a2-9249-c68b1f012c72	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:05	2026-06-29 09:43:05
+019f12c2-d3c9-707f-996e-66e72a2b438a	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:05	2026-06-29 09:43:05
+019f12c2-d422-7305-998a-bd6047c1bfea	Laravel	login	request	150.66.123.75	2026-06-29 09:43:06	2026-06-29 09:43:06
+019f12c2-d47a-72b0-ab9b-2fbe265af11f	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:06	2026-06-29 09:43:06
+019f12c2-d4d4-73e8-8c6f-c1eadd98a835	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:06	2026-06-29 09:43:06
+019f12c2-d52a-7119-a274-9587a32a9a38	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:06	2026-06-29 09:43:06
+019f12c2-d583-733c-8e85-7e506fc7f566	image-analysis-api	/analyze-by-mistral	request	24.152.66.188	2026-06-29 09:43:06	2026-06-29 09:43:06
+019f12c2-d5d9-7092-bb26-c880f07a04b8	image-analysis-api	/health/	request	140.190.81.12	2026-06-29 09:43:06	2026-06-29 09:43:06
+019f12c2-d632-73e3-9feb-1298f401b5a7	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:06	2026-06-29 09:43:06
+019f12c2-d68d-70ed-9750-2b6a092d6c57	Laravel	login	request	13.8.201.40	2026-06-29 09:43:06	2026-06-29 09:43:06
+019f12c2-d6e6-73b3-8f1c-d1e1624caa1f	image-analysis-api	/health/	request	185.3.247.89	2026-06-29 09:43:06	2026-06-29 09:43:06
+019f12c2-d73c-7084-8047-5c32dd39dcaf	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:06	2026-06-29 09:43:06
+019f12c2-d796-71e3-b715-a4d01862bb97	Laravel	login	request	155.153.30.118	2026-06-29 09:43:06	2026-06-29 09:43:06
+019f12c2-d7ed-7192-9587-32f2bea20074	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:06	2026-06-29 09:43:06
+019f12c2-d846-73a2-9ae2-23652c35afe7	Laravel	login	request	63.161.30.89	2026-06-29 09:43:07	2026-06-29 09:43:07
+019f12c2-d89c-70b2-9151-b53a57eeaefa	image-analysis-api	/health/	request	43.140.60.39	2026-06-29 09:43:07	2026-06-29 09:43:07
+019f12c2-d8f4-7309-bd15-910f4c44fb2d	image-analysis-api	/analyze-by-mistral	request	157.162.135.184	2026-06-29 09:43:07	2026-06-29 09:43:07
+019f12c2-d94d-7092-b019-27cf5d3cc6bd	Laravel	login	request	151.2.89.224	2026-06-29 09:43:07	2026-06-29 09:43:07
+019f12c2-d9a4-7273-9a31-e64086eefd39	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:07	2026-06-29 09:43:07
+019f12c2-d9fa-7274-8ad3-ffe4f60e6658	ml-api	/profiles	request	107.72.201.246	2026-06-29 09:43:07	2026-06-29 09:43:07
+019f12c2-da51-72e4-8950-045756b91d7c	image-analysis-api	/health/	request	131.150.172.171	2026-06-29 09:43:07	2026-06-29 09:43:07
+019f12c2-daa9-7197-b0dd-cd765c0d33c1	Laravel	login	request	141.100.29.201	2026-06-29 09:43:07	2026-06-29 09:43:07
+019f12c2-db00-7353-a8f6-c04734c2312a	Laravel	allergies	request	147.98.91.240	2026-06-29 09:43:07	2026-06-29 09:43:07
+019f12c2-db59-7269-9cf0-480d386ae13a	Laravel	allergies	request	250.131.53.10	2026-06-29 09:43:07	2026-06-29 09:43:07
+019f12c2-dbb2-72f2-9d78-3848b476b18e	Laravel	register	request	237.114.241.224	2026-06-29 09:43:07	2026-06-29 09:43:07
+019f12c2-dc0a-71c8-b2ea-376c566c03e6	ml-api	/recommend	request	167.223.249.93	2026-06-29 09:43:08	2026-06-29 09:43:08
+019f12c2-dc64-7080-a234-1f7a08e21a10	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:08	2026-06-29 09:43:08
+019f12c2-dcc0-7382-81c6-88a373fcb9ad	Laravel	register	request	238.193.159.76	2026-06-29 09:43:08	2026-06-29 09:43:08
+019f12c2-dd17-72fb-a3bc-9c195a489681	Laravel	login	request	133.23.223.189	2026-06-29 09:43:08	2026-06-29 09:43:08
+019f12c2-dd6f-710a-919f-0da29db57c76	Laravel	register	request	249.101.113.68	2026-06-29 09:43:08	2026-06-29 09:43:08
+019f12c2-ddc5-70ea-94f4-bebc48818654	ml-api	/health	request	213.247.37.4	2026-06-29 09:43:08	2026-06-29 09:43:08
+019f12c2-de1c-717f-ab38-1becd8de7576	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:08	2026-06-29 09:43:08
+019f12c2-de77-73c5-9126-fcaf33c17525	Laravel	register	request	171.133.177.45	2026-06-29 09:43:08	2026-06-29 09:43:08
+019f12c2-dede-70af-8061-523b2329ec7f	Laravel	login	request	118.112.196.13	2026-06-29 09:43:08	2026-06-29 09:43:08
+019f12c2-df35-7072-ab89-4bef094938cb	image-analysis-api	/analyze	request	107.17.201.39	2026-06-29 09:43:08	2026-06-29 09:43:08
+019f12c2-df8e-7097-bf7c-0622f9d28f79	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:08	2026-06-29 09:43:08
+019f12c2-dfef-72b1-9fa7-55491cf6f181	Laravel	register	request	147.181.170.225	2026-06-29 09:43:09	2026-06-29 09:43:09
+019f12c2-e047-729e-b282-f8eb849b41bb	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:09	2026-06-29 09:43:09
+019f12c2-e0a2-7100-b209-18725f6faad8	ml-api	/health	request	103.113.169.238	2026-06-29 09:43:09	2026-06-29 09:43:09
+019f12c2-e0f8-7045-93c4-2841a491e28c	image-analysis-api	/health/	request	145.183.165.163	2026-06-29 09:43:09	2026-06-29 09:43:09
+019f12c2-e152-72aa-b9d4-8d12f2cb46b8	Laravel	register	request	216.222.225.145	2026-06-29 09:43:09	2026-06-29 09:43:09
+019f12c2-e1af-71a1-b8cf-8cfeeb35f409	Laravel	allergies	request	237.21.192.33	2026-06-29 09:43:09	2026-06-29 09:43:09
+019f12c2-e205-707f-b8a7-2e6ccde20137	Laravel	register	request	23.65.213.48	2026-06-29 09:43:09	2026-06-29 09:43:09
+019f12c2-e25c-7290-ae45-af374f12f544	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:09	2026-06-29 09:43:09
+019f12c2-e2b3-722b-a18d-12b620850139	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:09	2026-06-29 09:43:09
+019f12c2-e30b-725d-9580-f5f06f4a4d9f	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:09	2026-06-29 09:43:09
+019f12c2-e366-73f2-9641-7a2d635446c2	Laravel	login	request	106.172.221.143	2026-06-29 09:43:09	2026-06-29 09:43:09
+019f12c2-e3bd-706f-9bdb-6c948d6d5475	ml-api	/recommend	request	99.74.230.236	2026-06-29 09:43:10	2026-06-29 09:43:10
+019f12c2-e415-73da-a8d7-ef3443db84a4	Laravel	login	request	218.34.150.131	2026-06-29 09:43:10	2026-06-29 09:43:10
+019f12c2-e472-70f9-923b-82441fd5149e	Laravel	register	request	118.45.57.244	2026-06-29 09:43:10	2026-06-29 09:43:10
+019f12c2-e4ce-71d3-8ba7-f3485e83c035	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:10	2026-06-29 09:43:10
+019f12c2-e527-7087-b6c2-2e255ca27026	ml-api	/recommend	request	134.253.209.138	2026-06-29 09:43:10	2026-06-29 09:43:10
+019f12c2-e584-7079-8a24-1155c36f3a9d	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:10	2026-06-29 09:43:10
+019f12c2-e5da-7071-b965-cf9ca75c9add	ml-api	/profiles	request	110.214.70.179	2026-06-29 09:43:10	2026-06-29 09:43:10
+019f12c2-e633-7156-bc96-ecc30d23bf70	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:10	2026-06-29 09:43:10
+019f12c2-e68d-71f9-88c7-248bcd61e595	image-analysis-api	/analyze-by-mistral	request	63.167.29.2	2026-06-29 09:43:10	2026-06-29 09:43:10
+019f12c2-e6e5-71ff-b742-9e2365f443e3	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:10	2026-06-29 09:43:10
+019f12c2-e753-7093-840f-69e5ee25bc20	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:10	2026-06-29 09:43:10
+019f12c2-e7ab-719a-bf29-665320f61300	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:11	2026-06-29 09:43:11
+019f12c2-e812-73b4-bf6e-2e88ed13882b	ml-api	/recommend	request	234.30.92.254	2026-06-29 09:43:11	2026-06-29 09:43:11
+019f12c2-e86b-7278-bd8b-2d922494ae1a	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:11	2026-06-29 09:43:11
+019f12c2-e8c1-730a-ad8b-1d17f553ca23	Laravel	login	request	181.249.68.195	2026-06-29 09:43:11	2026-06-29 09:43:11
+019f12c2-e919-7261-8c9f-956f94055877	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:11	2026-06-29 09:43:11
+019f12c2-e972-73ff-a836-662aa1acb40a	Laravel	register	request	90.135.77.167	2026-06-29 09:43:11	2026-06-29 09:43:11
+019f12c2-e9cb-7362-8bd0-a59259ea02f8	Laravel	register	request	40.52.154.194	2026-06-29 09:43:11	2026-06-29 09:43:11
+019f12c2-ea24-70e5-aa29-642de589e3b8	ml-api	/health	request	136.167.159.211	2026-06-29 09:43:11	2026-06-29 09:43:11
+019f12c2-ea7b-71db-b92a-dffda80aa5e9	image-analysis-api	/analyze	request	55.173.122.46	2026-06-29 09:43:11	2026-06-29 09:43:11
+019f12c2-ead1-7304-b7db-3e1796cb563b	image-analysis-api	/analyze	request	219.132.8.204	2026-06-29 09:43:11	2026-06-29 09:43:11
+019f12c2-eb28-71a0-8571-26223833e785	Laravel	allergies	request	122.54.26.35	2026-06-29 09:43:11	2026-06-29 09:43:11
+019f12c2-eb80-73be-9cfe-2bf98d31b851	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:12	2026-06-29 09:43:12
+019f12c2-ebdd-723d-8ebf-5ee41bee9f1b	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:12	2026-06-29 09:43:12
+019f12c2-ec38-7231-8de6-d093733172e5	image-analysis-api	/analyze-by-mistral	request	54.167.89.146	2026-06-29 09:43:12	2026-06-29 09:43:12
+019f12c2-ec8f-7243-8127-1a01bb5ba093	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:12	2026-06-29 09:43:12
+019f12c2-ece9-71d4-b781-1969a9cc078f	image-analysis-api	/analyze-by-mistral	request	160.191.83.114	2026-06-29 09:43:12	2026-06-29 09:43:12
+019f12c2-ed3f-7138-8366-cff84aa45f06	image-analysis-api	/health/	request	56.98.235.29	2026-06-29 09:43:12	2026-06-29 09:43:12
+019f12c2-ed97-72e0-889d-aea6beb7fa00	ml-api	/recommend	request	156.196.172.40	2026-06-29 09:43:12	2026-06-29 09:43:12
+019f12c2-edee-726f-997b-c791b0c6cc7b	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:12	2026-06-29 09:43:12
+019f12c2-ee47-71fb-9188-c44c75ba4344	ml-api	/profiles	request	56.95.214.123	2026-06-29 09:43:12	2026-06-29 09:43:12
+019f12c2-ee9f-7092-8f8a-cc66731fad4b	ml-api	/health	request	49.72.48.241	2026-06-29 09:43:12	2026-06-29 09:43:12
+019f12c2-eef9-7225-b313-14ff6afb8cb2	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:12	2026-06-29 09:43:12
+019f12c2-ef51-7229-9fb2-eaaa5f38b1c2	ml-api	/recommend	request	232.155.91.39	2026-06-29 09:43:12	2026-06-29 09:43:12
+019f12c2-efa9-7173-b0d8-95afc622fdc8	Laravel	login	request	3.154.145.83	2026-06-29 09:43:13	2026-06-29 09:43:13
+019f12c2-f002-7202-a9b2-cadb8957b1af	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:13	2026-06-29 09:43:13
+019f12c2-f05b-711d-90b7-1991187aaf1a	Laravel	register	request	72.203.152.163	2026-06-29 09:43:13	2026-06-29 09:43:13
+019f12c2-f0b5-72b7-aa17-cf680f1e9f67	Laravel	allergies	request	242.235.81.182	2026-06-29 09:43:13	2026-06-29 09:43:13
+019f12c2-f10c-70d5-abce-f0b584ecf31c	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:13	2026-06-29 09:43:13
+019f12c2-f166-70f3-9aae-f10f5ca22071	Laravel	register	request	25.174.4.109	2026-06-29 09:43:13	2026-06-29 09:43:13
+019f12c2-f1c0-73fd-ac3b-ae4826cea97f	Laravel	login	request	151.105.81.48	2026-06-29 09:43:13	2026-06-29 09:43:13
+019f12c2-f217-71c9-b070-fb492af43c14	Laravel	login	request	122.114.193.194	2026-06-29 09:43:13	2026-06-29 09:43:13
+019f12c2-f26f-7281-974b-7a643289d0df	Laravel	login	request	76.124.81.81	2026-06-29 09:43:13	2026-06-29 09:43:13
+019f12c2-f2c6-718b-9963-ffa2207e820d	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:13	2026-06-29 09:43:13
+019f12c2-f31d-72d9-b3bd-0b08b007473e	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:13	2026-06-29 09:43:13
+019f12c2-f374-71c3-80fa-81af774218cc	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:14	2026-06-29 09:43:14
+019f12c2-f3cd-7306-9995-834bdb92d6ab	image-analysis-api	/health/	request	250.171.84.214	2026-06-29 09:43:14	2026-06-29 09:43:14
+019f12c2-f424-70f1-9851-1cf72a072feb	Laravel	register	request	248.51.3.85	2026-06-29 09:43:14	2026-06-29 09:43:14
+019f12c2-f480-7172-a061-7b560913396f	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:14	2026-06-29 09:43:14
+019f12c2-f4d8-72b0-9df5-89327904c8b9	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:14	2026-06-29 09:43:14
+019f12c2-f530-7393-85f6-e876fdb6782c	ml-api	/profiles	request	194.204.248.169	2026-06-29 09:43:14	2026-06-29 09:43:14
+019f12c2-f589-7305-8b90-6299dbacd709	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:14	2026-06-29 09:43:14
+019f12c2-f5e5-72e8-b5ba-41cf5fbaa61b	image-analysis-api	/health/	request	211.45.152.26	2026-06-29 09:43:14	2026-06-29 09:43:14
+019f12c2-f640-7110-b939-d6322656fbf7	Laravel	login	request	96.106.34.3	2026-06-29 09:43:14	2026-06-29 09:43:14
+019f12c2-f696-739f-a339-810070afcaf4	Laravel	login	request	31.173.165.134	2026-06-29 09:43:14	2026-06-29 09:43:14
+019f12c2-f6f5-71a8-a952-607bb6d47e17	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:14	2026-06-29 09:43:14
+019f12c2-f756-7000-badc-c2b021d2a944	image-analysis-api	/analyze	request	19.200.176.199	2026-06-29 09:43:15	2026-06-29 09:43:15
+019f12c2-f7b2-72b4-8cc6-13567d495bba	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:15	2026-06-29 09:43:15
+019f12c2-f809-71b6-9b3d-bdaf482c28a0	image-analysis-api	/analyze-by-mistral	request	46.18.235.67	2026-06-29 09:43:15	2026-06-29 09:43:15
+019f12c2-f870-72be-aafd-6bacb5e131aa	ml-api	/profiles	request	220.18.72.234	2026-06-29 09:43:15	2026-06-29 09:43:15
+019f12c2-f8c6-7038-93f7-fdd17d1830ee	image-analysis-api	/analyze-by-mistral	request	19.88.99.184	2026-06-29 09:43:15	2026-06-29 09:43:15
+019f12c2-f91c-72e4-85eb-67d1ad952de3	ml-api	/health	request	235.198.102.174	2026-06-29 09:43:15	2026-06-29 09:43:15
+019f12c2-f973-7392-8081-ade157a41cb4	Laravel	allergies	request	85.99.185.42	2026-06-29 09:43:15	2026-06-29 09:43:15
+019f12c2-f9ca-73f9-ba50-f1c6082b57a1	Laravel	login	request	49.96.187.68	2026-06-29 09:43:15	2026-06-29 09:43:15
+019f12c2-fa22-72fb-8ff7-2d66d5195df1	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:15	2026-06-29 09:43:15
+019f12c2-fa7b-735b-8d93-db259d1ae988	Laravel	register	request	218.35.155.250	2026-06-29 09:43:15	2026-06-29 09:43:15
+019f12c2-fad4-7142-964c-9bed32e37f72	ml-api	/recommend	request	2.111.41.101	2026-06-29 09:43:15	2026-06-29 09:43:15
+019f12c2-fb2e-730b-8332-a6a57b71d6be	Laravel	login	request	15.22.158.110	2026-06-29 09:43:16	2026-06-29 09:43:16
+019f12c2-fb87-7386-bbd8-0203ba012a1a	Laravel	register	request	86.5.177.237	2026-06-29 09:43:16	2026-06-29 09:43:16
+019f12c2-fbe1-736d-beae-ced790799cc0	ml-api	/health	request	233.185.67.62	2026-06-29 09:43:16	2026-06-29 09:43:16
+019f12c2-fc41-7212-8e32-fa7e5e93dea2	Laravel	login	request	35.156.196.158	2026-06-29 09:43:16	2026-06-29 09:43:16
+019f12c2-fc99-7186-af56-55b828b6ce61	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:16	2026-06-29 09:43:16
+019f12c2-fcef-7012-83ba-bd34c482784d	ml-api	/recommend	request	25.125.17.172	2026-06-29 09:43:16	2026-06-29 09:43:16
+019f12c2-fd46-72d9-98d9-e5affd261d0c	Laravel	allergies	request	205.174.108.173	2026-06-29 09:43:16	2026-06-29 09:43:16
+019f12c2-fda2-7075-9eca-105bba924948	Laravel	allergies	request	120.26.55.133	2026-06-29 09:43:16	2026-06-29 09:43:16
+019f12c2-fdfa-7084-9c5c-528cede7d46f	ml-api	/recommend	request	236.248.143.150	2026-06-29 09:43:16	2026-06-29 09:43:16
+019f12c2-fe56-7275-905d-5e43563b81e9	Laravel	allergies	request	220.226.255.32	2026-06-29 09:43:16	2026-06-29 09:43:16
+019f12c2-feb0-7062-9512-ec7dc7f94e0f	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:16	2026-06-29 09:43:16
+019f12c2-ff07-7297-a0fd-868e69e79982	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:16	2026-06-29 09:43:16
+019f12c2-ff5e-71fb-ab84-e14d9a5dd863	Laravel	allergies	request	162.7.159.181	2026-06-29 09:43:17	2026-06-29 09:43:17
+019f12c2-ffb4-7212-be2e-284679b1cd5c	image-analysis-api	/analyze-by-mistral	request	144.210.117.68	2026-06-29 09:43:17	2026-06-29 09:43:17
+019f12c3-0016-71a4-8b87-ebc01474ed9d	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:17	2026-06-29 09:43:17
+019f12c3-006d-716a-98ad-1ccaae8c25ba	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:17	2026-06-29 09:43:17
+019f12c3-00c8-72b2-b932-73e63d42e621	Laravel	allergies	request	212.37.160.202	2026-06-29 09:43:17	2026-06-29 09:43:17
+019f12c3-196d-70b1-beb2-668b19967f30	Laravel	login	request	255.180.247.70	2026-06-29 09:43:23	2026-06-29 09:43:23
+019f12c3-0120-71e3-8431-e64ee0e83c79	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:17	2026-06-29 09:43:17
+019f12c3-017a-71e0-a507-23673f204c1e	ml-api	/recommend	request	234.61.243.201	2026-06-29 09:43:17	2026-06-29 09:43:17
+019f12c3-01d2-73e1-9a91-88398987f304	ml-api	/profiles	request	234.112.80.34	2026-06-29 09:43:17	2026-06-29 09:43:17
+019f12c3-0238-70a0-bddc-dee19217ff57	Laravel	login	request	45.234.245.33	2026-06-29 09:43:17	2026-06-29 09:43:17
+019f12c3-0291-7243-8900-fffecf2ea83e	image-analysis-api	/analyze	request	167.47.59.130	2026-06-29 09:43:17	2026-06-29 09:43:17
+019f12c3-02eb-708c-9481-33d5fc0c90a5	image-analysis-api	/health/	request	81.162.127.149	2026-06-29 09:43:17	2026-06-29 09:43:17
+019f12c3-034c-7212-9b33-623799937faa	Laravel	register	request	213.246.155.112	2026-06-29 09:43:18	2026-06-29 09:43:18
+019f12c3-03a3-7379-a58f-e578f292c327	Laravel	allergies	request	73.231.81.216	2026-06-29 09:43:18	2026-06-29 09:43:18
+019f12c3-03f9-70ea-8369-740fd05a4c3c	Laravel	login	request	228.216.215.109	2026-06-29 09:43:18	2026-06-29 09:43:18
+019f12c3-0451-7138-b2ea-877cd83ef24b	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:18	2026-06-29 09:43:18
+019f12c3-04a7-73b7-a0ef-4f5426aa6059	image-analysis-api	/analyze-by-mistral	request	250.114.1.126	2026-06-29 09:43:18	2026-06-29 09:43:18
+019f12c3-04fe-7343-bea4-3360fd1ac3d4	ml-api	/health	request	254.67.204.54	2026-06-29 09:43:18	2026-06-29 09:43:18
+019f12c3-0556-7108-8b0a-23791e47f412	ml-api	/profiles	request	42.243.223.141	2026-06-29 09:43:18	2026-06-29 09:43:18
+019f12c3-05ae-7236-b32e-4b8c472a877b	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:18	2026-06-29 09:43:18
+019f12c3-0607-7129-af94-7b8a30b2338a	ml-api	/recommend	request	128.39.118.178	2026-06-29 09:43:18	2026-06-29 09:43:18
+019f12c3-065e-72f4-acef-562f02710efd	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:18	2026-06-29 09:43:18
+019f12c3-06b5-71bf-b61e-aa5ac3caa786	Laravel	register	request	175.180.102.141	2026-06-29 09:43:18	2026-06-29 09:43:18
+019f12c3-070c-70e0-8c8c-c78a7d1c6f52	image-analysis-api	/health/	request	36.134.244.150	2026-06-29 09:43:19	2026-06-29 09:43:19
+019f12c3-0762-7170-8a26-22f2d49659ab	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:19	2026-06-29 09:43:19
+019f12c3-07c4-7011-a6a9-5a346cdb3b53	image-analysis-api	/analyze	request	204.109.138.110	2026-06-29 09:43:19	2026-06-29 09:43:19
+019f12c3-0823-7296-88b3-cc93d67926ec	Laravel	login	request	185.50.14.74	2026-06-29 09:43:19	2026-06-29 09:43:19
+019f12c3-087e-721d-949b-5b7f9f4a2f8e	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:19	2026-06-29 09:43:19
+019f12c3-08da-73b5-849e-7944cb80b19e	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:19	2026-06-29 09:43:19
+019f12c3-0936-70c8-8529-763df9a2a2e3	Laravel	allergies	request	48.225.58.102	2026-06-29 09:43:19	2026-06-29 09:43:19
+019f12c3-098f-7312-8c64-f7b641922c78	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:19	2026-06-29 09:43:19
+019f12c3-09e6-70ad-978d-ed0b5ea42353	ml-api	/profiles	request	95.240.19.200	2026-06-29 09:43:19	2026-06-29 09:43:19
+019f12c3-0a49-70d4-b594-a5b17a98dfe4	Laravel	login	request	246.214.135.220	2026-06-29 09:43:19	2026-06-29 09:43:19
+019f12c3-0aa3-734e-a05a-3de212591c25	Laravel	login	request	18.243.94.110	2026-06-29 09:43:19	2026-06-29 09:43:19
+019f12c3-0b07-71eb-8392-c16a3dbc9438	image-analysis-api	/analyze-by-mistral	request	25.189.57.42	2026-06-29 09:43:20	2026-06-29 09:43:20
+019f12c3-0b61-72f3-91b0-af42e8d5c619	image-analysis-api	/health/	request	77.240.144.86	2026-06-29 09:43:20	2026-06-29 09:43:20
+019f12c3-0bb9-732c-8188-c77a8465b983	Laravel	allergies	request	165.108.95.26	2026-06-29 09:43:20	2026-06-29 09:43:20
+019f12c3-0c12-7089-aa83-1c6b4e9a3491	image-analysis-api	/analyze	request	95.15.207.39	2026-06-29 09:43:20	2026-06-29 09:43:20
+019f12c3-0c6b-7152-b8e1-ba2dc9db59da	Laravel	login	request	29.17.51.170	2026-06-29 09:43:20	2026-06-29 09:43:20
+019f12c3-0cd3-7238-ad88-1cbd6df2f6f6	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:20	2026-06-29 09:43:20
+019f12c3-0d2d-713b-acf2-57519dfee0ce	image-analysis-api	/analyze-by-mistral	request	206.195.24.248	2026-06-29 09:43:20	2026-06-29 09:43:20
+019f12c3-0d85-720e-b31b-246f0fd7d29f	image-analysis-api	/analyze	request	238.71.238.93	2026-06-29 09:43:20	2026-06-29 09:43:20
+019f12c3-0de2-71d8-8020-d767bf6c1dd4	image-analysis-api	/health/	request	126.68.0.15	2026-06-29 09:43:20	2026-06-29 09:43:20
+019f12c3-0e3d-7197-88c6-15ea36606320	image-analysis-api	/analyze	request	250.110.245.59	2026-06-29 09:43:20	2026-06-29 09:43:20
+019f12c3-0e94-7224-8f19-ce48d972f2c3	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:20	2026-06-29 09:43:20
+019f12c3-0eed-70cd-ad0c-65de36547cb5	ml-api	/recommend	request	230.146.138.48	2026-06-29 09:43:21	2026-06-29 09:43:21
+019f12c3-0f45-701c-89e5-cf4bceff4d5b	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:21	2026-06-29 09:43:21
+019f12c3-0f9c-7088-8e78-90374bea111c	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:21	2026-06-29 09:43:21
+019f12c3-0ff4-73a0-986c-9a070aa48928	ml-api	/health	request	60.180.182.84	2026-06-29 09:43:21	2026-06-29 09:43:21
+019f12c3-1058-723f-921e-c6b6923e9c8f	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:21	2026-06-29 09:43:21
+019f12c3-10b0-7043-895c-456563ba98c1	Laravel	register	request	241.156.239.113	2026-06-29 09:43:21	2026-06-29 09:43:21
+019f12c3-1107-70a5-b547-3d048857a935	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:21	2026-06-29 09:43:21
+019f12c3-1160-72e2-acad-b8d9731fe15e	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:21	2026-06-29 09:43:21
+019f12c3-11b7-7394-9538-130677b7b035	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:21	2026-06-29 09:43:21
+019f12c3-1216-7274-ad11-b3fc10119d90	image-analysis-api	/health/	request	234.124.161.148	2026-06-29 09:43:21	2026-06-29 09:43:21
+019f12c3-1274-7075-8636-1eb0cc691887	Laravel	register	request	220.232.3.59	2026-06-29 09:43:21	2026-06-29 09:43:21
+019f12c3-12cf-71ab-bf9e-a22609ff0346	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:22	2026-06-29 09:43:22
+019f12c3-1327-7227-aca6-7d7db2c5d353	ml-api	/recommend	request	80.180.112.135	2026-06-29 09:43:22	2026-06-29 09:43:22
+019f12c3-137e-72ae-84fb-ce17ebc8ae29	image-analysis-api	/health/	request	101.141.57.2	2026-06-29 09:43:22	2026-06-29 09:43:22
+019f12c3-13da-7142-ad9c-ae8b37f4dc6e	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:22	2026-06-29 09:43:22
+019f12c3-1433-732f-9df1-e1903d1b5c24	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:22	2026-06-29 09:43:22
+019f12c3-148f-7176-97cd-2305ce96e704	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:22	2026-06-29 09:43:22
+019f12c3-14ec-7145-8909-4c68118eca32	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:22	2026-06-29 09:43:22
+019f12c3-1547-70f0-9589-47740b9e9f1a	Laravel	register	request	237.114.132.3	2026-06-29 09:43:22	2026-06-29 09:43:22
+019f12c3-15a4-7143-93b8-e689a538401d	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:22	2026-06-29 09:43:22
+019f12c3-15fc-7154-bbed-d48a8a126ead	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:22	2026-06-29 09:43:22
+019f12c3-1658-7041-8009-80eb07589620	Laravel	register	request	112.203.140.104	2026-06-29 09:43:22	2026-06-29 09:43:22
+019f12c3-16b0-70c1-bc3f-5064aeec2c7b	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:23	2026-06-29 09:43:23
+019f12c3-1708-7243-8c47-79b2e9f169e1	ml-api	/profiles	request	43.201.38.217	2026-06-29 09:43:23	2026-06-29 09:43:23
+019f12c3-175f-724a-b2ec-5f5e436572de	Laravel	login	request	103.192.75.67	2026-06-29 09:43:23	2026-06-29 09:43:23
+019f12c3-17b7-723b-99c8-15c2be314167	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:23	2026-06-29 09:43:23
+019f12c3-180e-70e5-a5be-d0087f15cea5	ml-api	/health	request	151.177.225.54	2026-06-29 09:43:23	2026-06-29 09:43:23
+019f12c3-1866-713d-b611-a02aacfad1b3	Laravel	login	request	157.17.138.72	2026-06-29 09:43:23	2026-06-29 09:43:23
+019f12c3-18c0-7029-a850-c54b99a0870d	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:23	2026-06-29 09:43:23
+019f12c3-1917-7256-9876-d8fa51ed36f9	ml-api	/profiles	request	162.129.44.148	2026-06-29 09:43:23	2026-06-29 09:43:23
+019f12c3-19c7-7033-a00a-44706313b1f2	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:23	2026-06-29 09:43:23
+019f12c3-1a1e-7323-89ec-eeb99897e6b9	ml-api	/profiles	request	51.242.38.74	2026-06-29 09:43:23	2026-06-29 09:43:23
+019f12c3-1a75-7066-97d5-ab96c9f7b2f2	ml-api	/profiles	request	217.74.3.15	2026-06-29 09:43:24	2026-06-29 09:43:24
+019f12c3-1ad1-7292-ab12-dc5b368b6046	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:24	2026-06-29 09:43:24
+019f12c3-1b2b-7040-9cac-eebe3ea320a0	image-analysis-api	/analyze	request	11.84.107.90	2026-06-29 09:43:24	2026-06-29 09:43:24
+019f12c3-1b83-73e8-a1c1-c355982023d8	ml-api	/profiles	request	199.105.249.255	2026-06-29 09:43:24	2026-06-29 09:43:24
+019f12c3-1bda-7060-8485-d670c9b8488d	ml-api	/recommend	request	19.210.11.153	2026-06-29 09:43:24	2026-06-29 09:43:24
+019f12c3-1c34-7192-9fc1-9b49c0a11abf	Laravel	allergies	request	152.242.94.176	2026-06-29 09:43:24	2026-06-29 09:43:24
+019f12c3-1c8b-73e9-a4c7-227ee037404a	image-analysis-api	/health/	request	246.75.60.251	2026-06-29 09:43:24	2026-06-29 09:43:24
+019f12c3-1ce2-7257-9a86-764ea7b6a80d	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:24	2026-06-29 09:43:24
+019f12c3-1d3e-7238-bfc3-48b3c0f9d672	Laravel	allergies	request	79.192.156.101	2026-06-29 09:43:24	2026-06-29 09:43:24
+019f12c3-1d9c-7033-a9b4-8e9eee40a69b	Laravel	register	request	46.219.147.231	2026-06-29 09:43:24	2026-06-29 09:43:24
+019f12c3-1e04-71aa-85a3-0fca7ed53ec7	ml-api	/health	request	7.18.65.204	2026-06-29 09:43:24	2026-06-29 09:43:24
+019f12c3-1e5f-7317-9cc3-e81d3e58b4ca	ml-api	/recommend	request	93.97.32.160	2026-06-29 09:43:25	2026-06-29 09:43:25
+019f12c3-1eb8-72ad-9c5d-50d2dda96e07	Laravel	allergies	request	112.69.252.197	2026-06-29 09:43:25	2026-06-29 09:43:25
+019f12c3-1f0f-70d9-8f95-f562296b405c	image-analysis-api	/analyze-by-mistral	request	10.144.177.22	2026-06-29 09:43:25	2026-06-29 09:43:25
+019f12c3-1f65-7157-801d-8d9dd51ffc98	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:25	2026-06-29 09:43:25
+019f12c3-1fbf-71f3-bdd8-c0804a430e00	ml-api	/profiles	request	140.35.199.233	2026-06-29 09:43:25	2026-06-29 09:43:25
+019f12c3-2018-7155-9583-7caf10795554	ml-api	/recommend	request	37.124.37.170	2026-06-29 09:43:25	2026-06-29 09:43:25
+019f12c3-206e-7223-b2c6-24d6707a5841	image-analysis-api	/health/	request	128.16.77.4	2026-06-29 09:43:25	2026-06-29 09:43:25
+019f12c3-20c5-70a2-bf46-44d2a50e9ca9	Laravel	allergies	request	50.73.58.228	2026-06-29 09:43:25	2026-06-29 09:43:25
+019f12c3-211e-73c6-85eb-2ee03a456a6d	Laravel	allergies	request	160.45.213.146	2026-06-29 09:43:25	2026-06-29 09:43:25
+019f12c3-2175-729c-9481-226079a154f0	image-analysis-api	/analyze	request	136.198.207.4	2026-06-29 09:43:25	2026-06-29 09:43:25
+019f12c3-21cf-737f-b79d-56d2251b5823	Laravel	register	request	38.16.12.223	2026-06-29 09:43:25	2026-06-29 09:43:25
+019f12c3-2226-7358-be9a-df5d25f6375a	ml-api	/health	request	183.203.0.111	2026-06-29 09:43:25	2026-06-29 09:43:25
+019f12c3-227d-711b-bb79-741a763bd948	Laravel	register	request	56.72.23.112	2026-06-29 09:43:26	2026-06-29 09:43:26
+019f12c3-22d4-71ee-a9db-37fa72e5e532	Laravel	allergies	request	82.102.20.22	2026-06-29 09:43:26	2026-06-29 09:43:26
+019f12c3-232a-7021-82f7-ac01adf6d901	image-analysis-api	/analyze-by-mistral	request	6.42.80.111	2026-06-29 09:43:26	2026-06-29 09:43:26
+019f12c3-237f-73d9-986f-309b2dc84c21	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:26	2026-06-29 09:43:26
+019f12c3-23d6-71f4-8570-6c760388f0be	Laravel	login	request	176.182.98.170	2026-06-29 09:43:26	2026-06-29 09:43:26
+019f12c3-242d-7243-b7c9-baebc5100984	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:26	2026-06-29 09:43:26
+019f12c3-2486-7051-bbe3-f6e5b08d4fa5	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:26	2026-06-29 09:43:26
+019f12c3-24dc-7014-952c-e22211f046dc	Laravel	register	request	139.3.72.75	2026-06-29 09:43:26	2026-06-29 09:43:26
+019f12c3-253a-707c-aa94-247b882be84c	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:26	2026-06-29 09:43:26
+019f12c3-2591-73a3-854d-d5c937862f57	Laravel	login	request	244.60.45.81	2026-06-29 09:43:26	2026-06-29 09:43:26
+019f12c3-25ec-714e-bcb6-c78b7430a47a	Laravel	login	request	203.181.230.105	2026-06-29 09:43:26	2026-06-29 09:43:26
+019f12c3-264a-702f-9ec0-c5089e928373	Laravel	login	request	120.178.10.95	2026-06-29 09:43:27	2026-06-29 09:43:27
+019f12c3-26a1-7222-8182-f16f0db40bb7	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:27	2026-06-29 09:43:27
+019f12c3-26fd-7110-b9c3-3c7d60a0c821	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:27	2026-06-29 09:43:27
+019f12c3-2754-70c4-8b3d-6679ffdd5b30	Laravel	allergies	request	239.219.69.145	2026-06-29 09:43:27	2026-06-29 09:43:27
+019f12c3-27ac-70cd-bbca-af0b0e982b85	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:27	2026-06-29 09:43:27
+019f12c3-2803-7055-9683-a3cb7e7421c0	ml-api	/profiles	request	42.183.114.142	2026-06-29 09:43:27	2026-06-29 09:43:27
+019f12c3-285a-733d-a588-f38c4b28a753	Laravel	login	request	168.32.173.64	2026-06-29 09:43:27	2026-06-29 09:43:27
+019f12c3-28b4-73a0-b4dc-00d3e1270604	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:27	2026-06-29 09:43:27
+019f12c3-290b-73d3-867a-27135a6d3787	image-analysis-api	/analyze	request	189.86.128.63	2026-06-29 09:43:27	2026-06-29 09:43:27
+019f12c3-2963-70b9-9de9-34de29fd18a1	Laravel	register	request	123.163.9.99	2026-06-29 09:43:27	2026-06-29 09:43:27
+019f12c3-29bd-731e-9f36-16180c87c6fa	image-analysis-api	/health/	request	253.20.13.13	2026-06-29 09:43:27	2026-06-29 09:43:27
+019f12c3-2a14-73cd-a6f3-2ba925152885	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:28	2026-06-29 09:43:28
+019f12c3-2a6c-73ad-90a7-b00a822c871f	ml-api	/recommend	request	224.50.7.162	2026-06-29 09:43:28	2026-06-29 09:43:28
+019f12c3-2ac2-7063-b6e6-26df8f3e509c	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:28	2026-06-29 09:43:28
+019f12c3-2b19-70b5-9063-cebe467e28f8	Laravel	login	request	245.44.168.25	2026-06-29 09:43:28	2026-06-29 09:43:28
+019f12c3-2b70-72dd-8264-59e2e105429e	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:28	2026-06-29 09:43:28
+019f12c3-2bc8-726c-bcc1-67b82764a0b7	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:28	2026-06-29 09:43:28
+019f12c3-2c21-71dd-8984-e2299a9b9f69	ml-api	/health	request	190.233.207.172	2026-06-29 09:43:28	2026-06-29 09:43:28
+019f12c3-2c78-72e0-b40d-9eb38d2a5800	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:28	2026-06-29 09:43:28
+019f12c3-2ccf-73db-85ff-e29a53239282	Laravel	allergies	request	229.27.119.211	2026-06-29 09:43:28	2026-06-29 09:43:28
+019f12c3-2d27-725c-ac72-f8eba6d85427	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:28	2026-06-29 09:43:28
+019f12c3-2d7e-7324-976d-a22c57831ae8	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:28	2026-06-29 09:43:28
+019f12c3-2dd5-7072-8fba-a664dd7fa7ea	ml-api	/profiles	request	167.132.186.18	2026-06-29 09:43:28	2026-06-29 09:43:28
+019f12c3-2e2f-733c-992d-e59b7f877c5b	Laravel	allergies	request	233.250.31.248	2026-06-29 09:43:29	2026-06-29 09:43:29
+019f12c3-2e85-70c5-814e-5bf19edd87a1	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:29	2026-06-29 09:43:29
+019f12c3-2edb-71f2-9581-64c8d46bcac7	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:29	2026-06-29 09:43:29
+019f12c3-2f32-71b2-bf08-73a78f325d72	Laravel	login	request	78.51.98.22	2026-06-29 09:43:29	2026-06-29 09:43:29
+019f12c3-2f88-7351-83a5-a0eb7a65c8ea	Laravel	allergies	request	143.217.63.78	2026-06-29 09:43:29	2026-06-29 09:43:29
+019f12c3-2fe1-71cf-b68c-7aa6eb71a396	Laravel	allergies	request	9.33.174.25	2026-06-29 09:43:29	2026-06-29 09:43:29
+019f12c3-3037-73ac-be13-2991ccb19f94	Laravel	register	request	129.77.113.134	2026-06-29 09:43:29	2026-06-29 09:43:29
+019f12c3-308f-73ad-9fa3-df52ca7069ee	image-analysis-api	/analyze-by-mistral	request	224.232.58.27	2026-06-29 09:43:29	2026-06-29 09:43:29
+019f12c3-30e6-73ae-8911-3770ab57e08e	ml-api	/health	request	4.43.236.113	2026-06-29 09:43:29	2026-06-29 09:43:29
+019f12c3-313f-7058-b3f0-6b76d1f1fedb	Laravel	register	request	84.66.47.111	2026-06-29 09:43:29	2026-06-29 09:43:29
+019f12c3-3197-70cc-8b01-0142aaa5b8da	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:29	2026-06-29 09:43:29
+019f12c3-31ee-7230-b78a-18b529f8e6ee	image-analysis-api	/analyze	request	207.38.78.224	2026-06-29 09:43:30	2026-06-29 09:43:30
+019f12c3-3247-72b4-bf19-87797ac042d5	Laravel	register	request	144.146.62.214	2026-06-29 09:43:30	2026-06-29 09:43:30
+019f12c3-329f-71a8-9df1-07753029748c	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:30	2026-06-29 09:43:30
+019f12c3-32f8-729d-a5df-90f87357e201	Laravel	register	request	164.27.174.55	2026-06-29 09:43:30	2026-06-29 09:43:30
+019f12c3-334e-73a8-bdf7-e3260848b70a	image-analysis-api	/health/	request	96.206.103.241	2026-06-29 09:43:30	2026-06-29 09:43:30
+019f12c3-33a7-72c7-a3e8-d143483a1e06	Laravel	allergies	request	230.70.203.123	2026-06-29 09:43:30	2026-06-29 09:43:30
+019f12c3-33fe-72dc-b498-9e19036dca48	Laravel	register	request	223.236.241.236	2026-06-29 09:43:30	2026-06-29 09:43:30
+019f12c3-3455-72c6-839c-144fa9c55b80	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:30	2026-06-29 09:43:30
+019f12c3-34ae-72a8-9d86-d8d882735b02	ml-api	/recommend	request	207.194.219.119	2026-06-29 09:43:30	2026-06-29 09:43:30
+019f12c3-350c-731a-860e-636681c96420	Laravel	login	request	168.216.111.198	2026-06-29 09:43:30	2026-06-29 09:43:30
+019f12c3-356a-7233-80f1-455230c648b3	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:30	2026-06-29 09:43:30
+019f12c3-35c7-704b-8dcf-344111c07eb1	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:31	2026-06-29 09:43:31
+019f12c3-3626-70bb-991a-43aaa031b34c	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:31	2026-06-29 09:43:31
+019f12c3-3680-7395-b78f-9e51f88f9c0b	Laravel	register	request	6.48.137.252	2026-06-29 09:43:31	2026-06-29 09:43:31
+019f12c3-36da-72d0-b22e-97b717aba0f4	Laravel	login	request	43.36.193.228	2026-06-29 09:43:31	2026-06-29 09:43:31
+019f12c3-3731-73d9-9710-51e0e01ac828	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:31	2026-06-29 09:43:31
+019f12c3-3788-70c3-a76e-e5268c0bce70	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:31	2026-06-29 09:43:31
+019f12c3-37e1-7208-a619-d070be375837	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:31	2026-06-29 09:43:31
+019f12c3-3838-72a5-a011-e44b6be07490	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:31	2026-06-29 09:43:31
+019f12c3-388f-73ce-b10b-7fff66fdf314	Laravel	login	request	244.29.110.106	2026-06-29 09:43:31	2026-06-29 09:43:31
+019f12c3-38e7-7109-94cb-42ff75809180	image-analysis-api	/health/	request	169.24.22.184	2026-06-29 09:43:31	2026-06-29 09:43:31
+019f12c3-393e-710b-a7f1-3139926e7e1e	image-analysis-api	/health/	request	170.48.12.91	2026-06-29 09:43:31	2026-06-29 09:43:31
+019f12c3-3996-7139-b8a4-fe9df036dea6	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:31	2026-06-29 09:43:31
+019f12c3-39ec-7021-a302-31b53834e166	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:32	2026-06-29 09:43:32
+019f12c3-3a43-72e2-8356-c3b111f799ed	ml-api	/health	request	75.162.56.124	2026-06-29 09:43:32	2026-06-29 09:43:32
+019f12c3-3a9b-72f4-8142-81a9e8d91157	Laravel	login	request	187.208.193.255	2026-06-29 09:43:32	2026-06-29 09:43:32
+019f12c3-3af1-71c8-a341-fec7d8b43c3b	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:32	2026-06-29 09:43:32
+019f12c3-3b49-72fc-a645-7e67b158ef30	Laravel	allergies	request	185.189.76.150	2026-06-29 09:43:32	2026-06-29 09:43:32
+019f12c3-3b9f-73be-a0ba-e5ef905f8f78	Laravel	allergies	request	112.253.87.39	2026-06-29 09:43:32	2026-06-29 09:43:32
+019f12c3-3bf8-70f7-8900-f703561b9ec3	Laravel	register	request	213.159.16.131	2026-06-29 09:43:32	2026-06-29 09:43:32
+019f12c3-3c50-70ab-8664-e6e24b4eba76	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:32	2026-06-29 09:43:32
+019f12c3-3cb1-710a-958c-a303b38370f1	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:32	2026-06-29 09:43:32
+019f12c3-3d1a-7116-9a1f-b96814a0b939	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:32	2026-06-29 09:43:32
+019f12c3-3d71-7075-9469-d76ce64c8b38	Laravel	allergies	request	18.180.18.172	2026-06-29 09:43:32	2026-06-29 09:43:32
+019f12c3-3dc7-7214-b75a-0716a5d3dd23	image-analysis-api	/analyze-by-mistral	request	9.87.73.23	2026-06-29 09:43:33	2026-06-29 09:43:33
+019f12c3-3e1e-70ff-8e06-4d0dd77e874e	Laravel	register	request	3.40.143.182	2026-06-29 09:43:33	2026-06-29 09:43:33
+019f12c3-3e75-7226-b5c1-3e9c14387034	ml-api	/recommend	request	132.2.93.182	2026-06-29 09:43:33	2026-06-29 09:43:33
+019f12c3-3edf-7102-b872-9beca2f39491	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:33	2026-06-29 09:43:33
+019f12c3-3f3c-7146-90d6-65648d636f4a	image-analysis-api	/analyze-by-mistral	request	12.27.117.183	2026-06-29 09:43:33	2026-06-29 09:43:33
+019f12c3-3f9a-72c7-baf2-81ebd7ec63ed	Laravel	login	request	177.172.99.141	2026-06-29 09:43:33	2026-06-29 09:43:33
+019f12c3-3ff4-7382-855d-1bfd64e369bf	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:33	2026-06-29 09:43:33
+019f12c3-404a-7030-a7db-d219758b23fc	Laravel	register	request	119.169.58.81	2026-06-29 09:43:33	2026-06-29 09:43:33
+019f12c3-40a1-719e-a859-8ae4e852dfee	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:33	2026-06-29 09:43:33
+019f12c3-40fa-707b-b089-76776b84fa68	Laravel	allergies	request	220.233.126.233	2026-06-29 09:43:33	2026-06-29 09:43:33
+019f12c3-4150-7065-beed-72295d596b09	image-analysis-api	/analyze-by-mistral	request	251.6.62.138	2026-06-29 09:43:33	2026-06-29 09:43:33
+019f12c3-41a6-7134-b0f5-8c105b118ae6	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:34	2026-06-29 09:43:34
+019f12c3-41ff-7148-ae22-6cb36a90d197	Laravel	login	request	133.174.84.51	2026-06-29 09:43:34	2026-06-29 09:43:34
+019f12c3-4256-722b-a812-ace67bdf4f98	image-analysis-api	/analyze-by-mistral	request	60.37.24.52	2026-06-29 09:43:34	2026-06-29 09:43:34
+019f12c3-42b4-7151-b941-822bc169accc	image-analysis-api	/analyze-by-mistral	request	43.22.74.108	2026-06-29 09:43:34	2026-06-29 09:43:34
+019f12c3-430e-736e-910e-a3fac4a86f6e	image-analysis-api	/health/	request	158.253.224.247	2026-06-29 09:43:34	2026-06-29 09:43:34
+019f12c3-4364-737d-b420-91dc52d90ac5	Laravel	register	request	104.249.156.67	2026-06-29 09:43:34	2026-06-29 09:43:34
+019f12c3-43bb-709d-b6cd-45cb7bf9eda8	ml-api	/health	request	115.237.238.97	2026-06-29 09:43:34	2026-06-29 09:43:34
+019f12c3-4411-72e6-82a0-035c456eb226	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:34	2026-06-29 09:43:34
+019f12c3-4469-73d7-8537-d34ba9c80b9c	Laravel	register	request	218.72.16.36	2026-06-29 09:43:34	2026-06-29 09:43:34
+019f12c3-44c1-7030-b248-c5c1769d4563	Laravel	login	request	223.95.63.99	2026-06-29 09:43:34	2026-06-29 09:43:34
+019f12c3-4518-7086-8706-2af96fcf6ae6	Laravel	allergies	request	101.39.147.128	2026-06-29 09:43:34	2026-06-29 09:43:34
+019f12c3-456e-73cf-bd32-503d62d3a70c	Laravel	login	request	55.82.20.200	2026-06-29 09:43:35	2026-06-29 09:43:35
+019f12c3-45c4-73d5-abcf-69da988d8859	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:35	2026-06-29 09:43:35
+019f12c3-461c-72ee-90f4-cf4d686ccd0b	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:35	2026-06-29 09:43:35
+019f12c3-4684-739c-a5f6-01fe0213d83c	ml-api	/recommend	request	51.17.249.72	2026-06-29 09:43:35	2026-06-29 09:43:35
+019f12c3-46e6-7164-9af1-0c99913c9c28	Laravel	allergies	request	211.178.191.196	2026-06-29 09:43:35	2026-06-29 09:43:35
+019f12c3-4746-71b7-b3fe-bf39ecd49713	ml-api	/health	request	164.73.172.201	2026-06-29 09:43:35	2026-06-29 09:43:35
+019f12c3-479c-704a-8493-9c110b55c70d	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:35	2026-06-29 09:43:35
+019f12c3-47f2-7090-8023-965793176616	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:35	2026-06-29 09:43:35
+019f12c3-4848-71fb-8b1d-d233cb3bea65	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:35	2026-06-29 09:43:35
+019f12c3-48a0-7026-bf44-e2967c7b9fd2	ml-api	/profiles	request	76.221.122.39	2026-06-29 09:43:35	2026-06-29 09:43:35
+019f12c3-48f8-7329-8ffa-4121a00b3e93	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:35	2026-06-29 09:43:35
+019f12c3-494f-71b4-b5df-beac112d25e2	ml-api	/health	request	156.180.30.83	2026-06-29 09:43:36	2026-06-29 09:43:36
+019f12c3-49a7-70d2-9d93-5a11f21b1ba4	image-analysis-api	/health/	request	129.141.5.188	2026-06-29 09:43:36	2026-06-29 09:43:36
+019f12c3-4a03-7302-abb9-ac2fb8810258	image-analysis-api	/analyze-by-mistral	request	166.235.204.108	2026-06-29 09:43:36	2026-06-29 09:43:36
+019f12c3-4a5a-7322-8e2f-115c4189abae	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:36	2026-06-29 09:43:36
+019f12c3-4ab2-72b5-8b7c-71a0ab18d339	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:36	2026-06-29 09:43:36
+019f12c3-4b0a-72ce-82ec-2497e12ad9bd	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:36	2026-06-29 09:43:36
+019f12c3-4b60-72b0-9d3c-a236f936fe93	Laravel	allergies	request	110.243.94.189	2026-06-29 09:43:36	2026-06-29 09:43:36
+019f12c3-4bbc-7143-9e27-68fb30fc2e87	image-analysis-api	/analyze-by-mistral	request	42.31.242.90	2026-06-29 09:43:36	2026-06-29 09:43:36
+019f12c3-4c13-729e-a23f-6f04aafe5193	Laravel	login	request	106.216.0.218	2026-06-29 09:43:36	2026-06-29 09:43:36
+019f12c3-4c6a-71b8-91c8-eb20175e52ff	Laravel	login	request	136.3.102.132	2026-06-29 09:43:36	2026-06-29 09:43:36
+019f12c3-4cc1-719e-aee6-d0ebfaef51de	Laravel	login	request	47.108.251.61	2026-06-29 09:43:36	2026-06-29 09:43:36
+019f12c3-4d17-7116-bc4c-73307541269e	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:36	2026-06-29 09:43:36
+019f12c3-4d6d-70e3-8bec-4223b8c62985	Laravel	allergies	request	199.97.29.118	2026-06-29 09:43:37	2026-06-29 09:43:37
+019f12c3-4dc4-724b-a890-f0024d538b21	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:37	2026-06-29 09:43:37
+019f12c3-4e1a-73db-90a9-566dd49b38fa	Laravel	register	request	169.232.135.115	2026-06-29 09:43:37	2026-06-29 09:43:37
+019f12c3-4e70-71c5-bfae-0813553d29df	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:37	2026-06-29 09:43:37
+019f12c3-4ec7-7065-a324-d4e2b7ba8422	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:37	2026-06-29 09:43:37
+019f12c3-4f1d-7297-bd73-90e6b0d01b2c	Laravel	register	request	66.71.103.1	2026-06-29 09:43:37	2026-06-29 09:43:37
+019f12c3-4f75-722e-b057-a15adaec6a2f	Laravel	login	request	106.58.171.54	2026-06-29 09:43:37	2026-06-29 09:43:37
+019f12c3-4fcd-7123-9ded-c72e59330a33	Laravel	register	request	146.65.42.192	2026-06-29 09:43:37	2026-06-29 09:43:37
+019f12c3-5023-7350-8d80-34b17e88a5db	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:37	2026-06-29 09:43:37
+019f12c3-5078-73d7-b7bf-bbf35ae3fd4a	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:37	2026-06-29 09:43:37
+019f12c3-50cf-71cb-9d5e-8d896907951e	Laravel	login	request	35.63.208.184	2026-06-29 09:43:37	2026-06-29 09:43:37
+019f12c3-5126-73de-8983-bb94882eb037	Laravel	register	request	156.216.228.17	2026-06-29 09:43:38	2026-06-29 09:43:38
+019f12c3-517c-72fd-b4ec-e14fd149c8d7	image-analysis-api	/health/	request	49.84.94.138	2026-06-29 09:43:38	2026-06-29 09:43:38
+019f12c3-51d2-70dd-9022-cf5fa77cb8ba	image-analysis-api	/analyze-by-mistral	request	178.128.137.73	2026-06-29 09:43:38	2026-06-29 09:43:38
+019f12c3-522b-71c1-8eb8-271222278f2d	ml-api	/profiles	request	218.16.244.35	2026-06-29 09:43:38	2026-06-29 09:43:38
+019f12c3-5284-71f6-89ea-6bd5d1f382c6	image-analysis-api	/analyze-by-mistral	request	42.97.198.235	2026-06-29 09:43:38	2026-06-29 09:43:38
+019f12c3-52da-720d-a9db-8cac860ba458	ml-api	/health	request	151.124.44.116	2026-06-29 09:43:38	2026-06-29 09:43:38
+019f12c3-5332-7139-b869-477b8c3421b0	image-analysis-api	/analyze	request	19.3.140.19	2026-06-29 09:43:38	2026-06-29 09:43:38
+019f12c3-538b-7079-9cb3-749b164356b2	Laravel	register	request	187.164.238.121	2026-06-29 09:43:38	2026-06-29 09:43:38
+019f12c3-53e5-7359-bf29-c42fa6d461e0	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:38	2026-06-29 09:43:38
+019f12c3-543c-724f-8203-bf02be89811e	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:38	2026-06-29 09:43:38
+019f12c3-549a-70f2-b62e-d27efe56744e	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:38	2026-06-29 09:43:38
+019f12c3-54f1-725a-b661-992adacc4bd5	Laravel	allergies	request	168.151.129.243	2026-06-29 09:43:38	2026-06-29 09:43:38
+019f12c3-5547-7131-8d6d-6f9041f88235	Laravel	login	request	113.164.117.127	2026-06-29 09:43:39	2026-06-29 09:43:39
+019f12c3-55a4-7184-bd7c-9d4f21b61ae8	Laravel	login	request	157.191.105.207	2026-06-29 09:43:39	2026-06-29 09:43:39
+019f12c3-55fc-7371-bcbf-45a6e2cc81d2	image-analysis-api	/health/	request	120.99.216.32	2026-06-29 09:43:39	2026-06-29 09:43:39
+019f12c3-5656-7276-a5da-93b884a9cebb	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:39	2026-06-29 09:43:39
+019f12c3-56ad-72fd-8ba2-44d46b51e43f	Laravel	login	request	150.52.100.31	2026-06-29 09:43:39	2026-06-29 09:43:39
+019f12c3-5703-7132-ba7b-0377cac71e91	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:39	2026-06-29 09:43:39
+019f12c3-5759-700a-b3a7-229828d1e316	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:39	2026-06-29 09:43:39
+019f12c3-57b1-70b7-98a1-9488f5f7bc51	Laravel	allergies	request	52.209.119.236	2026-06-29 09:43:39	2026-06-29 09:43:39
+019f12c3-5807-727d-8464-d56c9832f0c6	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:39	2026-06-29 09:43:39
+019f12c3-586a-732c-b116-61e170355a1c	ml-api	/profiles	request	238.207.20.109	2026-06-29 09:43:39	2026-06-29 09:43:39
+019f12c3-58c0-70e8-9402-5a827c4fc582	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:39	2026-06-29 09:43:39
+019f12c3-5918-711c-9edf-b7ff45cf1d21	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:40	2026-06-29 09:43:40
+019f12c3-596f-7226-abd0-f2ede66d42a3	Laravel	login	request	7.116.215.9	2026-06-29 09:43:40	2026-06-29 09:43:40
+019f12c3-59c6-7338-b950-64e5784dfab0	Laravel	register	request	97.143.229.47	2026-06-29 09:43:40	2026-06-29 09:43:40
+019f12c3-5a1d-7241-b33d-dd8175bcfe3c	image-analysis-api	/analyze	request	146.180.168.57	2026-06-29 09:43:40	2026-06-29 09:43:40
+019f12c3-5a7e-70ae-8b13-a06fbb2897fd	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:40	2026-06-29 09:43:40
+019f12c3-5ad6-7102-b7f1-19eac72d8852	ml-api	/profiles	request	123.130.146.114	2026-06-29 09:43:40	2026-06-29 09:43:40
+019f12c3-5b2f-70b7-b68e-4b386609d725	Laravel	allergies	request	155.142.94.4	2026-06-29 09:43:40	2026-06-29 09:43:40
+019f12c3-5b87-718a-9d64-5412a21914ec	image-analysis-api	/health/	request	198.251.71.239	2026-06-29 09:43:40	2026-06-29 09:43:40
+019f12c3-5bdd-735c-9713-e6e74cb7d791	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:40	2026-06-29 09:43:40
+019f12c3-5c33-7369-a3d9-2436598a7f79	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:40	2026-06-29 09:43:40
+019f12c3-5cc2-7219-8477-abebc8b37da6	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:40	2026-06-29 09:43:40
+019f12c3-5d18-735d-8e55-a5040cbc002c	ml-api	/health	request	207.172.90.78	2026-06-29 09:43:41	2026-06-29 09:43:41
+019f12c3-5d70-728b-bea1-a05634be4222	ml-api	/recommend	request	208.47.69.89	2026-06-29 09:43:41	2026-06-29 09:43:41
+019f12c3-5dc7-7250-b868-e9a5d9e8c680	ml-api	/recommend	request	207.104.66.29	2026-06-29 09:43:41	2026-06-29 09:43:41
+019f12c3-5e2c-702a-b3f1-86bee3e0afe0	image-analysis-api	/health/	request	203.231.212.36	2026-06-29 09:43:41	2026-06-29 09:43:41
+019f12c3-5e83-71d9-9828-2b0ac01afe4a	image-analysis-api	/health/	request	194.6.255.114	2026-06-29 09:43:41	2026-06-29 09:43:41
+019f12c3-5edc-7190-80af-31ec58bc00c7	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:41	2026-06-29 09:43:41
+019f12c3-5f33-7012-b70f-52ad50179008	image-analysis-api	/analyze-by-mistral	request	247.130.34.147	2026-06-29 09:43:41	2026-06-29 09:43:41
+019f12c3-5f92-71ae-813f-0ab861cdf9fa	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:41	2026-06-29 09:43:41
+019f12c3-5fe9-7347-a732-7147fc5a1ca4	Laravel	register	request	160.140.5.126	2026-06-29 09:43:41	2026-06-29 09:43:41
+019f12c3-6040-72ee-ac63-ef2a66f6e231	Laravel	allergies	request	243.107.111.39	2026-06-29 09:43:41	2026-06-29 09:43:41
+019f12c3-6096-7172-8733-bd9e64eb92c7	Laravel	register	request	114.64.253.214	2026-06-29 09:43:41	2026-06-29 09:43:41
+019f12c3-60ed-7217-945f-2db801421b2c	Laravel	login	request	210.102.142.28	2026-06-29 09:43:42	2026-06-29 09:43:42
+019f12c3-6147-706b-bcb9-63a6047f427e	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:42	2026-06-29 09:43:42
+019f12c3-619c-72f2-b056-4d4fe5e20fa1	Laravel	login	request	232.184.225.166	2026-06-29 09:43:42	2026-06-29 09:43:42
+019f12c3-61f6-729f-86b5-9e876197d67f	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:42	2026-06-29 09:43:42
+019f12c3-625a-729e-b8b2-ae966e83bc8f	Laravel	register	request	142.179.137.244	2026-06-29 09:43:42	2026-06-29 09:43:42
+019f12c3-62b1-71d2-80a8-c8ee4ab974ea	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:42	2026-06-29 09:43:42
+019f12c3-6309-730f-8abd-a1932a329c61	image-analysis-api	/analyze	request	115.50.160.87	2026-06-29 09:43:42	2026-06-29 09:43:42
+019f12c3-6361-701c-87b2-b31d3bf8f6d7	image-analysis-api	/health/	request	8.27.113.120	2026-06-29 09:43:42	2026-06-29 09:43:42
+019f12c3-63b8-72ee-97af-cc3f14ebd847	Laravel	login	request	153.229.245.230	2026-06-29 09:43:42	2026-06-29 09:43:42
+019f12c3-640e-7213-91d1-0797f99827fb	ml-api	/profiles	request	89.193.54.252	2026-06-29 09:43:42	2026-06-29 09:43:42
+019f12c3-6464-704a-85a9-d62987f10349	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:42	2026-06-29 09:43:42
+019f12c3-64ba-726f-a8df-5dd2b2edaa45	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:43	2026-06-29 09:43:43
+019f12c3-6511-7229-a5e2-fa8d4b47aa33	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:43	2026-06-29 09:43:43
+019f12c3-6568-71d9-9899-0a35f900e6dc	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:43	2026-06-29 09:43:43
+019f12c3-65be-70f3-adb9-adf32a4bd01d	ml-api	/recommend	request	231.179.5.80	2026-06-29 09:43:43	2026-06-29 09:43:43
+019f12c3-6614-7352-ac22-8408cca75cd6	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:43	2026-06-29 09:43:43
+019f12c3-666c-70a8-be82-cdffe73b8e9a	Laravel	register	request	216.146.11.212	2026-06-29 09:43:43	2026-06-29 09:43:43
+019f12c3-66c3-724f-a167-a0cb7cd1de35	image-analysis-api	/analyze	request	212.195.66.196	2026-06-29 09:43:43	2026-06-29 09:43:43
+019f12c3-6719-703f-8de4-9878febe7bbe	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:43	2026-06-29 09:43:43
+019f12c3-676f-73d5-8f39-dcff4ca3bce9	ml-api	/health	request	88.133.181.71	2026-06-29 09:43:43	2026-06-29 09:43:43
+019f12c3-67ca-715c-ac0a-cb9c74f42b7e	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:43	2026-06-29 09:43:43
+019f12c3-6820-7072-8810-1b794c0964fc	image-analysis-api	/analyze	request	99.208.122.229	2026-06-29 09:43:43	2026-06-29 09:43:43
+019f12c3-6877-70e5-bf2b-461c30829319	image-analysis-api	/analyze-by-mistral	request	10.13.164.1	2026-06-29 09:43:43	2026-06-29 09:43:43
+019f12c3-68ce-71bf-89d7-63a25cd094b3	image-analysis-api	/analyze-by-mistral	request	225.197.30.161	2026-06-29 09:43:44	2026-06-29 09:43:44
+019f12c3-6927-723b-9a3d-d09923de0635	Laravel	register	request	192.32.123.101	2026-06-29 09:43:44	2026-06-29 09:43:44
+019f12c3-697e-71df-930b-b308848da14e	Laravel	login	request	152.141.160.124	2026-06-29 09:43:44	2026-06-29 09:43:44
+019f12c3-69d8-71c5-8022-03b48d302721	Laravel	allergies	request	3.182.42.6	2026-06-29 09:43:44	2026-06-29 09:43:44
+019f12c3-6a2e-7178-af93-b6ac85656610	Laravel	register	request	113.116.95.148	2026-06-29 09:43:44	2026-06-29 09:43:44
+019f12c3-6a8a-7189-a4dc-eea60838b132	Laravel	allergies	request	56.192.112.119	2026-06-29 09:43:44	2026-06-29 09:43:44
+019f12c3-6ae1-7180-8af9-7ef6f36c3d72	Laravel	allergies	request	197.176.168.222	2026-06-29 09:43:44	2026-06-29 09:43:44
+019f12c3-6b38-73d7-9c78-01665ed35277	Laravel	register	request	42.127.190.255	2026-06-29 09:43:44	2026-06-29 09:43:44
+019f12c3-6b90-7253-bbc7-5b852fc733ae	Laravel	login	request	226.59.141.175	2026-06-29 09:43:44	2026-06-29 09:43:44
+019f12c3-6be7-7090-bda4-aed1edbfe796	Laravel	allergies	request	30.43.0.253	2026-06-29 09:43:44	2026-06-29 09:43:44
+019f12c3-6c3e-7047-a97c-de873c46f7b3	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:44	2026-06-29 09:43:44
+019f12c3-6c95-737d-8d6a-9e0471c2d664	Laravel	login	request	239.141.254.81	2026-06-29 09:43:45	2026-06-29 09:43:45
+019f12c3-6cec-72c1-883e-5df79efc4f35	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:45	2026-06-29 09:43:45
+019f12c3-6d45-7378-999a-95a81b551ddc	Laravel	login	request	6.218.157.97	2026-06-29 09:43:45	2026-06-29 09:43:45
+019f12c3-6da0-737b-a9a4-d7e4dc1f22b2	ml-api	/profiles	request	37.24.103.208	2026-06-29 09:43:45	2026-06-29 09:43:45
+019f12c3-6df6-72a4-90c5-46570ecbfd39	Laravel	register	request	103.222.98.147	2026-06-29 09:43:45	2026-06-29 09:43:45
+019f12c3-6e4f-7095-89ab-6cdb5aa500a8	Laravel	allergies	request	221.58.54.74	2026-06-29 09:43:45	2026-06-29 09:43:45
+019f12c3-6ea5-71fa-bc53-b8e62137cb7c	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:45	2026-06-29 09:43:45
+019f12c3-6efb-7281-84bf-93dfd3fa2298	ml-api	/recommend	request	179.73.116.205	2026-06-29 09:43:45	2026-06-29 09:43:45
+019f12c3-6f52-71c9-ac2d-d1c78ee1110b	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:45	2026-06-29 09:43:45
+019f12c3-6fa8-71cb-80df-4a6effd78678	ml-api	/profiles	request	221.119.80.75	2026-06-29 09:43:45	2026-06-29 09:43:45
+019f12c3-7001-71e3-8878-d1051205f415	Laravel	allergies	request	137.140.59.33	2026-06-29 09:43:45	2026-06-29 09:43:45
+019f12c3-7058-71ba-905c-3a94f21c3b4e	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:46	2026-06-29 09:43:46
+019f12c3-70b1-70a5-b7eb-4ef6e17afe78	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:46	2026-06-29 09:43:46
+019f12c3-7108-729f-87ab-eb0343bad08e	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:46	2026-06-29 09:43:46
+019f12c3-715e-728b-aea1-be97afd6513f	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:46	2026-06-29 09:43:46
+019f12c3-71b4-73fb-afd4-43cd48d01012	Laravel	login	request	169.236.117.254	2026-06-29 09:43:46	2026-06-29 09:43:46
+019f12c3-720b-71f1-a55d-1b4f5a279efe	Laravel	register	request	111.247.16.165	2026-06-29 09:43:46	2026-06-29 09:43:46
+019f12c3-7261-72a3-9e7c-9aac7593accf	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:46	2026-06-29 09:43:46
+019f12c3-72b8-7327-bc18-e754c695ca81	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:46	2026-06-29 09:43:46
+019f12c3-730f-73b3-84e8-8ad81edcbaa3	Laravel	login	request	155.171.131.229	2026-06-29 09:43:46	2026-06-29 09:43:46
+019f12c3-736a-7038-a405-82cd4bf0ca29	Laravel	register	request	8.67.173.132	2026-06-29 09:43:46	2026-06-29 09:43:46
+019f12c3-73c1-73b1-a611-a8176eebcd9c	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:46	2026-06-29 09:43:46
+019f12c3-741a-7168-8f6b-8dd097a3405d	Laravel	register	request	109.98.30.51	2026-06-29 09:43:46	2026-06-29 09:43:46
+019f12c3-7470-7331-bbec-df712f7186b7	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:47	2026-06-29 09:43:47
+019f12c3-74c7-70d2-95ab-4cce93f7faea	Laravel	login	request	70.171.183.56	2026-06-29 09:43:47	2026-06-29 09:43:47
+019f12c3-751d-734a-9e05-031a051f46dd	image-analysis-api	/health/	request	55.144.148.153	2026-06-29 09:43:47	2026-06-29 09:43:47
+019f12c3-7574-7029-8ff6-4d5d4f506fbd	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:47	2026-06-29 09:43:47
+019f12c3-75ca-7346-abc3-0a1a8e51f3dd	ml-api	/profiles	request	104.175.218.185	2026-06-29 09:43:47	2026-06-29 09:43:47
+019f12c3-7620-73b1-8482-b9c5c284b8fd	image-analysis-api	/health/	request	185.51.109.56	2026-06-29 09:43:47	2026-06-29 09:43:47
+019f12c3-7676-7097-8e04-c7c76df21a93	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:47	2026-06-29 09:43:47
+019f12c3-76cc-720f-9cc0-f40da433162e	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:47	2026-06-29 09:43:47
+019f12c3-7723-71a0-b61e-97ced2539f0b	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:47	2026-06-29 09:43:47
+019f12c3-777a-71b6-b202-d5834e8b77a0	ml-api	/health	request	25.55.183.40	2026-06-29 09:43:47	2026-06-29 09:43:47
+019f12c3-77d3-7186-9174-272c2b0d11f6	image-analysis-api	/health/	request	34.23.111.104	2026-06-29 09:43:47	2026-06-29 09:43:47
+019f12c3-782b-71e3-b101-981da37c680d	Laravel	login	request	48.13.77.91	2026-06-29 09:43:48	2026-06-29 09:43:48
+019f12c3-7884-709d-bec8-1788f71a3a9e	Laravel	register	request	1.24.34.60	2026-06-29 09:43:48	2026-06-29 09:43:48
+019f12c3-78db-722f-80e1-1c0f853cec67	Laravel	register	request	92.129.18.185	2026-06-29 09:43:48	2026-06-29 09:43:48
+019f12c3-7932-7350-8053-449cb9ceacd7	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:48	2026-06-29 09:43:48
+019f12c3-798a-70fa-af76-029920d88c71	Laravel	allergies	request	38.75.219.224	2026-06-29 09:43:48	2026-06-29 09:43:48
+019f12c3-79e1-71f8-ad6c-bc1f10b66d57	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:48	2026-06-29 09:43:48
+019f12c3-7a37-7120-babd-7f6a7e7e5b4f	Laravel	login	request	120.36.135.203	2026-06-29 09:43:48	2026-06-29 09:43:48
+019f12c3-7a8e-716e-bbb5-5f3cdd2ae381	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:48	2026-06-29 09:43:48
+019f12c3-7ae8-71b0-a9e9-d84c8aef97fb	image-analysis-api	/health/	request	24.26.218.178	2026-06-29 09:43:48	2026-06-29 09:43:48
+019f12c3-7b3f-73ed-a0a3-714d782e2c82	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:48	2026-06-29 09:43:48
+019f12c3-7b98-7195-a51f-60dd296ecce0	Laravel	allergies	request	222.255.147.238	2026-06-29 09:43:48	2026-06-29 09:43:48
+019f12c3-7bef-7090-b9d9-67551827ffa4	Laravel	register	request	242.146.55.63	2026-06-29 09:43:48	2026-06-29 09:43:48
+019f12c3-7c47-72dc-8304-1cbbe21ccd06	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:49	2026-06-29 09:43:49
+019f12c3-7ca0-73b3-9ef7-bf14c5a7853e	image-analysis-api	/health/	request	19.221.67.212	2026-06-29 09:43:49	2026-06-29 09:43:49
+019f12c3-7cf9-723b-aabd-81f98b3422cd	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:49	2026-06-29 09:43:49
+019f12c3-7d4f-73af-a408-59d6b3c5cda1	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:49	2026-06-29 09:43:49
+019f12c3-7da7-721d-b613-a78a1a9f67b0	ml-api	/recommend	request	22.106.71.137	2026-06-29 09:43:49	2026-06-29 09:43:49
+019f12c3-7dff-72d7-a775-5090c82969f0	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:49	2026-06-29 09:43:49
+019f12c3-7e55-70c9-8080-7265e98ee25c	Laravel	register	request	231.9.67.61	2026-06-29 09:43:49	2026-06-29 09:43:49
+019f12c3-7ead-737b-9462-6f5ffdaa3df5	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:49	2026-06-29 09:43:49
+019f12c3-7f08-73c7-8877-6fc7df0d93c0	ml-api	/recommend	request	180.220.41.36	2026-06-29 09:43:49	2026-06-29 09:43:49
+019f12c3-7f5f-7375-9c57-a067cb968f1c	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:49	2026-06-29 09:43:49
+019f12c3-7fb6-73f4-af09-617478e6f469	ml-api	/recommend	request	241.85.61.144	2026-06-29 09:43:49	2026-06-29 09:43:49
+019f12c3-800d-7371-a5ca-0faa4e765039	ml-api	/health	request	179.78.182.128	2026-06-29 09:43:50	2026-06-29 09:43:50
+019f12c3-8065-72f8-88c9-1074cd4774f3	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:50	2026-06-29 09:43:50
+019f12c3-80bb-7336-8706-413f500b41de	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:50	2026-06-29 09:43:50
+019f12c3-8114-73fb-bf90-6c78a39efd65	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:50	2026-06-29 09:43:50
+019f12c3-816a-70d6-b597-51f17c903588	Laravel	register	request	82.247.163.161	2026-06-29 09:43:50	2026-06-29 09:43:50
+019f12c3-81c0-70ac-a1f8-be0fcb7b5d12	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:50	2026-06-29 09:43:50
+019f12c3-821e-737b-83de-b6c5c453fede	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:50	2026-06-29 09:43:50
+019f12c3-8274-70aa-a57d-d4485f42e904	Laravel	login	request	126.80.68.114	2026-06-29 09:43:50	2026-06-29 09:43:50
+019f12c3-82ca-73eb-80c5-1d6cc5ed20d0	Laravel	login	request	208.88.195.141	2026-06-29 09:43:50	2026-06-29 09:43:50
+019f12c3-8320-70d2-87b5-4f67b8735941	Laravel	login	request	29.70.48.2	2026-06-29 09:43:50	2026-06-29 09:43:50
+019f12c3-8378-7373-959d-4f9088c5c33d	ml-api	/profiles	request	62.113.198.206	2026-06-29 09:43:50	2026-06-29 09:43:50
+019f12c3-83ce-7347-b82b-f8dafa2a4f90	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:50	2026-06-29 09:43:50
+019f12c3-8424-732a-b9ea-2d98950acd27	ml-api	/recommend	request	194.161.177.13	2026-06-29 09:43:51	2026-06-29 09:43:51
+019f12c3-847b-737c-b263-80be89839420	ml-api	/health	request	25.236.211.218	2026-06-29 09:43:51	2026-06-29 09:43:51
+019f12c3-84d2-70a2-80fe-655c8ee9ba6e	image-analysis-api	/health/	request	128.68.206.217	2026-06-29 09:43:51	2026-06-29 09:43:51
+019f12c3-8528-71b1-a621-2bd75db8a54f	Laravel	register	request	60.117.199.84	2026-06-29 09:43:51	2026-06-29 09:43:51
+019f12c3-857f-7266-a5ed-1937e7e8f19b	ml-api	/recommend	request	76.100.56.171	2026-06-29 09:43:51	2026-06-29 09:43:51
+019f12c3-85d6-7093-a586-835145867628	Laravel	allergies	request	91.183.110.249	2026-06-29 09:43:51	2026-06-29 09:43:51
+019f12c3-862c-719e-b1d1-9f74d301b5ea	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:51	2026-06-29 09:43:51
+019f12c3-8683-7025-8067-bbdf7ce50d40	ml-api	/profiles	request	124.173.120.60	2026-06-29 09:43:51	2026-06-29 09:43:51
+019f12c3-86d9-71cb-a5be-9dafe535dafe	ml-api	/profiles	request	53.252.157.104	2026-06-29 09:43:51	2026-06-29 09:43:51
+019f12c3-8732-70f3-9e3a-9d93a6ca12fb	image-analysis-api	/analyze	request	185.79.127.131	2026-06-29 09:43:51	2026-06-29 09:43:51
+019f12c3-878a-7200-9895-947407f6cfb3	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:51	2026-06-29 09:43:51
+019f12c3-87e0-7237-a4d5-392fa402d47a	Laravel	register	request	39.144.197.239	2026-06-29 09:43:52	2026-06-29 09:43:52
+019f12c3-883a-73ec-aa18-0a8d81b46b89	Laravel	login	request	217.245.111.207	2026-06-29 09:43:52	2026-06-29 09:43:52
+019f12c3-8891-737e-979b-c19905345ea0	ml-api	/recommend	request	53.242.151.201	2026-06-29 09:43:52	2026-06-29 09:43:52
+019f12c3-88e7-73fa-b6f4-e730426eb963	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:52	2026-06-29 09:43:52
+019f12c3-893e-7030-bed4-ee7ddf1feed6	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:52	2026-06-29 09:43:52
+019f12c3-8994-7142-9b48-42df6c43fe84	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:52	2026-06-29 09:43:52
+019f12c3-89ea-706d-af9d-4d3791da9a7b	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:52	2026-06-29 09:43:52
+019f12c3-8a40-73cb-8e4f-19e04ff7a858	ml-api	/health	request	238.70.234.102	2026-06-29 09:43:52	2026-06-29 09:43:52
+019f12c3-8a96-7203-8a3b-2fc1a0e34a3c	image-analysis-api	/health/	request	74.53.92.97	2026-06-29 09:43:52	2026-06-29 09:43:52
+019f12c3-8aec-72f1-816e-8750c476fc08	Laravel	allergies	request	167.222.180.179	2026-06-29 09:43:52	2026-06-29 09:43:52
+019f12c3-8b43-7352-8f97-9d69e4ba89e2	Laravel	login	request	173.57.59.136	2026-06-29 09:43:52	2026-06-29 09:43:52
+019f12c3-8b9d-713a-a3fe-9af54ba42bbe	Laravel	register	request	30.1.253.121	2026-06-29 09:43:52	2026-06-29 09:43:52
+019f12c3-8bf3-719c-b811-3170164e29ec	ml-api	/recommend	request	141.172.186.57	2026-06-29 09:43:53	2026-06-29 09:43:53
+019f12c3-8c49-708a-a4b7-897761b0cbdc	Laravel	allergies	request	26.234.104.15	2026-06-29 09:43:53	2026-06-29 09:43:53
+019f12c3-8ca0-7214-aa1a-c8a0eb4064d8	image-analysis-api	/analyze	request	157.186.135.146	2026-06-29 09:43:53	2026-06-29 09:43:53
+019f12c3-8cf8-70f7-af92-951018ba8983	Laravel	register	request	115.32.170.239	2026-06-29 09:43:53	2026-06-29 09:43:53
+019f12c3-8d4f-724d-9c9c-b6dad1e57c27	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:53	2026-06-29 09:43:53
+019f12c3-8da6-73bf-8d82-837c255080ff	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:53	2026-06-29 09:43:53
+019f12c3-8dff-718c-905d-4f5a52edc565	image-analysis-api	/analyze-by-mistral	request	55.31.89.245	2026-06-29 09:43:53	2026-06-29 09:43:53
+019f12c3-8e56-72ed-8a97-d6ff53efb8ed	ml-api	/health	request	109.209.218.89	2026-06-29 09:43:53	2026-06-29 09:43:53
+019f12c3-8eb1-7071-81d9-3b7bf9818b4b	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:53	2026-06-29 09:43:53
+019f12c3-8f16-7376-b2c1-9d08a3cf800f	image-analysis-api	/analyze	request	167.126.217.211	2026-06-29 09:43:53	2026-06-29 09:43:53
+019f12c3-8f72-7267-87ef-62aca44f90b5	image-analysis-api	/health/	request	110.66.134.23	2026-06-29 09:43:53	2026-06-29 09:43:53
+019f12c3-8fcf-73be-8d37-0a997a109914	Laravel	register	request	220.41.101.101	2026-06-29 09:43:54	2026-06-29 09:43:54
+019f12c3-902c-733e-b1a7-2aa93086a36e	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:54	2026-06-29 09:43:54
+019f12c3-9085-737c-8ed2-afda1e340ec5	Laravel	register	request	44.232.111.70	2026-06-29 09:43:54	2026-06-29 09:43:54
+019f12c3-90dc-7161-997c-a08513e066af	Laravel	allergies	request	31.184.19.232	2026-06-29 09:43:54	2026-06-29 09:43:54
+019f12c3-9133-701e-b3ad-b36a0b75240a	image-analysis-api	/health/	request	157.13.73.235	2026-06-29 09:43:54	2026-06-29 09:43:54
+019f12c3-918a-726e-8085-a51b236e9c16	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:54	2026-06-29 09:43:54
+019f12c3-91e2-71d1-95b3-ba16956730fb	image-analysis-api	/analyze	request	196.31.170.28	2026-06-29 09:43:54	2026-06-29 09:43:54
+019f12c3-923b-7116-910f-e21ed7e038b9	ml-api	/health	request	124.155.58.221	2026-06-29 09:43:54	2026-06-29 09:43:54
+019f12c3-9296-739e-b827-612ac68f54c1	Laravel	register	request	214.22.134.241	2026-06-29 09:43:54	2026-06-29 09:43:54
+019f12c3-92ef-7157-a825-a12ce23dd3bc	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:54	2026-06-29 09:43:54
+019f12c3-9349-71f7-af4a-fc21051df78e	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:54	2026-06-29 09:43:54
+019f12c3-93a0-73ce-b528-63639ad898bb	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:55	2026-06-29 09:43:55
+019f12c3-93f6-732b-a203-660af7ea56e9	ml-api	/health	request	125.151.39.159	2026-06-29 09:43:55	2026-06-29 09:43:55
+019f12c3-944f-7028-899e-9d68397639b6	Laravel	login	request	124.159.219.3	2026-06-29 09:43:55	2026-06-29 09:43:55
+019f12c3-94a5-71bc-9469-2f8226dce4f8	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:55	2026-06-29 09:43:55
+019f12c3-94fe-7154-94f7-744b1f2f06ee	image-analysis-api	/analyze	request	19.52.38.113	2026-06-29 09:43:55	2026-06-29 09:43:55
+019f12c3-9556-7219-8e15-468581ed737c	Laravel	allergies	request	34.12.172.81	2026-06-29 09:43:55	2026-06-29 09:43:55
+019f12c3-95b1-715f-a95b-ad515504163b	image-analysis-api	/analyze	request	227.120.127.27	2026-06-29 09:43:55	2026-06-29 09:43:55
+019f12c3-9607-73c0-b8fd-1fd0fce77e0f	image-analysis-api	/analyze	request	62.212.77.163	2026-06-29 09:43:55	2026-06-29 09:43:55
+019f12c3-965f-7355-84d4-c23a622ebd00	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:55	2026-06-29 09:43:55
+019f12c3-96b6-702d-9f9f-f6261c18a0f7	ml-api	/health	request	52.226.50.87	2026-06-29 09:43:55	2026-06-29 09:43:55
+019f12c3-970d-735e-8ce0-d42d8a50c916	ml-api	/health	request	23.154.161.10	2026-06-29 09:43:55	2026-06-29 09:43:55
+019f12c3-9764-7378-857c-fa8adee6c5d3	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:56	2026-06-29 09:43:56
+019f12c3-97bb-722c-9481-c653ade41e57	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:56	2026-06-29 09:43:56
+019f12c3-9812-7245-ae95-c07f6cc49d08	Laravel	allergies	request	236.170.127.19	2026-06-29 09:43:56	2026-06-29 09:43:56
+019f12c3-9869-70d4-a3de-6672b4930853	Laravel	allergies	request	23.24.237.204	2026-06-29 09:43:56	2026-06-29 09:43:56
+019f12c3-98c1-71c3-bd8c-89530cd4c4aa	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:56	2026-06-29 09:43:56
+019f12c3-9919-709b-87ef-dbddc714b2f4	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:56	2026-06-29 09:43:56
+019f12c3-996e-710c-9c0e-1e7ad0661015	image-analysis-api	/health/	request	195.216.252.61	2026-06-29 09:43:56	2026-06-29 09:43:56
+019f12c3-99c5-723c-bcaf-ec2856e5641c	ml-api	/health	request	102.71.29.244	2026-06-29 09:43:56	2026-06-29 09:43:56
+019f12c3-9a1d-720c-b2a8-0bc31405cd44	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:56	2026-06-29 09:43:56
+019f12c3-9a74-705a-a40a-5c94a5b0f162	ml-api	/profiles	request	68.205.231.41	2026-06-29 09:43:56	2026-06-29 09:43:56
+019f12c3-9acc-70d2-86db-516577131b97	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:56	2026-06-29 09:43:56
+019f12c3-9b23-7212-8de6-550528fd1276	image-analysis-api	/analyze-by-mistral	request	112.73.94.222	2026-06-29 09:43:56	2026-06-29 09:43:56
+019f12c3-9b7a-7302-8be4-47dccc912efe	ml-api	/recommend	request	20.176.49.10	2026-06-29 09:43:57	2026-06-29 09:43:57
+019f12c3-9bd1-7311-af9e-6fe64ee7ac67	image-analysis-api	/health/	request	185.136.106.181	2026-06-29 09:43:57	2026-06-29 09:43:57
+019f12c3-9c28-7255-9787-4a9994b7bab7	image-analysis-api	/analyze-by-mistral	request	214.213.92.129	2026-06-29 09:43:57	2026-06-29 09:43:57
+019f12c3-9c7f-7175-a9bb-ecfedf3994cc	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:57	2026-06-29 09:43:57
+019f12c3-9cd5-735e-92af-06234bd476d5	Laravel	register	request	87.244.208.179	2026-06-29 09:43:57	2026-06-29 09:43:57
+019f12c3-9d2c-709e-bd42-ae24cc6ce188	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:57	2026-06-29 09:43:57
+019f12c3-9d83-7087-b3a6-46bee89397cd	image-analysis-api	/analyze-by-mistral	request	168.103.136.95	2026-06-29 09:43:57	2026-06-29 09:43:57
+019f12c3-9dda-72fa-a034-eae462aaf3ba	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:57	2026-06-29 09:43:57
+019f12c3-9e33-7384-bf39-38b856cec29e	Laravel	register	request	240.6.88.4	2026-06-29 09:43:57	2026-06-29 09:43:57
+019f12c3-9e89-7249-b904-63b4d1e70b58	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:57	2026-06-29 09:43:57
+019f12c3-9ee0-70e8-aede-356635f22737	ml-api	/profiles	request	211.0.226.35	2026-06-29 09:43:57	2026-06-29 09:43:57
+019f12c3-9f36-73ca-b25c-25243d1c4d2f	ml-api	/health	request	6.72.136.175	2026-06-29 09:43:58	2026-06-29 09:43:58
+019f12c3-9f8e-7226-8bf3-75b366b04b02	ml-api	/profiles	request	103.114.92.161	2026-06-29 09:43:58	2026-06-29 09:43:58
+019f12c3-9fe5-71e9-ba31-4fa92e37e853	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:58	2026-06-29 09:43:58
+019f12c3-a03b-7109-8a81-b9427f91385c	ml-api	/health	request	29.30.111.102	2026-06-29 09:43:58	2026-06-29 09:43:58
+019f12c3-a095-7141-ac84-d19dfcc55699	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:58	2026-06-29 09:43:58
+019f12c3-a0eb-73ec-b30a-55c7a0d1ea19	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:58	2026-06-29 09:43:58
+019f12c3-a149-7180-a53f-e448253d6251	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:43:58	2026-06-29 09:43:58
+019f12c3-a1a0-729b-b4ca-8fdb49b32fa2	image-analysis-api	/health/	request	184.134.36.123	2026-06-29 09:43:58	2026-06-29 09:43:58
+019f12c3-a1f9-708b-8e48-0023d8ec51ba	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:43:58	2026-06-29 09:43:58
+019f12c3-a250-71aa-a940-c6d4c04fb406	ml-api	/recommend	request	90.70.111.199	2026-06-29 09:43:58	2026-06-29 09:43:58
+019f12c3-a2a7-719f-9e00-e4550a5bfc4a	Laravel	allergies	request	116.44.152.213	2026-06-29 09:43:58	2026-06-29 09:43:58
+019f12c3-a2fc-73c1-81d4-b291ce95a949	Laravel	login	request	24.17.197.225	2026-06-29 09:43:58	2026-06-29 09:43:58
+019f12c3-a353-7118-a4db-5f4f5a5fc50f	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:59	2026-06-29 09:43:59
+019f12c3-a3a9-7079-9bd3-26d4001399cb	Laravel	login	request	178.189.175.18	2026-06-29 09:43:59	2026-06-29 09:43:59
+019f12c3-a400-7129-b778-fd02f7eee1dc	Laravel	register	request	126.196.198.157	2026-06-29 09:43:59	2026-06-29 09:43:59
+019f12c3-a45d-7023-9d5c-4ccbed4c975f	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:43:59	2026-06-29 09:43:59
+019f12c3-a4b5-73ab-9863-4f8100a74b22	Laravel	register	request	20.170.211.15	2026-06-29 09:43:59	2026-06-29 09:43:59
+019f12c3-a50d-71a0-9f25-fba812d3bb2b	Laravel	register	request	121.55.223.15	2026-06-29 09:43:59	2026-06-29 09:43:59
+019f12c3-a564-72da-958b-d6bb1b01e402	Laravel	register	request	34.98.204.30	2026-06-29 09:43:59	2026-06-29 09:43:59
+019f12c3-a5c5-73b8-af5b-ee8c7695a70a	ml-api	/health	request	7.88.69.136	2026-06-29 09:43:59	2026-06-29 09:43:59
+019f12c3-a61c-73c7-991f-116260a38e67	Laravel	register	request	55.133.16.173	2026-06-29 09:43:59	2026-06-29 09:43:59
+019f12c3-a674-72eb-970b-073efd0c1f0b	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:43:59	2026-06-29 09:43:59
+019f12c3-a6cc-73cb-aa5e-426e1c37f26e	Laravel	allergies	request	17.61.63.7	2026-06-29 09:43:59	2026-06-29 09:43:59
+019f12c3-a723-7222-bb2a-f45dca2bf626	Laravel	register	request	48.1.7.101	2026-06-29 09:44:00	2026-06-29 09:44:00
+019f12c3-a77b-7327-af61-aa6ae940d3fc	Laravel	allergies	request	250.23.230.225	2026-06-29 09:44:00	2026-06-29 09:44:00
+019f12c3-a7d4-725e-bc08-54545c1110e9	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:00	2026-06-29 09:44:00
+019f12c3-a82d-73fb-a9bc-8889de585e10	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:00	2026-06-29 09:44:00
+019f12c3-a884-70cb-b10b-a7a023029b4b	image-analysis-api	/analyze	request	145.178.101.106	2026-06-29 09:44:00	2026-06-29 09:44:00
+019f12c3-a8db-7328-91cb-439fec5ae6da	image-analysis-api	/analyze	request	29.60.162.62	2026-06-29 09:44:00	2026-06-29 09:44:00
+019f12c3-a932-71fa-bc0a-583ee86126cf	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:00	2026-06-29 09:44:00
+019f12c3-a98a-7276-afeb-76e33f0c38cf	image-analysis-api	/health/	request	100.176.222.118	2026-06-29 09:44:00	2026-06-29 09:44:00
+019f12c3-a9e1-715b-a8c7-c797465333a0	Laravel	register	request	199.180.0.204	2026-06-29 09:44:00	2026-06-29 09:44:00
+019f12c3-aa37-73f9-9dbc-c3111691efb2	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:00	2026-06-29 09:44:00
+019f12c3-aa8f-731b-9341-7eaeac6f4854	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:00	2026-06-29 09:44:00
+019f12c3-aae7-7290-b738-b8276d5a686e	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:00	2026-06-29 09:44:00
+019f12c3-ab40-732d-8fbe-7164b3bd429d	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:01	2026-06-29 09:44:01
+019f12c3-ab9e-7246-8496-292640136b28	image-analysis-api	/health/	request	177.31.80.228	2026-06-29 09:44:01	2026-06-29 09:44:01
+019f12c3-abf5-71d4-9d9d-f17b1eb4ceb2	image-analysis-api	/analyze-by-mistral	request	11.135.85.192	2026-06-29 09:44:01	2026-06-29 09:44:01
+019f12c3-ac4d-71db-b9ac-dc35f6806d61	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:01	2026-06-29 09:44:01
+019f12c3-aca4-7224-8947-331f286f263e	image-analysis-api	/analyze	request	142.24.154.250	2026-06-29 09:44:01	2026-06-29 09:44:01
+019f12c3-acfb-71a6-80b9-32abd69b6585	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:01	2026-06-29 09:44:01
+019f12c3-ad59-72c1-97fa-54eb6260e3de	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:01	2026-06-29 09:44:01
+019f12c3-adb1-725c-93cb-e8029dc8cab1	Laravel	allergies	request	184.182.169.224	2026-06-29 09:44:01	2026-06-29 09:44:01
+019f12c3-ae09-73f5-9f6a-9604d37db59c	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:01	2026-06-29 09:44:01
+019f12c3-ae60-73a5-a8de-9191f0fe067e	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:01	2026-06-29 09:44:01
+019f12c3-aeb7-7116-8f81-eccdee690739	Laravel	register	request	236.171.89.222	2026-06-29 09:44:01	2026-06-29 09:44:01
+019f12c3-af10-70ee-b709-13184d78b808	ml-api	/profiles	request	107.182.148.145	2026-06-29 09:44:02	2026-06-29 09:44:02
+019f12c3-af68-7234-9de7-9575c242acd0	ml-api	/recommend	request	240.121.20.87	2026-06-29 09:44:02	2026-06-29 09:44:02
+019f12c3-afbf-711d-900d-fb00f77370a7	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:02	2026-06-29 09:44:02
+019f12c3-b015-717b-8fe1-e31ed30b90c1	Laravel	allergies	request	253.120.125.40	2026-06-29 09:44:02	2026-06-29 09:44:02
+019f12c3-b06c-7373-a3cb-6556d5caf372	ml-api	/profiles	request	142.75.238.252	2026-06-29 09:44:02	2026-06-29 09:44:02
+019f12c3-b0c2-724a-9141-d48bb7680259	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:02	2026-06-29 09:44:02
+019f12c3-b119-723f-8d5b-40104caf6d61	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:02	2026-06-29 09:44:02
+019f12c3-b171-71b8-a0ac-7807563e098f	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:02	2026-06-29 09:44:02
+019f12c3-b1c7-730f-af2a-458cab285552	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:02	2026-06-29 09:44:02
+019f12c3-b21e-72fe-98fe-19956d360b8f	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:02	2026-06-29 09:44:02
+019f12c3-b27e-73b3-9199-bb7ee25ef579	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:02	2026-06-29 09:44:02
+019f12c3-b2d5-7151-8835-5643e80aeb66	Laravel	login	request	94.69.18.248	2026-06-29 09:44:03	2026-06-29 09:44:03
+019f12c3-b32b-71a2-abd9-8f469bde1355	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:03	2026-06-29 09:44:03
+019f12c3-b38c-706d-8470-a5d32741db7b	image-analysis-api	/analyze-by-mistral	request	250.244.137.3	2026-06-29 09:44:03	2026-06-29 09:44:03
+019f12c3-b3e5-7191-b62d-df568791c6b5	Laravel	register	request	110.55.113.48	2026-06-29 09:44:03	2026-06-29 09:44:03
+019f12c3-b43c-718e-b1ec-a80259ea9377	image-analysis-api	/health/	request	2.96.36.126	2026-06-29 09:44:03	2026-06-29 09:44:03
+019f12c3-b492-700e-a267-5a8d3379b7bf	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:03	2026-06-29 09:44:03
+019f12c3-b4e9-72a5-97d1-7503005d6233	ml-api	/health	request	254.126.85.57	2026-06-29 09:44:03	2026-06-29 09:44:03
+019f12c3-b540-731f-9075-d6b9e0ebbd92	Laravel	allergies	request	12.71.4.68	2026-06-29 09:44:03	2026-06-29 09:44:03
+019f12c3-b598-7235-a871-29bca925807b	Laravel	login	request	139.5.3.237	2026-06-29 09:44:03	2026-06-29 09:44:03
+019f12c3-b5ef-70e8-b25f-1206b8e9d934	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:03	2026-06-29 09:44:03
+019f12c3-b650-71c9-b701-063c8c1c3549	Laravel	register	request	244.182.115.81	2026-06-29 09:44:03	2026-06-29 09:44:03
+019f12c3-b6a7-7318-aee3-38759850ab91	Laravel	register	request	87.56.137.222	2026-06-29 09:44:04	2026-06-29 09:44:04
+019f12c3-b6fd-72bb-8e55-b72528e11484	Laravel	register	request	17.192.177.58	2026-06-29 09:44:04	2026-06-29 09:44:04
+019f12c3-b754-70bc-9a5e-244148efa6d8	Laravel	register	request	255.17.143.79	2026-06-29 09:44:04	2026-06-29 09:44:04
+019f12c3-b7ac-71ce-9f20-ef18995952f2	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:04	2026-06-29 09:44:04
+019f12c3-b802-7387-a390-82670db0242c	Laravel	login	request	107.62.76.220	2026-06-29 09:44:04	2026-06-29 09:44:04
+019f12c3-b859-717c-8f1a-e213b1c73542	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:04	2026-06-29 09:44:04
+019f12c3-b8b0-7284-8ef0-4ba2d71dbc5d	Laravel	register	request	119.14.218.168	2026-06-29 09:44:04	2026-06-29 09:44:04
+019f12c3-b907-7277-8498-869294582750	image-analysis-api	/analyze	request	98.49.143.198	2026-06-29 09:44:04	2026-06-29 09:44:04
+019f12c3-b95e-72e6-a5f1-cb7c50c33202	Laravel	allergies	request	100.164.76.98	2026-06-29 09:44:04	2026-06-29 09:44:04
+019f12c3-b9b5-71e2-a63b-05c00f92dae0	ml-api	/health	request	78.160.103.156	2026-06-29 09:44:04	2026-06-29 09:44:04
+019f12c3-ba0e-71ab-836d-6e79e5a1e0a5	ml-api	/recommend	request	219.164.161.29	2026-06-29 09:44:04	2026-06-29 09:44:04
+019f12c3-ba65-70a9-b901-b19d1fc2a19d	Laravel	register	request	71.211.5.13	2026-06-29 09:44:04	2026-06-29 09:44:04
+019f12c3-babc-73a0-bb0b-822ba7592a72	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:05	2026-06-29 09:44:05
+019f12c3-bb14-7219-a42b-e5765991e4cc	Laravel	register	request	115.16.116.138	2026-06-29 09:44:05	2026-06-29 09:44:05
+019f12c3-bb6b-7228-8135-248b46c2f567	Laravel	login	request	157.32.137.187	2026-06-29 09:44:05	2026-06-29 09:44:05
+019f12c3-bbc4-7179-bbd0-e8817399d77b	Laravel	register	request	6.144.139.11	2026-06-29 09:44:05	2026-06-29 09:44:05
+019f12c3-bc1b-71d2-a7cc-59db4b9f77a6	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:05	2026-06-29 09:44:05
+019f12c3-bc71-73b8-b9a6-123bd16e95aa	ml-api	/profiles	request	94.134.11.192	2026-06-29 09:44:05	2026-06-29 09:44:05
+019f12c3-bcca-727d-8f47-3e7741c0ba73	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:05	2026-06-29 09:44:05
+019f12c3-bd20-7383-8916-6af02209b053	ml-api	/profiles	request	68.209.63.255	2026-06-29 09:44:05	2026-06-29 09:44:05
+019f12c3-bd77-73a3-b7b4-dac2b7f3c090	Laravel	allergies	request	134.88.178.158	2026-06-29 09:44:05	2026-06-29 09:44:05
+019f12c3-bdcf-722c-9c53-2fc7517dda22	ml-api	/recommend	request	48.19.204.59	2026-06-29 09:44:05	2026-06-29 09:44:05
+019f12c3-be28-7192-98ef-a8677f4c16c8	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:05	2026-06-29 09:44:05
+019f12c3-be82-70de-b7de-8001e99b24fb	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:06	2026-06-29 09:44:06
+019f12c3-beda-7282-96ec-67db96789ea0	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:06	2026-06-29 09:44:06
+019f12c3-bf32-710a-88f0-90a7b6444647	Laravel	login	request	6.25.161.112	2026-06-29 09:44:06	2026-06-29 09:44:06
+019f12c3-bf8a-701e-b569-35d3e83fd249	Laravel	allergies	request	146.190.122.244	2026-06-29 09:44:06	2026-06-29 09:44:06
+019f12c3-bfe1-72a0-95f7-2100d20e2d24	Laravel	login	request	17.27.85.53	2026-06-29 09:44:06	2026-06-29 09:44:06
+019f12c3-c038-7045-8bac-720d27bada5c	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:06	2026-06-29 09:44:06
+019f12c3-c08f-7206-80bd-7c0dd3338393	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:06	2026-06-29 09:44:06
+019f12c3-c0e7-7212-a0a7-f260c4274672	Laravel	allergies	request	13.53.184.150	2026-06-29 09:44:06	2026-06-29 09:44:06
+019f12c3-c13d-705b-8b8b-b1e4fd9cba7c	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:06	2026-06-29 09:44:06
+019f12c3-d942-7036-8c81-d38a13cec319	ml-api	/recommend	request	132.84.136.11	2026-06-29 09:44:12	2026-06-29 09:44:12
+019f12c3-c196-71e9-8704-86bb8c599323	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:06	2026-06-29 09:44:06
+019f12c3-c1ed-7134-ba95-6e16a2a29b89	image-analysis-api	/health/	request	90.233.135.4	2026-06-29 09:44:06	2026-06-29 09:44:06
+019f12c3-c244-7264-a212-d277038ca9ec	image-analysis-api	/health/	request	231.196.98.44	2026-06-29 09:44:06	2026-06-29 09:44:06
+019f12c3-c29b-700d-8e7b-afd027fa429f	image-analysis-api	/analyze	request	173.30.40.203	2026-06-29 09:44:07	2026-06-29 09:44:07
+019f12c3-c2f2-709f-b346-12f940badbf2	Laravel	login	request	79.216.106.121	2026-06-29 09:44:07	2026-06-29 09:44:07
+019f12c3-c349-7243-af6a-197faa9cff6a	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:07	2026-06-29 09:44:07
+019f12c3-c3a0-7336-8702-03e23c4f0bdb	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:07	2026-06-29 09:44:07
+019f12c3-c3fc-738a-988e-3f0400c08700	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:07	2026-06-29 09:44:07
+019f12c3-c457-7352-856c-5beba2e07beb	Laravel	allergies	request	119.220.134.60	2026-06-29 09:44:07	2026-06-29 09:44:07
+019f12c3-c4b3-72f8-9fe1-66b5eb9423b7	Laravel	register	request	185.213.108.241	2026-06-29 09:44:07	2026-06-29 09:44:07
+019f12c3-c50a-70eb-b8f8-6215817266a2	Laravel	allergies	request	152.19.104.159	2026-06-29 09:44:07	2026-06-29 09:44:07
+019f12c3-c562-7346-9eea-d5f338584964	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:07	2026-06-29 09:44:07
+019f12c3-c5bb-7306-aeec-f225aed395bd	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:07	2026-06-29 09:44:07
+019f12c3-c611-708f-9386-c281872ddb04	ml-api	/profiles	request	13.101.61.101	2026-06-29 09:44:07	2026-06-29 09:44:07
+019f12c3-c668-7061-b69c-d8da9c2edfa8	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:08	2026-06-29 09:44:08
+019f12c3-c6bf-7198-807c-6fd136cea34d	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:08	2026-06-29 09:44:08
+019f12c3-c717-7167-adcf-3d2c30e8ef6f	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:08	2026-06-29 09:44:08
+019f12c3-c76e-73f8-8ab9-5c2558626946	Laravel	register	request	85.35.46.182	2026-06-29 09:44:08	2026-06-29 09:44:08
+019f12c3-c7c5-72e3-b27b-9dd775f700a1	image-analysis-api	/health/	request	49.158.246.246	2026-06-29 09:44:08	2026-06-29 09:44:08
+019f12c3-c81b-7086-9445-ffcd6105e1c3	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:08	2026-06-29 09:44:08
+019f12c3-c872-7178-bee0-6848b8b9ca29	Laravel	login	request	37.137.149.153	2026-06-29 09:44:08	2026-06-29 09:44:08
+019f12c3-c8ca-72b3-aa8e-be1fae699f7c	image-analysis-api	/analyze	request	58.147.73.242	2026-06-29 09:44:08	2026-06-29 09:44:08
+019f12c3-c920-731b-b30f-e1d45eb711ef	Laravel	allergies	request	191.90.128.185	2026-06-29 09:44:08	2026-06-29 09:44:08
+019f12c3-c97a-72e2-aafc-c3d14aa2ba92	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:08	2026-06-29 09:44:08
+019f12c3-c9d3-704d-9611-223c3a6c0289	ml-api	/health	request	46.69.153.64	2026-06-29 09:44:08	2026-06-29 09:44:08
+019f12c3-ca2b-7162-824d-19d2ded8da72	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:09	2026-06-29 09:44:09
+019f12c3-ca84-7085-ba1c-ffe69a69b004	image-analysis-api	/health/	request	86.48.192.250	2026-06-29 09:44:09	2026-06-29 09:44:09
+019f12c3-cadb-7179-8b40-b63931521030	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:09	2026-06-29 09:44:09
+019f12c3-cb32-734f-8622-e0814ca84052	Laravel	register	request	149.25.176.173	2026-06-29 09:44:09	2026-06-29 09:44:09
+019f12c3-cb88-71d2-aebc-d8bbdcfec546	Laravel	register	request	185.225.115.75	2026-06-29 09:44:09	2026-06-29 09:44:09
+019f12c3-cbe1-73c7-a66b-7edb44487e94	ml-api	/health	request	49.197.236.117	2026-06-29 09:44:09	2026-06-29 09:44:09
+019f12c3-cc38-7288-a864-feb1954345ff	Laravel	register	request	184.251.177.43	2026-06-29 09:44:09	2026-06-29 09:44:09
+019f12c3-cc8e-718a-a092-02b6a7a860f3	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:09	2026-06-29 09:44:09
+019f12c3-cce7-7268-a703-199928548191	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:09	2026-06-29 09:44:09
+019f12c3-cd3d-73b9-a643-bcb307564d7c	ml-api	/health	request	127.50.38.83	2026-06-29 09:44:09	2026-06-29 09:44:09
+019f12c3-cd94-7220-9003-59fe64ccbe3c	Laravel	allergies	request	112.192.58.241	2026-06-29 09:44:09	2026-06-29 09:44:09
+019f12c3-cdf3-7130-989e-0689d2ef7f07	ml-api	/health	request	240.185.171.196	2026-06-29 09:44:09	2026-06-29 09:44:09
+019f12c3-ce4a-726f-bafc-6c74e557d900	image-analysis-api	/health/	request	187.204.89.84	2026-06-29 09:44:10	2026-06-29 09:44:10
+019f12c3-cea2-7303-90f7-abf43585f4aa	Laravel	login	request	234.60.208.210	2026-06-29 09:44:10	2026-06-29 09:44:10
+019f12c3-cef9-7272-a395-8d1b4772b79d	image-analysis-api	/health/	request	185.109.68.106	2026-06-29 09:44:10	2026-06-29 09:44:10
+019f12c3-cf53-73cc-9649-32308875cc9e	image-analysis-api	/health/	request	102.43.62.66	2026-06-29 09:44:10	2026-06-29 09:44:10
+019f12c3-cfa8-71ae-b763-c184bcea3535	ml-api	/profiles	request	97.231.2.49	2026-06-29 09:44:10	2026-06-29 09:44:10
+019f12c3-d000-7371-8659-83512186c5d4	Laravel	allergies	request	180.36.146.179	2026-06-29 09:44:10	2026-06-29 09:44:10
+019f12c3-d056-7273-863b-2ccd1ef505ee	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:10	2026-06-29 09:44:10
+019f12c3-d0ad-7317-867c-a2d5c5a20ab7	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:10	2026-06-29 09:44:10
+019f12c3-d104-706a-a88f-8cf4c6a8f096	Laravel	login	request	216.64.114.242	2026-06-29 09:44:10	2026-06-29 09:44:10
+019f12c3-d15c-727f-a27c-ed8b07aa4ac8	Laravel	allergies	request	79.229.76.127	2026-06-29 09:44:10	2026-06-29 09:44:10
+019f12c3-d1b3-717b-8bec-490a13f0921b	image-analysis-api	/analyze	request	195.214.68.54	2026-06-29 09:44:10	2026-06-29 09:44:10
+019f12c3-d20a-724e-bad1-ec792b260316	Laravel	login	request	100.41.6.164	2026-06-29 09:44:11	2026-06-29 09:44:11
+019f12c3-d261-7222-b0ce-d1a58994d497	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:11	2026-06-29 09:44:11
+019f12c3-d2b8-73ac-9122-185cb74a695e	image-analysis-api	/health/	request	40.253.134.9	2026-06-29 09:44:11	2026-06-29 09:44:11
+019f12c3-d30f-7392-9ece-f5b67b260689	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:11	2026-06-29 09:44:11
+019f12c3-d366-73f0-a14a-21ae15e5d415	ml-api	/profiles	request	196.233.152.216	2026-06-29 09:44:11	2026-06-29 09:44:11
+019f12c3-d3bc-711f-906a-1ecd5c41d6c3	Laravel	login	request	146.216.103.207	2026-06-29 09:44:11	2026-06-29 09:44:11
+019f12c3-d412-7120-89e5-87bcf0ded80b	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:11	2026-06-29 09:44:11
+019f12c3-d46a-7149-b83d-187adb9556f1	ml-api	/recommend	request	31.234.159.130	2026-06-29 09:44:11	2026-06-29 09:44:11
+019f12c3-d4c1-70e8-8b05-b4dc3090d212	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:11	2026-06-29 09:44:11
+019f12c3-d517-7344-a5ee-20b3142ec124	image-analysis-api	/analyze	request	206.119.217.26	2026-06-29 09:44:11	2026-06-29 09:44:11
+019f12c3-d56e-7262-97a8-feefd296c8d4	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:11	2026-06-29 09:44:11
+019f12c3-d5c5-737d-8f4a-8cdb248e0bf5	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:11	2026-06-29 09:44:11
+019f12c3-d61c-70d8-8947-dcaab3c7c3ff	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:12	2026-06-29 09:44:12
+019f12c3-d672-70a1-8e8b-c689f78ded03	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:12	2026-06-29 09:44:12
+019f12c3-d6cb-70f3-840e-c8c907bbf91c	Laravel	allergies	request	132.152.187.77	2026-06-29 09:44:12	2026-06-29 09:44:12
+019f12c3-d721-73c4-9df8-d52252a0accc	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:12	2026-06-29 09:44:12
+019f12c3-d779-73e1-85e2-5ffcbadda05d	image-analysis-api	/analyze-by-mistral	request	14.32.131.30	2026-06-29 09:44:12	2026-06-29 09:44:12
+019f12c3-d7d4-7060-b27c-386c4cc12b3f	ml-api	/profiles	request	142.194.128.213	2026-06-29 09:44:12	2026-06-29 09:44:12
+019f12c3-d82b-7315-bffb-4397a7e0a7e6	Laravel	allergies	request	31.85.98.31	2026-06-29 09:44:12	2026-06-29 09:44:12
+019f12c3-d882-733d-8836-5c4d19295790	Laravel	register	request	245.56.17.158	2026-06-29 09:44:12	2026-06-29 09:44:12
+019f12c3-d8ec-7022-8b6d-a9bf85f396e9	image-analysis-api	/analyze-by-mistral	request	251.65.93.108	2026-06-29 09:44:12	2026-06-29 09:44:12
+019f12c3-d999-7162-9e33-9eb017bbf501	ml-api	/recommend	request	204.81.127.39	2026-06-29 09:44:12	2026-06-29 09:44:12
+019f12c3-d9ef-7169-9042-2caa5c747973	Laravel	allergies	request	118.181.80.113	2026-06-29 09:44:13	2026-06-29 09:44:13
+019f12c3-da47-71d3-bc20-133d364e6311	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:13	2026-06-29 09:44:13
+019f12c3-da9d-70f0-a263-a3aa749ff427	Laravel	login	request	34.251.28.211	2026-06-29 09:44:13	2026-06-29 09:44:13
+019f12c3-daf4-7189-91f8-ed5f871de9d2	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:13	2026-06-29 09:44:13
+019f12c3-db4d-7248-b9a2-40e3a19fa100	Laravel	register	request	127.103.146.87	2026-06-29 09:44:13	2026-06-29 09:44:13
+019f12c3-dba7-717e-b196-d17cf28a44eb	Laravel	allergies	request	37.149.29.202	2026-06-29 09:44:13	2026-06-29 09:44:13
+019f12c3-dbff-7008-ac74-450256085153	image-analysis-api	/health/	request	100.197.93.2	2026-06-29 09:44:13	2026-06-29 09:44:13
+019f12c3-dc56-7023-b2bc-85933baf4a0f	image-analysis-api	/health/	request	88.56.58.64	2026-06-29 09:44:13	2026-06-29 09:44:13
+019f12c3-dcae-7301-8209-1920f91314b0	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:13	2026-06-29 09:44:13
+019f12c3-dd08-71db-b4e3-3573abec36d4	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:13	2026-06-29 09:44:13
+019f12c3-dd61-7168-b47e-9eac7d957d02	image-analysis-api	/analyze-by-mistral	request	223.132.224.80	2026-06-29 09:44:13	2026-06-29 09:44:13
+019f12c3-ddb7-7334-a0f5-2ddf13b7a1aa	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:14	2026-06-29 09:44:14
+019f12c3-de0d-73f4-a9dc-71af1c6849ff	Laravel	login	request	42.124.97.30	2026-06-29 09:44:14	2026-06-29 09:44:14
+019f12c3-de65-7280-aa3c-bcfa572e20c4	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:14	2026-06-29 09:44:14
+019f12c3-debc-71a0-9c09-f5c8239bcb9c	Laravel	allergies	request	178.235.36.69	2026-06-29 09:44:14	2026-06-29 09:44:14
+019f12c3-df14-7051-b35d-a8373f3db247	ml-api	/recommend	request	54.233.11.31	2026-06-29 09:44:14	2026-06-29 09:44:14
+019f12c3-df6c-705c-a9f7-6c9b9521d2d8	Laravel	login	request	190.82.135.66	2026-06-29 09:44:14	2026-06-29 09:44:14
+019f12c3-dfc5-7250-85d8-9206dee96a9a	Laravel	login	request	198.122.236.195	2026-06-29 09:44:14	2026-06-29 09:44:14
+019f12c3-e01d-72d2-b137-8fa93bdd0d26	ml-api	/profiles	request	28.21.90.20	2026-06-29 09:44:14	2026-06-29 09:44:14
+019f12c3-e076-72bf-8c6f-86ae979a33b0	ml-api	/profiles	request	152.251.255.99	2026-06-29 09:44:14	2026-06-29 09:44:14
+019f12c3-e0cd-709e-9490-bf76f67923b2	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:14	2026-06-29 09:44:14
+019f12c3-e126-70ba-a80c-ee83c5628a3f	image-analysis-api	/analyze-by-mistral	request	81.108.254.189	2026-06-29 09:44:14	2026-06-29 09:44:14
+019f12c3-e17d-702c-8149-28f55f1f6887	ml-api	/profiles	request	133.151.169.89	2026-06-29 09:44:14	2026-06-29 09:44:14
+019f12c3-e1d4-737e-a0e1-5d6cb14ef6e9	ml-api	/recommend	request	152.140.185.104	2026-06-29 09:44:15	2026-06-29 09:44:15
+019f12c3-e22b-723a-901f-beefadb91f43	image-analysis-api	/health/	request	184.155.7.189	2026-06-29 09:44:15	2026-06-29 09:44:15
+019f12c3-e283-7112-afe4-fbe7a01ea169	Laravel	register	request	111.159.27.179	2026-06-29 09:44:15	2026-06-29 09:44:15
+019f12c3-e2db-70be-8cd3-066ef7a9b163	image-analysis-api	/analyze	request	61.66.251.121	2026-06-29 09:44:15	2026-06-29 09:44:15
+019f12c3-e331-712e-9782-8c7d472167f9	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:15	2026-06-29 09:44:15
+019f12c3-e388-701f-89f2-328a344a7b10	image-analysis-api	/health/	request	19.132.192.205	2026-06-29 09:44:15	2026-06-29 09:44:15
+019f12c3-e3e1-7328-b13a-41d48596002c	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:15	2026-06-29 09:44:15
+019f12c3-e439-705c-8186-f2cfcdb66018	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:15	2026-06-29 09:44:15
+019f12c3-e491-7363-b134-c7315824be02	ml-api	/profiles	request	3.77.182.65	2026-06-29 09:44:15	2026-06-29 09:44:15
+019f12c3-e4e8-73de-9941-f7d05b83a080	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:15	2026-06-29 09:44:15
+019f12c3-e53e-73b0-9803-b5814207f637	Laravel	allergies	request	224.103.184.41	2026-06-29 09:44:15	2026-06-29 09:44:15
+019f12c3-e595-7057-af11-008e2b6e6381	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:16	2026-06-29 09:44:16
+019f12c3-e5ed-7238-810f-c71f2a0e2f7c	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:16	2026-06-29 09:44:16
+019f12c3-e644-72fb-943c-65b7b68723e6	ml-api	/health	request	70.242.77.49	2026-06-29 09:44:16	2026-06-29 09:44:16
+019f12c3-e69b-7119-a3ec-3588d0257412	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:16	2026-06-29 09:44:16
+019f12c3-e6f3-72b1-9e02-d8d78676b8ea	image-analysis-api	/health/	request	176.103.235.15	2026-06-29 09:44:16	2026-06-29 09:44:16
+019f12c3-e74a-7317-8ff4-11f8dc8115d1	Laravel	login	request	233.101.217.60	2026-06-29 09:44:16	2026-06-29 09:44:16
+019f12c3-e7a1-70fa-9b5a-7e3935fdcd34	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:16	2026-06-29 09:44:16
+019f12c3-e7f8-73c1-8cb7-4888155566ab	ml-api	/profiles	request	248.108.14.182	2026-06-29 09:44:16	2026-06-29 09:44:16
+019f12c3-e850-701e-b008-948b6ddd3303	image-analysis-api	/analyze	request	170.183.133.98	2026-06-29 09:44:16	2026-06-29 09:44:16
+019f12c3-e8a7-70ab-9327-27c68b2c584f	Laravel	allergies	request	104.86.252.212	2026-06-29 09:44:16	2026-06-29 09:44:16
+019f12c3-e8ff-70ab-912e-dd54d58fdf0f	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:16	2026-06-29 09:44:16
+019f12c3-e956-7259-a013-27d7b9ea3cd3	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:16	2026-06-29 09:44:16
+019f12c3-e9ad-727a-9509-3c5517b1356f	ml-api	/health	request	14.42.0.157	2026-06-29 09:44:17	2026-06-29 09:44:17
+019f12c3-ea07-722e-b2db-e4c121efa855	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:17	2026-06-29 09:44:17
+019f12c3-ea61-73dc-b7c0-caa475129819	Laravel	register	request	10.170.16.186	2026-06-29 09:44:17	2026-06-29 09:44:17
+019f12c3-eaba-73a2-8bfa-8f9e06312c76	Laravel	login	request	42.144.103.17	2026-06-29 09:44:17	2026-06-29 09:44:17
+019f12c3-eb10-7067-a5f7-d72f571866c2	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:17	2026-06-29 09:44:17
+019f12c3-eb66-7264-a08e-3ca9b886d23e	Laravel	login	request	145.18.125.19	2026-06-29 09:44:17	2026-06-29 09:44:17
+019f12c3-ebbd-71d3-ac8f-614464554fb5	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:17	2026-06-29 09:44:17
+019f12c3-ec14-7140-bad9-ba07cbd18508	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:17	2026-06-29 09:44:17
+019f12c3-ec6b-71e3-bd91-7677cf82e58d	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:17	2026-06-29 09:44:17
+019f12c3-ecd4-7113-9dc5-689f4ba6e66b	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:17	2026-06-29 09:44:17
+019f12c3-ed2a-7260-84d9-a4512563f71f	Laravel	login	request	191.114.125.130	2026-06-29 09:44:17	2026-06-29 09:44:17
+019f12c3-ed80-7239-9025-b3b55a64a7d4	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:18	2026-06-29 09:44:18
+019f12c3-edd7-716b-b448-f6ad5910657f	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:18	2026-06-29 09:44:18
+019f12c3-ee30-70cd-8bd6-5ffa8dda3bff	ml-api	/health	request	18.224.56.99	2026-06-29 09:44:18	2026-06-29 09:44:18
+019f12c3-ee8d-7055-8737-7bd3f0cb2355	Laravel	login	request	169.1.50.67	2026-06-29 09:44:18	2026-06-29 09:44:18
+019f12c3-eee5-701c-a757-f4a54d71ad45	image-analysis-api	/analyze-by-mistral	request	171.194.58.141	2026-06-29 09:44:18	2026-06-29 09:44:18
+019f12c3-ef3c-72b0-af2c-865af0f6a90a	Laravel	register	request	156.46.246.153	2026-06-29 09:44:18	2026-06-29 09:44:18
+019f12c3-ef93-7265-b4f9-5806db1fcdfd	ml-api	/profiles	request	228.173.174.182	2026-06-29 09:44:18	2026-06-29 09:44:18
+019f12c3-efeb-736c-915a-f1569008a4d2	ml-api	/health	request	56.127.229.219	2026-06-29 09:44:18	2026-06-29 09:44:18
+019f12c3-f041-707d-97ed-d27e6c267b39	ml-api	/recommend	request	83.165.141.12	2026-06-29 09:44:18	2026-06-29 09:44:18
+019f12c3-f098-7315-88ca-22c650848cd6	Laravel	login	request	57.184.11.192	2026-06-29 09:44:18	2026-06-29 09:44:18
+019f12c3-f0f3-72d3-b3e7-c76beb0e2133	Laravel	register	request	144.73.133.145	2026-06-29 09:44:18	2026-06-29 09:44:18
+019f12c3-f149-71e5-823b-de20fc7d1d33	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:19	2026-06-29 09:44:19
+019f12c3-f1a9-72e2-8829-b8aff7ed3660	Laravel	register	request	221.208.36.125	2026-06-29 09:44:19	2026-06-29 09:44:19
+019f12c3-f204-710c-8b4e-704a0498f95c	Laravel	allergies	request	39.246.164.46	2026-06-29 09:44:19	2026-06-29 09:44:19
+019f12c3-f25d-7064-a5a2-9654a19d830a	image-analysis-api	/analyze	request	178.225.229.74	2026-06-29 09:44:19	2026-06-29 09:44:19
+019f12c3-f2b5-72f0-84d8-a3b45b8cd82a	image-analysis-api	/health/	request	76.206.234.227	2026-06-29 09:44:19	2026-06-29 09:44:19
+019f12c3-f30c-73f1-96d4-47a4100ee10b	ml-api	/profiles	request	7.157.168.174	2026-06-29 09:44:19	2026-06-29 09:44:19
+019f12c3-f363-737d-bfe8-ae2d323336f7	image-analysis-api	/health/	request	109.99.127.128	2026-06-29 09:44:19	2026-06-29 09:44:19
+019f12c3-f3b9-72cc-899f-0dfda6e2eda9	Laravel	register	request	185.58.179.249	2026-06-29 09:44:19	2026-06-29 09:44:19
+019f12c3-f41a-73d7-85d1-800d94d5424e	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:19	2026-06-29 09:44:19
+019f12c3-f471-7239-a9b0-93adf02acf8a	image-analysis-api	/analyze-by-mistral	request	161.5.8.88	2026-06-29 09:44:19	2026-06-29 09:44:19
+019f12c3-f4c8-7207-9094-3c4ba725d217	image-analysis-api	/analyze	request	120.65.40.194	2026-06-29 09:44:19	2026-06-29 09:44:19
+019f12c3-f51e-73e9-bad0-0428662415e9	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:19	2026-06-29 09:44:19
+019f12c3-f575-71dd-8512-3287ed1c0d3f	Laravel	login	request	174.173.223.119	2026-06-29 09:44:20	2026-06-29 09:44:20
+019f12c3-f5cd-731b-b48b-e18c13eb168e	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:20	2026-06-29 09:44:20
+019f12c3-f623-7092-a31d-adfc3b43619b	Laravel	login	request	22.45.153.40	2026-06-29 09:44:20	2026-06-29 09:44:20
+019f12c3-f67a-72bc-98d4-fb8ed94d33be	Laravel	register	request	203.0.230.188	2026-06-29 09:44:20	2026-06-29 09:44:20
+019f12c3-f6d1-705c-8726-5881c921e72a	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:20	2026-06-29 09:44:20
+019f12c3-f728-73db-91a7-c4ab53fd8294	Laravel	login	request	236.251.120.210	2026-06-29 09:44:20	2026-06-29 09:44:20
+019f12c3-f77e-70e3-9b56-da77f7b3beee	ml-api	/health	request	82.125.194.79	2026-06-29 09:44:20	2026-06-29 09:44:20
+019f12c3-f7db-73e4-b94f-75d8239a4499	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:20	2026-06-29 09:44:20
+019f12c3-f832-701c-8081-62899fff22b8	Laravel	login	request	49.205.181.128	2026-06-29 09:44:20	2026-06-29 09:44:20
+019f12c3-f88a-70c1-a35a-9ba55481cc7c	Laravel	login	request	102.230.198.178	2026-06-29 09:44:20	2026-06-29 09:44:20
+019f12c3-f8e1-71fb-b99c-86550981e6f5	Laravel	login	request	201.237.43.230	2026-06-29 09:44:20	2026-06-29 09:44:20
+019f12c3-f937-739f-a449-747bb20a4246	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:21	2026-06-29 09:44:21
+019f12c3-f98e-712a-b30d-80e467879476	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:21	2026-06-29 09:44:21
+019f12c3-f9e7-728c-afd1-a148930fa03b	image-analysis-api	/analyze	request	133.169.253.72	2026-06-29 09:44:21	2026-06-29 09:44:21
+019f12c3-fa42-7234-af78-a59cf4cb78e5	ml-api	/profiles	request	187.140.147.216	2026-06-29 09:44:21	2026-06-29 09:44:21
+019f12c3-fa98-7036-95e1-d361409fed94	image-analysis-api	/health/	request	240.4.155.138	2026-06-29 09:44:21	2026-06-29 09:44:21
+019f12c3-faef-7233-9d60-a93659b79141	Laravel	register	request	100.93.3.228	2026-06-29 09:44:21	2026-06-29 09:44:21
+019f12c3-fb46-7397-b571-b22de9b4250e	Laravel	login	request	76.158.130.101	2026-06-29 09:44:21	2026-06-29 09:44:21
+019f12c3-fba4-7123-93d6-445431e0f3d6	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:21	2026-06-29 09:44:21
+019f12c3-fbfa-71f7-ba8f-4264df73bab6	Laravel	login	request	60.53.6.227	2026-06-29 09:44:21	2026-06-29 09:44:21
+019f12c3-fc52-713c-94c9-f143653e90e3	image-analysis-api	HTTPException: 500 Internal server error	error	\N	2026-06-29 09:44:21	2026-06-29 09:44:21
+019f12c3-fca8-72dc-aa58-cfb1cbc978bc	image-analysis-api	/health/	request	160.244.120.50	2026-06-29 09:44:21	2026-06-29 09:44:21
+019f12c3-fcff-7060-8b12-b9c2d2adbfa7	Laravel	allergies	request	8.173.151.68	2026-06-29 09:44:22	2026-06-29 09:44:22
+019f12c3-fd59-7055-9efe-05aaa4312995	Laravel	register	request	191.210.162.45	2026-06-29 09:44:22	2026-06-29 09:44:22
+019f12c3-fdb1-70ea-9b52-ff1e9dc1e459	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:22	2026-06-29 09:44:22
+019f12c3-fe08-704a-aa25-2f8d90d0b2d1	image-analysis-api	HTTPException: 401 Invalid token	error	\N	2026-06-29 09:44:22	2026-06-29 09:44:22
+019f12c3-fe5f-73c1-9de3-abbabe9eedd4	ml-api	/profiles	request	23.87.207.74	2026-06-29 09:44:22	2026-06-29 09:44:22
+019f12c3-feb5-73a3-85d1-7616dd124888	image-analysis-api	/analyze	request	62.34.52.179	2026-06-29 09:44:22	2026-06-29 09:44:22
+019f12c3-ff0d-7366-9481-b2525511313a	Laravel	register	request	55.184.32.192	2026-06-29 09:44:22	2026-06-29 09:44:22
+019f12c3-ff64-72b7-a172-b92696277b4a	Laravel	allergies	request	227.243.229.180	2026-06-29 09:44:22	2026-06-29 09:44:22
+019f12c3-ffba-72d4-bbeb-24f17838a0c2	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:22	2026-06-29 09:44:22
+019f12c4-0011-72ec-bd25-686887237a71	image-analysis-api	/analyze-by-mistral	request	69.87.14.176	2026-06-29 09:44:22	2026-06-29 09:44:22
+019f12c4-0069-737e-b45c-3649a81f815d	ml-api	/recommend	request	84.124.8.55	2026-06-29 09:44:22	2026-06-29 09:44:22
+019f12c4-00c0-72c8-9ac0-72f0235da349	ml-api	TypeError: unsupported operand type(s) for /: 'NoneType' and 'float'	error	\N	2026-06-29 09:44:22	2026-06-29 09:44:22
+019f12c4-0117-71cf-b909-e64d7247813f	image-analysis-api	/health/	request	215.224.90.167	2026-06-29 09:44:23	2026-06-29 09:44:23
+019f12c4-016e-73c8-8d69-a535688a4811	ml-api	/profiles	request	213.22.145.22	2026-06-29 09:44:23	2026-06-29 09:44:23
+019f12c4-01c5-732a-aef4-e8e833ba01e2	image-analysis-api	/health/	request	123.30.217.24	2026-06-29 09:44:23	2026-06-29 09:44:23
+019f12c4-021b-73dc-9b1d-5f928ebf8de6	ml-api	/profiles	request	209.13.32.66	2026-06-29 09:44:23	2026-06-29 09:44:23
+019f12c4-0271-701a-9611-d77aafb57424	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:23	2026-06-29 09:44:23
+019f12c4-02ca-714c-993a-1bdabb26782c	image-analysis-api	/analyze-by-mistral	request	117.199.33.209	2026-06-29 09:44:23	2026-06-29 09:44:23
+019f12c4-0321-72b6-afae-3bed80a0d004	Laravel	allergies	request	65.153.204.85	2026-06-29 09:44:23	2026-06-29 09:44:23
+019f12c4-037a-7054-a73f-6a64d1266add	ml-api	/recommend	request	61.150.63.27	2026-06-29 09:44:23	2026-06-29 09:44:23
+019f12c4-03d2-73a6-8d74-60d38473b087	Laravel	allergies	request	195.46.102.0	2026-06-29 09:44:23	2026-06-29 09:44:23
+019f12c4-042b-7184-a0a0-110acd89d828	Laravel	register	request	67.84.43.84	2026-06-29 09:44:23	2026-06-29 09:44:23
+019f12c4-0482-702f-904b-2d39860f3cfa	Laravel	login	request	84.140.96.206	2026-06-29 09:44:23	2026-06-29 09:44:23
+019f12c4-04d9-7162-bfdc-e31c8de09482	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:24	2026-06-29 09:44:24
+019f12c4-0531-7246-8309-ac123cc82a62	ml-api	AttributeError: 'NoneType' object has no attribute 'client'	error	\N	2026-06-29 09:44:24	2026-06-29 09:44:24
+019f12c4-0588-7069-b5a5-976b97af7e24	ml-api	/profiles	request	40.196.8.211	2026-06-29 09:44:24	2026-06-29 09:44:24
+019f133e-8009-73e2-a145-ce673c787d71	Laravel	api/logs/mutate	request	10.220.230.209	2026-06-29 11:58:10	2026-06-29 11:58:10
+019f133e-8033-7276-9070-4940f921cbfb	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 11:58:10	2026-06-29 11:58:10
+019f133e-807e-7268-b5af-6314e83882a4	Laravel	api/logs/mutate	request	10.220.230.209	2026-06-29 11:58:11	2026-06-29 11:58:11
+019f133e-8091-72b5-bcf7-90f82cf52898	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 11:58:11	2026-06-29 11:58:11
+019f133e-80ce-7213-87c5-1aef2872d67c	Laravel	api/logs/mutate	request	10.220.230.209	2026-06-29 11:58:11	2026-06-29 11:58:11
+019f133e-80e1-702c-8e9a-d0fe8b60de29	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 11:58:11	2026-06-29 11:58:11
+019f1352-ed09-733d-beab-90f93c6bc43d	Laravel	api/logs/mutate	request	10.250.18.253	2026-06-29 12:20:29	2026-06-29 12:20:29
+019f1352-ed60-73d0-95bf-3251eadaee5d	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 12:20:29	2026-06-29 12:20:29
+019f1352-ed83-70f8-8edb-89b8a137a3e8	Laravel	api/logs/mutate	request	10.250.18.253	2026-06-29 12:20:29	2026-06-29 12:20:29
+019f1352-ed8a-72b1-ad44-f1a45b063b18	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 12:20:29	2026-06-29 12:20:29
+019f1352-eda3-73d6-8858-79f95c184285	Laravel	api/logs/mutate	request	10.250.18.253	2026-06-29 12:20:29	2026-06-29 12:20:29
+019f1352-edaa-7285-b84f-6e74d7096766	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 12:20:29	2026-06-29 12:20:29
+019f136d-d781-71e0-9975-e9320a482d76	Laravel	api/me	request	79.127.178.81	2026-06-29 12:49:53	2026-06-29 12:49:53
+019f136d-d833-7282-b9b9-1500c716f600	Laravel	api/me/sessions	request	79.127.178.81	2026-06-29 12:49:53	2026-06-29 12:49:53
+019f136d-d83b-7056-b57b-fb970c6ac561	Laravel	api/dishes/search	request	79.127.178.81	2026-06-29 12:49:53	2026-06-29 12:49:53
+019f136d-d879-71d3-a98f-ab55f124a055	Laravel	api/dishes/search	request	79.127.178.81	2026-06-29 12:49:53	2026-06-29 12:49:53
+019f136d-d8d6-7285-ab5f-d107bd594835	Laravel	api/me/sessions	request	79.127.178.81	2026-06-29 12:49:53	2026-06-29 12:49:53
+019f136f-672b-711c-92b7-a1a5a554596e	Laravel	api/me	request	79.127.178.81	2026-06-29 12:51:35	2026-06-29 12:51:35
+019f136f-8e4b-729b-9b97-a212dfb59fa6	Laravel	api/me	request	79.127.178.81	2026-06-29 12:51:45	2026-06-29 12:51:45
+019f136f-ad8f-7364-80c3-4ac4448d7937	Laravel	api/me	request	79.127.178.81	2026-06-29 12:51:53	2026-06-29 12:51:53
+019f1370-941b-7361-bff8-f0480eafeabb	Laravel	api/me	request	79.127.178.81	2026-06-29 12:52:52	2026-06-29 12:52:52
+019f1370-94ce-71b9-a6da-3ab6c9cfca99	Laravel	api/me/sessions	request	79.127.178.81	2026-06-29 12:52:53	2026-06-29 12:52:53
+019f1370-94d0-72cf-8f3d-5ed1e44bdd89	Laravel	api/dishes/search	request	79.127.178.81	2026-06-29 12:52:53	2026-06-29 12:52:53
+019f1370-950e-737c-bfc5-f5eb29d8a5f8	Laravel	api/dishes/search	request	79.127.178.81	2026-06-29 12:52:53	2026-06-29 12:52:53
+019f1370-9531-7143-809f-cb02fff73481	Laravel	api/me/sessions	request	79.127.178.81	2026-06-29 12:52:53	2026-06-29 12:52:53
+019f1371-0937-7006-8179-4dd18cb259c0	Laravel	api/me	request	79.127.178.81	2026-06-29 12:53:22	2026-06-29 12:53:22
+019f1371-09de-7297-89e9-4da41683ad2b	Laravel	api/me/sessions	request	79.127.178.81	2026-06-29 12:53:23	2026-06-29 12:53:23
+019f1371-09e5-734b-a63b-b46b3007e298	Laravel	api/dishes/search	request	79.127.178.81	2026-06-29 12:53:23	2026-06-29 12:53:23
+019f1371-0a1e-7391-8454-c611a9b8e7f4	Laravel	api/dishes/search	request	79.127.178.81	2026-06-29 12:53:23	2026-06-29 12:53:23
+019f1371-0a44-7339-a9b0-5036f3260bef	Laravel	api/me/sessions	request	79.127.178.81	2026-06-29 12:53:23	2026-06-29 12:53:23
+019f1371-8263-72d2-b2b1-9c81676d63c1	Laravel	api/me	request	79.127.178.81	2026-06-29 12:53:53	2026-06-29 12:53:53
+019f1371-830e-7061-9094-6473ea87b4c8	Laravel	api/me/sessions	request	79.127.178.81	2026-06-29 12:53:54	2026-06-29 12:53:54
+019f1371-8313-7111-b3c6-b56caefd71a5	Laravel	api/dishes/search	request	79.127.178.81	2026-06-29 12:53:54	2026-06-29 12:53:54
+019f1371-834b-7281-946b-7d00f4b9c00c	Laravel	api/dishes/search	request	79.127.178.81	2026-06-29 12:53:54	2026-06-29 12:53:54
+019f1371-836f-72f7-9cd4-8a3eb0a14e20	Laravel	api/me/sessions	request	79.127.178.81	2026-06-29 12:53:54	2026-06-29 12:53:54
+019f1372-5b92-734c-b3ad-6ccf4bcca4d3	Laravel	api/logs/mutate	request	10.173.36.181	2026-06-29 12:54:49	2026-06-29 12:54:49
+019f1372-5bc9-73e2-a257-279ed8fbf3f4	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 12:54:49	2026-06-29 12:54:49
+019f1372-5bef-73c8-94eb-9553894dd0a2	Laravel	api/logs/mutate	request	10.173.36.181	2026-06-29 12:54:49	2026-06-29 12:54:49
+019f1372-5bf6-72e3-b694-be0077ab1271	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 12:54:49	2026-06-29 12:54:49
+019f1375-b540-700a-a8cc-5359d3a99f7d	Laravel	api/posts/search	request	79.127.178.81	2026-06-29 12:58:29	2026-06-29 12:58:29
+019f1375-b540-7016-8323-09b6a7aa18e0	Laravel	api/posts/search	request	79.127.178.81	2026-06-29 12:58:29	2026-06-29 12:58:29
+019f1375-bf2f-7130-a1b3-1a89ed55e8e2	Laravel	api/me	request	79.127.178.81	2026-06-29 12:58:31	2026-06-29 12:58:31
+019f1375-bfdd-731c-b394-6b37af5f76de	Laravel	api/dishes/search	request	79.127.178.81	2026-06-29 12:58:31	2026-06-29 12:58:31
+019f1375-bfe0-7256-865c-7e0fb4ef0132	Laravel	api/me/sessions	request	79.127.178.81	2026-06-29 12:58:31	2026-06-29 12:58:31
+019f1375-bffe-705b-bf59-7171e75b1046	Laravel	api/dishes/search	request	79.127.178.81	2026-06-29 12:58:31	2026-06-29 12:58:31
+019f1375-c030-7261-918d-1f08424a08bc	Laravel	api/me/sessions	request	79.127.178.81	2026-06-29 12:58:31	2026-06-29 12:58:31
+019f1375-c53b-73f3-a3aa-24d5fac1da6b	Laravel	api/posts/search	request	79.127.178.81	2026-06-29 12:58:33	2026-06-29 12:58:33
+019f1375-c53d-712a-ac1d-964c9a4f0cc8	Laravel	api/posts/search	request	79.127.178.81	2026-06-29 12:58:33	2026-06-29 12:58:33
+019f1375-d65f-70e6-9a7c-12fb86d258b7	Laravel	api/comments/search	request	79.127.178.81	2026-06-29 12:58:37	2026-06-29 12:58:37
+019f1375-d664-70d5-a08b-3282eefc646d	Laravel	api/posts/search	request	79.127.178.81	2026-06-29 12:58:37	2026-06-29 12:58:37
+019f1375-ed55-708b-b578-200c80bf6639	Laravel	api/comments/mutate	request	79.127.178.81	2026-06-29 12:58:43	2026-06-29 12:58:43
+019f1375-edf5-71c1-84b9-984dd2c201b1	Laravel	api/comments/search	request	79.127.178.81	2026-06-29 12:58:43	2026-06-29 12:58:43
+019f1375-fc5e-71a5-9f30-8b54fe35a446	Laravel	api/posts/search	request	79.127.178.81	2026-06-29 12:58:47	2026-06-29 12:58:47
+019f1376-0a3f-7268-976a-57a54a56c1db	Laravel	api/posts/mutate	request	79.127.178.81	2026-06-29 12:58:50	2026-06-29 12:58:50
+019f1376-0abd-72af-b170-bb903c080278	Laravel	api/posts/search	request	79.127.178.81	2026-06-29 12:58:50	2026-06-29 12:58:50
+019f1379-5229-7064-b1d5-81775d978c4a	Laravel	api/posts/search	request	79.127.178.81	2026-06-29 13:02:25	2026-06-29 13:02:25
+019f1379-522b-70fd-9b86-f8dc3ad91c1c	Laravel	api/posts/search	request	79.127.178.81	2026-06-29 13:02:25	2026-06-29 13:02:25
+019f1379-792c-7147-bd28-c3fbf1f1ce00	Laravel	api/posts/search	request	79.127.178.81	2026-06-29 13:02:35	2026-06-29 13:02:35
+019f1379-792d-7336-a824-3708a9b209ee	Laravel	api/posts/search	request	79.127.178.81	2026-06-29 13:02:35	2026-06-29 13:02:35
+019f1379-90b5-729e-a61b-a7f76326cc9d	Laravel	api/posts/search	request	79.127.178.81	2026-06-29 13:02:41	2026-06-29 13:02:41
+019f1379-90b8-71f9-978c-92a710109237	Laravel	api/posts/search	request	79.127.178.81	2026-06-29 13:02:41	2026-06-29 13:02:41
+019f1379-c365-72ff-bcd5-acd91e2de357	Laravel	api/posts/search	request	79.127.178.81	2026-06-29 13:02:54	2026-06-29 13:02:54
+019f1379-c36f-7386-baa7-bdad0dd72efe	Laravel	api/posts/search	request	79.127.178.81	2026-06-29 13:02:54	2026-06-29 13:02:54
+019f137d-66e7-726d-ab9a-cd099c95b2a9	Laravel	api/logs/mutate	request	10.202.174.26	2026-06-29 13:06:53	2026-06-29 13:06:53
+019f137d-6715-723d-b227-6d15647dceb7	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:06:53	2026-06-29 13:06:53
+019f137d-6746-7358-81ad-a5f757425dd9	Laravel	api/logs/mutate	request	10.202.174.26	2026-06-29 13:06:53	2026-06-29 13:06:53
+019f137d-674c-7319-a6cb-95d8500e62b8	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:06:53	2026-06-29 13:06:53
+019f137d-676b-739e-8512-a8f2fb4953ea	Laravel	api/logs/mutate	request	10.202.174.26	2026-06-29 13:06:53	2026-06-29 13:06:53
+019f137d-6770-738f-b464-8fe2bea87e37	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 13:06:53	2026-06-29 13:06:53
+019f1382-876f-72df-bbd1-070f0838171f	Laravel	api/posts/1/like	request	79.127.178.82	2026-06-29 13:12:29	2026-06-29 13:12:29
+019f1383-1ebd-719f-8297-1c13c66118bb	Laravel	api/posts/mutate	request	79.127.178.82	2026-06-29 13:13:08	2026-06-29 13:13:08
+019f1383-437e-7233-b57b-87d0f1bd9b39	Laravel	api/posts/mutate	request	79.127.178.82	2026-06-29 13:13:17	2026-06-29 13:13:17
+019f1383-63ce-704c-9bce-c6a9ca3bc442	Laravel	api/me	request	79.127.178.82	2026-06-29 13:13:25	2026-06-29 13:13:25
+019f1383-72fb-7113-b414-d432791fc161	Laravel	api/logs/mutate	request	10.226.164.226	2026-06-29 13:13:29	2026-06-29 13:13:29
+019f1383-7349-704d-8946-e066e0102ad6	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:13:29	2026-06-29 13:13:29
+019f1383-738c-7030-819e-6a4a3ae692d1	Laravel	api/logs/mutate	request	10.226.164.226	2026-06-29 13:13:29	2026-06-29 13:13:29
+019f1383-739f-70d1-b5dd-f55ed7071227	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:13:29	2026-06-29 13:13:29
+019f1383-73e1-70f8-8822-97d2e1989742	Laravel	api/logs/mutate	request	10.226.164.226	2026-06-29 13:13:29	2026-06-29 13:13:29
+019f1383-73f4-7256-86bc-0c8459621218	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 13:13:29	2026-06-29 13:13:29
+019f1383-ad27-737b-ba5f-ceb09980dc0d	Laravel	api/posts/mutate	request	79.127.178.82	2026-06-29 13:13:44	2026-06-29 13:13:44
+019f1383-ebcb-7011-89e8-306fcfa3a4bb	Laravel	api/me	request	79.127.178.82	2026-06-29 13:14:00	2026-06-29 13:14:00
+019f1384-4952-73a0-b6df-6c5cdd228c75	Laravel	api/posts/mutate	request	79.127.178.82	2026-06-29 13:14:24	2026-06-29 13:14:24
+019f1387-8c37-7090-97b2-5a16ba74671f	Laravel	api/me	request	79.127.178.82	2026-06-29 13:17:58	2026-06-29 13:17:58
+019f1387-8ce4-71f1-a0b8-e289c8764e13	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:17:58	2026-06-29 13:17:58
+019f1387-8cf4-7101-a4bc-afe21b80db19	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:17:58	2026-06-29 13:17:58
+019f1387-d2f1-728b-8ea8-892381261ea7	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:18:16	2026-06-29 13:18:16
+019f1387-d2f1-72b8-a35f-f38ca33ca9bf	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:18:16	2026-06-29 13:18:16
+019f1388-1091-73bb-ac62-9a4b69b2a9df	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:18:32	2026-06-29 13:18:32
+019f1388-1092-71cd-ad83-1d882acc88e8	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:18:32	2026-06-29 13:18:32
+019f1389-4afb-719e-883a-c125561590a1	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:19:52	2026-06-29 13:19:52
+019f1389-4afc-737b-bb46-464169b368a8	Laravel	api/comments/search	request	79.127.178.82	2026-06-29 13:19:52	2026-06-29 13:19:52
+019f1389-5121-706f-8259-fd5d6e55f30e	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:19:54	2026-06-29 13:19:54
+019f1389-a44e-7363-ac8d-6a83906db146	Laravel	api/logs/mutate	request	10.155.206.172	2026-06-29 13:20:15	2026-06-29 13:20:15
+019f1389-a471-7011-bba6-cdc7b7754b0b	Laravel	api/posts/mutate	request	79.127.178.82	2026-06-29 13:20:15	2026-06-29 13:20:15
+019f1389-a479-7184-9edc-5c7a061363a0	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:20:15	2026-06-29 13:20:15
+019f1389-a4c3-72a9-b09f-7c30accab7a2	Laravel	api/logs/mutate	request	10.155.206.172	2026-06-29 13:20:15	2026-06-29 13:20:15
+019f1389-a4d9-73a0-81e7-37e5b2d08f33	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:20:15	2026-06-29 13:20:15
+019f1389-a51b-708d-a4b1-fac0c7bae45b	Laravel	api/logs/mutate	request	10.155.206.172	2026-06-29 13:20:15	2026-06-29 13:20:15
+019f1389-a52d-7277-8a89-a8cfe713994f	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 13:20:15	2026-06-29 13:20:15
+019f1389-a54e-730f-9575-d4012ed0b9a0	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:20:15	2026-06-29 13:20:15
+019f1389-c200-7075-95c6-ad7b5d652303	Laravel	api/comments/search	request	79.127.178.82	2026-06-29 13:20:23	2026-06-29 13:20:23
+019f1389-c201-7254-9211-403d038674df	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:20:23	2026-06-29 13:20:23
+019f1389-c819-71b5-8ad2-511dc254f892	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:20:24	2026-06-29 13:20:24
+019f138a-67f3-70d5-943e-6d96bf5e762a	Laravel	api/logs/mutate	request	10.253.66.29	2026-06-29 13:21:05	2026-06-29 13:21:05
+019f138a-6810-73d9-aa9d-6c6f5387002f	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:21:05	2026-06-29 13:21:05
+019f138a-6837-7088-802a-031ca8302472	Laravel	api/logs/mutate	request	10.253.66.29	2026-06-29 13:21:05	2026-06-29 13:21:05
+019f138a-683f-72c8-b83b-a87d800b2699	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:21:05	2026-06-29 13:21:05
+019f138a-6858-7127-9f44-82f60e673291	Laravel	api/logs/mutate	request	10.253.66.29	2026-06-29 13:21:05	2026-06-29 13:21:05
+019f138a-685e-717d-bf3a-9eb74ce96297	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 13:21:05	2026-06-29 13:21:05
+\.
+
+
+--
 -- Data for Name: meals; Type: TABLE DATA; Schema: System; Owner: postgres
 --
 
@@ -4763,6 +7438,8 @@ COPY "System".migrations (id, migration, batch) FROM stdin;
 4	2026_03_13_092830_create_sessions_table	1
 5	2026_03_13_131503_create_permission_tables	1
 6	2026_03_13_131643_create_roles_and_permissions	1
+8	2026_06_19_140911_create_media_table	2
+10	2026_06_29_070154_create_logs_table	3
 \.
 
 
@@ -4788,6 +7465,33 @@ COPY "System".model_has_roles (role_id, model_type, model_id) FROM stdin;
 1	App\\Models\\User	8
 1	App\\Models\\User	9
 1	App\\Models\\User	10
+1	App\\Models\\User	11
+1	App\\Models\\User	13
+1	App\\Models\\User	14
+1	App\\Models\\User	15
+1	App\\Models\\User	16
+1	App\\Models\\User	17
+1	App\\Models\\User	18
+1	App\\Models\\User	19
+1	App\\Models\\User	20
+1	App\\Models\\User	21
+1	App\\Models\\User	22
+1	App\\Models\\User	24
+1	App\\Models\\User	25
+1	App\\Models\\User	26
+1	App\\Models\\User	27
+1	App\\Models\\User	28
+1	App\\Models\\User	32
+1	App\\Models\\User	33
+1	App\\Models\\User	34
+1	App\\Models\\User	35
+1	App\\Models\\User	36
+1	App\\Models\\User	38
+1	App\\Models\\User	39
+1	App\\Models\\User	40
+1	App\\Models\\User	41
+1	App\\Models\\User	42
+1	App\\Models\\User	43
 \.
 
 
@@ -4828,11 +7532,23 @@ COPY "System".permissions (id, name, guard_name, created_at, updated_at) FROM st
 --
 
 COPY "System".personal_access_tokens (id, tokenable_type, tokenable_id, name, token, abilities, last_used_at, expires_at, created_at, updated_at) FROM stdin;
+40	App\\Models\\User	27	api-token	4610d7579982090b87695935840752da86363d069944e8710a7a6be29f7ee51a	["*"]	2026-06-17 09:24:08	\N	2026-06-17 09:24:08	2026-06-17 09:24:08
+59	App\\Models\\User	13	api-token	147b2cdfb3473563924918fd0d39bac0fa3054b5cac87ee0321c3c4cc0b8956e	["*"]	2026-06-20 09:16:31	\N	2026-06-20 09:16:11	2026-06-20 09:16:31
+55	App\\Models\\User	10	api-token	ce54d7632484e58b9041f6c2bf4527938a8b04dd123b27f94cf9206c939aa55f	["*"]	2026-06-20 09:17:06	\N	2026-06-19 14:17:16	2026-06-20 09:17:06
+60	App\\Models\\User	7	api-token	e726fb7c5c423692782b2973dc114a32292038ca44d5e2ef1e3fce1a6377f568	["*"]	2026-06-29 09:32:34	\N	2026-06-21 08:57:36	2026-06-29 09:32:34
 19	App\\Models\\User	10	api-token	d976cd94843f6d03bbec72f47f912cdc9d892ac36ebf35840a7c627cc12f8095	["*"]	2026-06-16 13:47:25	\N	2026-06-16 13:43:10	2026-06-16 13:47:25
+22	App\\Models\\User	13	api-token	6b4352a2e0b1a007483b323ee8bc80b51ac17c4996fcd000bc44252debc4a976	["*"]	2026-06-16 19:08:16	\N	2026-06-16 18:48:37	2026-06-16 19:08:16
 13	App\\Models\\User	5	api-token	f6f745982e046357fb3fc7fefc4e2732ec34dcce52fa0ed571106ad1a8655c1a	["*"]	2026-06-16 00:06:46	\N	2026-06-16 00:06:46	2026-06-16 00:06:46
 14	App\\Models\\User	6	api-token	ad5611f57285590cace92f45b0b6a6c4305b8e6585e668116b6cbce1dc3987bd	["*"]	2026-06-16 00:07:23	\N	2026-06-16 00:07:23	2026-06-16 00:07:23
-20	App\\Models\\User	7	api-token	8fb0d80da8fb4e79e540d0fc07a5dde01056466a866ee473ede9b877e474e662	["*"]	2026-06-16 17:40:21	\N	2026-06-16 15:37:05	2026-06-16 17:40:21
 10	App\\Models\\User	3	api-token	933830aa03fcbcf0b245064594c3e00f09876ef91290b38fe499cf7bb60b0289	["*"]	2026-06-15 22:42:42	\N	2026-06-15 14:42:06	2026-06-15 22:42:42
+58	App\\Models\\User	33	api-token	20581e2f674c044cef6da7bd1677b73b7c28d628c66ff0b4db2203b33017404b	["*"]	2026-06-23 10:29:00	\N	2026-06-19 18:04:55	2026-06-23 10:29:00
+34	App\\Models\\User	22	api-token	549f6682faa2720d72021f46d28857f1fa061773b013468e61fbd6437d218473	["*"]	2026-06-17 07:01:14	\N	2026-06-17 02:44:07	2026-06-17 07:01:14
+43	App\\Models\\User	32	api-token	033fb9a8733cb28090f5e1345c75ac5ba1a6553cc2cb8fce087ab7bb6ccbb49b	["*"]	2026-06-19 06:53:33	\N	2026-06-18 09:29:49	2026-06-19 06:53:33
+24	App\\Models\\User	15	api-token	199a95730f1f270d1681bfa02eb1462ac378d9516b06fd243ee4b0ad38830f4c	["*"]	2026-06-16 19:26:51	\N	2026-06-16 19:01:36	2026-06-16 19:26:51
+38	App\\Models\\User	25	api-token	68da2958dbf09b17f40d7dca24ea5461a98355a772182c6029d50dc87e808381	["*"]	2026-06-18 04:04:49	\N	2026-06-17 07:36:50	2026-06-18 04:04:49
+51	App\\Models\\User	40	api-token	a476f714507e2bfb9d3c86e8ad675cd24e051a1b793370bb17281f7cf9513eec	["*"]	2026-06-29 13:20:24	\N	2026-06-19 09:19:51	2026-06-29 13:20:24
+61	App\\Models\\User	10	api-token	0b29c9da7b80f46e9c46664cf5b7420d293d56c082cb3c3948c0853a5850463a	["*"]	2026-06-29 13:21:05	\N	2026-06-29 08:58:15	2026-06-29 13:21:05
+54	App\\Models\\User	7	api-token	0e83477572f8e8bed96451f2a9f1651c32867e73cdb22280d8debe8d6c981ff6	["*"]	2026-06-20 15:23:04	\N	2026-06-19 11:28:42	2026-06-20 15:23:04
 \.
 
 
@@ -5104,10 +7820,17 @@ SELECT pg_catalog.setval('"Data".allergies_id_seq', 9, true);
 
 
 --
+-- Name: comments_id_seq; Type: SEQUENCE SET; Schema: Data; Owner: postgres
+--
+
+SELECT pg_catalog.setval('"Data".comments_id_seq', 2, true);
+
+
+--
 -- Name: dishes_id_seq; Type: SEQUENCE SET; Schema: Data; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"Data".dishes_id_seq', 35, true);
+SELECT pg_catalog.setval('"Data".dishes_id_seq', 94, true);
 
 
 --
@@ -5132,10 +7855,24 @@ SELECT pg_catalog.setval('"Data".meals_id_seq', 102, true);
 
 
 --
+-- Name: media_id_seq; Type: SEQUENCE SET; Schema: Data; Owner: postgres
+--
+
+SELECT pg_catalog.setval('"Data".media_id_seq', 3, true);
+
+
+--
 -- Name: metrics_id_seq; Type: SEQUENCE SET; Schema: Data; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"Data".metrics_id_seq', 1, true);
+SELECT pg_catalog.setval('"Data".metrics_id_seq', 7, true);
+
+
+--
+-- Name: posts_id_seq; Type: SEQUENCE SET; Schema: Data; Owner: postgres
+--
+
+SELECT pg_catalog.setval('"Data".posts_id_seq', 6, true);
 
 
 --
@@ -5156,14 +7893,14 @@ SELECT pg_catalog.setval('"Data".sport_sessions_id_seq', 6, true);
 -- Name: user_sessions_id_seq; Type: SEQUENCE SET; Schema: Data; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"Data".user_sessions_id_seq', 8, true);
+SELECT pg_catalog.setval('"Data".user_sessions_id_seq', 17, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: Data; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"Data".users_id_seq', 10, true);
+SELECT pg_catalog.setval('"Data".users_id_seq', 44, true);
 
 
 --
@@ -5212,7 +7949,7 @@ SELECT pg_catalog.setval('"System".meals_id_seq', 204, true);
 -- Name: migrations_id_seq; Type: SEQUENCE SET; Schema: System; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"System".migrations_id_seq', 6, true);
+SELECT pg_catalog.setval('"System".migrations_id_seq', 10, true);
 
 
 --
@@ -5226,7 +7963,7 @@ SELECT pg_catalog.setval('"System".permissions_id_seq', 24, true);
 -- Name: personal_access_tokens_id_seq; Type: SEQUENCE SET; Schema: System; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"System".personal_access_tokens_id_seq', 20, true);
+SELECT pg_catalog.setval('"System".personal_access_tokens_id_seq', 61, true);
 
 
 --
@@ -5263,6 +8000,22 @@ SELECT pg_catalog.setval('"System".workout_sessions_id_seq', 21, true);
 
 ALTER TABLE ONLY "Data".allergies
     ADD CONSTRAINT allergies_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: comments comments_pkey; Type: CONSTRAINT; Schema: Data; Owner: postgres
+--
+
+ALTER TABLE ONLY "Data".comments
+    ADD CONSTRAINT comments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: media data_media_uuid_unique; Type: CONSTRAINT; Schema: Data; Owner: postgres
+--
+
+ALTER TABLE ONLY "Data".media
+    ADD CONSTRAINT data_media_uuid_unique UNIQUE (uuid);
 
 
 --
@@ -5306,11 +8059,27 @@ ALTER TABLE ONLY "Data".meals
 
 
 --
+-- Name: media media_pkey; Type: CONSTRAINT; Schema: Data; Owner: postgres
+--
+
+ALTER TABLE ONLY "Data".media
+    ADD CONSTRAINT media_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: metrics metrics_pkey; Type: CONSTRAINT; Schema: Data; Owner: postgres
 --
 
 ALTER TABLE ONLY "Data".metrics
     ADD CONSTRAINT metrics_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: posts posts_pkey; Type: CONSTRAINT; Schema: Data; Owner: postgres
+--
+
+ALTER TABLE ONLY "Data".posts
+    ADD CONSTRAINT posts_pkey PRIMARY KEY (id);
 
 
 --
@@ -5343,6 +8112,22 @@ ALTER TABLE ONLY "Data".user_allergies
 
 ALTER TABLE ONLY "Data".user_handicaps
     ADD CONSTRAINT user_handicaps_pkey PRIMARY KEY (user_id, handicap_id);
+
+
+--
+-- Name: user_like_comments user_like_comments_pkey; Type: CONSTRAINT; Schema: Data; Owner: postgres
+--
+
+ALTER TABLE ONLY "Data".user_like_comments
+    ADD CONSTRAINT user_like_comments_pkey PRIMARY KEY (user_id, comment_id);
+
+
+--
+-- Name: user_like_posts user_like_posts_pkey; Type: CONSTRAINT; Schema: Data; Owner: postgres
+--
+
+ALTER TABLE ONLY "Data".user_like_posts
+    ADD CONSTRAINT user_like_posts_pkey PRIMARY KEY (user_id, post_id);
 
 
 --
@@ -5447,6 +8232,14 @@ ALTER TABLE ONLY "System".job_batches
 
 ALTER TABLE ONLY "System".jobs
     ADD CONSTRAINT jobs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: logs logs_pkey; Type: CONSTRAINT; Schema: System; Owner: postgres
+--
+
+ALTER TABLE ONLY "System".logs
+    ADD CONSTRAINT logs_pkey PRIMARY KEY (id);
 
 
 --
@@ -5575,6 +8368,20 @@ ALTER TABLE ONLY "System".workout_exercises
 
 ALTER TABLE ONLY "System".workout_sessions
     ADD CONSTRAINT workout_sessions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: data_media_model_type_model_id_index; Type: INDEX; Schema: Data; Owner: postgres
+--
+
+CREATE INDEX data_media_model_type_model_id_index ON "Data".media USING btree (model_type, model_id);
+
+
+--
+-- Name: data_media_order_column_index; Type: INDEX; Schema: Data; Owner: postgres
+--
+
+CREATE INDEX data_media_order_column_index ON "Data".media USING btree (order_column);
 
 
 --
@@ -5809,6 +8616,22 @@ CREATE INDEX sessions_user_id_index ON "System".sessions USING btree (user_id);
 
 
 --
+-- Name: comments comments_post_id_fkey; Type: FK CONSTRAINT; Schema: Data; Owner: postgres
+--
+
+ALTER TABLE ONLY "Data".comments
+    ADD CONSTRAINT comments_post_id_fkey FOREIGN KEY (post_id) REFERENCES "Data".posts(id) ON DELETE CASCADE;
+
+
+--
+-- Name: comments comments_user_id_fkey; Type: FK CONSTRAINT; Schema: Data; Owner: postgres
+--
+
+ALTER TABLE ONLY "Data".comments
+    ADD CONSTRAINT comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES "Data".users(id) ON DELETE CASCADE;
+
+
+--
 -- Name: dishes dishes_user_id_fkey; Type: FK CONSTRAINT; Schema: Data; Owner: postgres
 --
 
@@ -5822,6 +8645,14 @@ ALTER TABLE ONLY "Data".dishes
 
 ALTER TABLE ONLY "Data".metrics
     ADD CONSTRAINT metrics_user_id_fkey FOREIGN KEY (user_id) REFERENCES "Data".users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: posts posts_user_id_fkey; Type: FK CONSTRAINT; Schema: Data; Owner: postgres
+--
+
+ALTER TABLE ONLY "Data".posts
+    ADD CONSTRAINT posts_user_id_fkey FOREIGN KEY (user_id) REFERENCES "Data".users(id) ON DELETE CASCADE;
 
 
 --
@@ -5886,6 +8717,38 @@ ALTER TABLE ONLY "Data".user_handicaps
 
 ALTER TABLE ONLY "Data".user_handicaps
     ADD CONSTRAINT user_handicaps_user_id_fkey FOREIGN KEY (user_id) REFERENCES "Data".users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: user_like_comments user_like_comments_comment_id_fkey; Type: FK CONSTRAINT; Schema: Data; Owner: postgres
+--
+
+ALTER TABLE ONLY "Data".user_like_comments
+    ADD CONSTRAINT user_like_comments_comment_id_fkey FOREIGN KEY (comment_id) REFERENCES "Data".comments(id) ON DELETE CASCADE;
+
+
+--
+-- Name: user_like_comments user_like_comments_user_id_fkey; Type: FK CONSTRAINT; Schema: Data; Owner: postgres
+--
+
+ALTER TABLE ONLY "Data".user_like_comments
+    ADD CONSTRAINT user_like_comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES "Data".users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: user_like_posts user_like_posts_post_id_fkey; Type: FK CONSTRAINT; Schema: Data; Owner: postgres
+--
+
+ALTER TABLE ONLY "Data".user_like_posts
+    ADD CONSTRAINT user_like_posts_post_id_fkey FOREIGN KEY (post_id) REFERENCES "Data".posts(id) ON DELETE CASCADE;
+
+
+--
+-- Name: user_like_posts user_like_posts_user_id_fkey; Type: FK CONSTRAINT; Schema: Data; Owner: postgres
+--
+
+ALTER TABLE ONLY "Data".user_like_posts
+    ADD CONSTRAINT user_like_posts_user_id_fkey FOREIGN KEY (user_id) REFERENCES "Data".users(id) ON DELETE CASCADE;
 
 
 --
