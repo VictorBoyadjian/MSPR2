@@ -38,14 +38,12 @@ MODELS_DIR.mkdir(parents=True, exist_ok=True)
 ARTIFACTS.mkdir(parents=True, exist_ok=True)
 
 sys.path.insert(0, str(ROOT / "ml"))
-sys.path.insert(0, str(ROOT))
 
 from src.preprocessing.cleaner  import clean
 from src.preprocessing.engineer import engineer
 from src.preprocessing.pipeline import (
     build_preprocessor, build_label_encoder, get_X_y, get_feature_names,
 )
-from app.logs_service import LogService
 
 
 MLFLOW_DB  = str(ROOT / "ml" / "artifacts" / "mlflow.db")
@@ -89,8 +87,7 @@ try:
         "clf__colsample_bytree": [0.7, 0.8, 1.0],
     }
     print("[train] XGBoost détecté — inclus dans la comparaison")
-except ImportError as e:
-    LogService.send_log(e)
+except ImportError:
     print("[train] XGBoost non disponible — comparaison RF vs GB uniquement")
 
 
@@ -115,8 +112,7 @@ def _save_feature_importance(model, feature_names: list[str], name: str):
     preprocessor = model.named_steps["pre"]
     try:
         feat_names_out = preprocessor.get_feature_names_out()
-    except Exception as e:
-        LogService.send_log(e)
+    except Exception:
         feat_names_out = feature_names
 
     importances = clf.feature_importances_
@@ -209,7 +205,7 @@ def train_and_evaluate(X_train, X_test, y_train, y_test, label_encoder):
 
             cv_scores = cross_val_score(best_model, X_train, y_train,
                                         cv=cv, scoring="f1_macro", n_jobs=-1)
-    
+
             print(f"  Best params : {search.best_params_}")
             print(f"  Accuracy    : {acc:.4f}")
             print(f"  F1-macro    : {f1_mac:.4f}")
@@ -339,7 +335,4 @@ def _save_model_comparison(results: dict, best_name: str):
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        LogService.send_log(e)
+    main()

@@ -3,13 +3,8 @@ Seed — tables exercises, workout_sessions, session_exercises.
 Sessions construites selon les guidelines ACSM 2022 par profil fitness.
 """
 import os
-import sys
-from pathlib import Path
 import psycopg2
 import psycopg2.extras
-
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from app.logs_service import LogService
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 
@@ -513,16 +508,13 @@ def seed_sessions(cur, ex_map):
 
 
 if __name__ == "__main__":
-    try:
-        with psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
-            with conn.cursor() as cur:
-                cur.execute('SET search_path TO "Data"')
-                create_tables(cur)
-                ex_map = seed_exercises(cur)
-                n_sessions, n_links = seed_sessions(cur, ex_map)
-            conn.commit()
-        print(f"✓ {len(ex_map)} exercices insérés")
-        print(f"✓ {n_sessions} sessions insérées")
-        print(f"✓ {n_links} liens session↔exercice insérés")
-    except Exception as e:
-        LogService.send_log(e)
+    with psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor) as conn:
+        with conn.cursor() as cur:
+            cur.execute('SET search_path TO "Data"')
+            create_tables(cur)
+            ex_map = seed_exercises(cur)
+            n_sessions, n_links = seed_sessions(cur, ex_map)
+        conn.commit()
+    print(f"✓ {len(ex_map)} exercices insérés")
+    print(f"✓ {n_sessions} sessions insérées")
+    print(f"✓ {n_links} liens session↔exercice insérés")

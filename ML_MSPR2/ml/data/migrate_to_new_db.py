@@ -5,10 +5,6 @@ Copie la table exercises (ETL) + re-seed meals + re-seed sessions.
 import os
 import subprocess
 import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from app.logs_service import LogService
 
 OLD_URL = "postgresql://postgres:postgres@mainline.proxy.rlwy.net:51566/healthai"
 NEW_URL = "postgresql://postgres:postgres@thomas.proxy.rlwy.net:14269/healthai"
@@ -98,28 +94,25 @@ def migrate_exercises():
 
 
 if __name__ == "__main__":
-    try:
-        migrate_exercises()
+    migrate_exercises()
 
-        env = os.environ.copy()
-        env["DATABASE_URL"] = NEW_URL
+    env = os.environ.copy()
+    env["DATABASE_URL"] = NEW_URL
 
-        print("\n→ Seed meals sur nouvelle BDD...")
-        result = subprocess.run(
-            [sys.executable, "ml/data/seed_meals.py"],
-            env=env, capture_output=True, text=True
-        )
-        print(result.stdout or result.stderr)
+    print("\n→ Seed meals sur nouvelle BDD...")
+    result = subprocess.run(
+        [sys.executable, "ml/data/seed_meals.py"],
+        env=env, capture_output=True, text=True
+    )
+    print(result.stdout or result.stderr)
 
-        print("→ Seed sessions sur nouvelle BDD...")
-        result = subprocess.run(
-            [sys.executable, "ml/data/seed_sessions.py"],
-            env=env, capture_output=True, text=True
-        )
-        print(result.stdout or result.stderr)
+    print("→ Seed sessions sur nouvelle BDD...")
+    result = subprocess.run(
+        [sys.executable, "ml/data/seed_sessions.py"],
+        env=env, capture_output=True, text=True
+    )
+    print(result.stdout or result.stderr)
 
-        print("\n✓ Migration complète.")
-        print(f"  Mets à jour DATABASE_URL dans ton .env :")
-        print(f"  DATABASE_URL={NEW_URL}")
-    except Exception as e:
-        LogService.send_log(e)
+    print("\n✓ Migration complète.")
+    print(f"  Mets à jour DATABASE_URL dans ton .env :")
+    print(f"  DATABASE_URL={NEW_URL}")

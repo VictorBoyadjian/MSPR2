@@ -10,7 +10,6 @@ from pathlib import Path
 
 from ml.src.preprocessing.engineer import engineer
 from ml.src.preprocessing.pipeline import get_feature_names
-from app.logs_service import LogService
 
 MODELS_DIR = Path(__file__).parent.parent.parent.parent / "ml" / "models"
 
@@ -21,11 +20,8 @@ class FitnessPredictor:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            try:
-                cls._instance._model   = joblib.load(MODELS_DIR / "model.pkl")
-                cls._instance._encoder = joblib.load(MODELS_DIR / "encoder.pkl")
-            except Exception as e:
-                LogService.send_log(e)
+            cls._instance._model   = joblib.load(MODELS_DIR / "model.pkl")
+            cls._instance._encoder = joblib.load(MODELS_DIR / "encoder.pkl")
         return cls._instance
 
     def predict(self, age: int, gender: int, weight_kg: float, height_cm: float,
