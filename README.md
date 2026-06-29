@@ -1,7 +1,7 @@
 # MSPR2 — HealthAI
 
 ## 🚀 Lancement
-
+  
 Le dossier [start/](start/) lance **toute la stack** (build des images + démarrage + restauration
 de la base à partir de `start/pg_restore/dump.sql`).
 
