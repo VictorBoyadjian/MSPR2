@@ -8,6 +8,7 @@ import re
 #Modules
 from data_schemas import OutputResponse, DishCalculateOutput, Food, ScannedFood
 from color_enum import ColorEnum
+from logs_service import LogService
 
 class Parser():
     _mistral_dict_keys = [
@@ -23,13 +24,17 @@ class Parser():
 
     @staticmethod
     def _clean(content: str) -> str:
-        return (
-            str(content)
-            .replace('`', '')
-            .replace('json', '')
-            .replace('\\', '')
-            .strip()
-        )
+        try:
+            return (
+                str(content)
+                .replace('`', '')
+                .replace('json', '')
+                .replace('\\', '')
+                .strip()
+            )
+        except Exception as e:
+            LogService.send_log(e)
+            return str(content)
 
     @staticmethod
     def _to_float(value, default: float = 0.0) -> float:
@@ -47,36 +52,44 @@ class Parser():
 
     @classmethod
     def _accuracy(cls, entry: dict) -> float:
-        if "accuracy" in entry:
-            return cls._to_float(entry.get("accuracy"), 0.85)
-        confidence = str(entry.get("confidence", "")).lower()
-        return cls._CONFIDENCE_MAP.get(confidence, 0.6)
+        try:
+            if "accuracy" in entry:
+                return cls._to_float(entry.get("accuracy"), 0.85)
+            confidence = str(entry.get("confidence", "")).lower()
+            return cls._CONFIDENCE_MAP.get(confidence, 0.6)
+        except Exception as e:
+            LogService.send_log(e)
+            return 0.6
 
     @classmethod
     def _extract_entries(cls, content: str) -> list:
         """Return a list of food objects, tolerating a truncated JSON tail."""
-        content = cls._clean(content)
-
         try:
-            data = json.loads(content)
-            if isinstance(data, dict) and isinstance(data.get("foods"), list):
-                return data["foods"]
-            if isinstance(data, list):
-                return data
-            if isinstance(data, dict):
-                return [{"name_fr": k, **v} for k, v in data.items() if isinstance(v, dict)]
-        except json.JSONDecodeError:
-            pass
-        
-        entries = []
-        for match in re.findall(r'\{[^{}]*\}', content):
+            content = cls._clean(content)
+
             try:
-                obj = json.loads(match)
+                data = json.loads(content)
+                if isinstance(data, dict) and isinstance(data.get("foods"), list):
+                    return data["foods"]
+                if isinstance(data, list):
+                    return data
+                if isinstance(data, dict):
+                    return [{"name_fr": k, **v} for k, v in data.items() if isinstance(v, dict)]
             except json.JSONDecodeError:
-                continue
-            if isinstance(obj, dict) and any(k in obj for k in ( "name_fr", "name")):
-                entries.append(obj)
-        return entries
+                pass
+
+            entries = []
+            for match in re.findall(r'\{[^{}]*\}', content):
+                try:
+                    obj = json.loads(match)
+                except json.JSONDecodeError:
+                    continue
+                if isinstance(obj, dict) and any(k in obj for k in ( "name_fr", "name")):
+                    entries.append(obj)
+            return entries
+        except Exception as e:
+            LogService.send_log(e)
+            return []
 
     @classmethod
     def _foods_response(cls, content: str) -> Union[OutputResponse, dict]:
@@ -108,11 +121,16 @@ class Parser():
             return OutputResponse(aliments=aliments)
         except Exception as e:
             print(f"{ColorEnum.ERROR.format('[ERROR]')}: An error occurred while parsing the model response : {e}")
+            LogService.send_log(e)
             return {}
 
     @classmethod
     def ollama_reponse(cls, response: ChatResponse) -> Union[OutputResponse, dict]:
-        return cls._foods_response(response.message.content)
+        try:
+            return cls._foods_response(response.message.content)
+        except Exception as e:
+            LogService.send_log(e)
+            return {}
 
     @classmethod
     def mistral_vision_reponse(cls, response: ChatCompletionResponse) -> Union[OutputResponse, dict]:
@@ -120,6 +138,7 @@ class Parser():
             content = response.choices[0].message.content
         except Exception as e:
             print(f"{ColorEnum.ERROR.format('[ERROR]')}: An error occurred while parsing the model response : {e}")
+            LogService.send_log(e)
             return {}
         return cls._foods_response(content)
         
@@ -143,4 +162,5 @@ class Parser():
             return {}
         except Exception as e:
             print(f"{ColorEnum.ERROR.format('[ERROR]')}: An error occurred while parsing the model response : {e}")
+            LogService.send_log(e)
             return {}

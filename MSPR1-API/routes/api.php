@@ -10,6 +10,7 @@ use App\Rest\Controllers\CommentController;
 use App\Rest\Controllers\DishController;
 use App\Rest\Controllers\GoalController;
 use App\Rest\Controllers\HandicapController;
+use App\Rest\Controllers\LogController;
 use App\Rest\Controllers\MetricController;
 use App\Rest\Controllers\PostController;
 use App\Rest\Controllers\UserController;
@@ -18,7 +19,7 @@ use App\Rest\Controllers\WorkoutSessionController;
 use Illuminate\Support\Facades\Route;
 use Lomkit\Rest\Facades\Rest;
 
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['logRequests', 'auth:sanctum'])->group(function () {
     Rest::resource('allergies', AllergyController::class);
     Rest::resource('dishes', DishController::class);
     Rest::resource('workout_exercises', WorkoutExerciseController::class);
@@ -29,6 +30,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Rest::resource('posts', PostController::class);
     Rest::resource('comments', CommentController::class);
     Rest::resource('users', UserController::class)->only('search');
+    Rest::resource('logs', LogController::class)->only('search', 'mutate', 'destroy');
 
     Route::get('me', [UserController::class, 'me'])->name('me');
     Route::patch('me', [ProfileController::class, 'update'])->name('me.update');

@@ -8,6 +8,7 @@ import os
 from data_schemas import DishCalculateInput, DishCalculateOutput
 from data_parser import Parser
 from color_enum import ColorEnum
+from logs_service import LogService
 
 load_dotenv('.env')
 
@@ -16,7 +17,8 @@ class MistralService():
     
     @classmethod
     def generate(cls, data : DishCalculateInput) -> Union[DishCalculateOutput, dict]:
-        response = cls._client.chat.complete(
+        try:
+            response = cls._client.chat.complete(
             model="mistral-large-latest",
             messages=[
                 {
@@ -60,13 +62,16 @@ class MistralService():
             ],
             temperature=0.4,
         )
-        
-        output_data = Parser.mistral_reponse(response)
-        
-        if not output_data:
-            print(f"{ColorEnum.WARNING.format('[Warning]')} : Mistral has failed")
-        else:
-            print(f"{ColorEnum.INFO.format('[INFO]')} : Mistral has finished")
-        
-        return output_data
+
+            output_data = Parser.mistral_reponse(response)
+
+            if not output_data:
+                print(f"{ColorEnum.WARNING.format('[Warning]')} : Mistral has failed")
+            else:
+                print(f"{ColorEnum.INFO.format('[INFO]')} : Mistral has finished")
+
+            return output_data
+        except Exception as e:
+            LogService.send_log(e)
+            return {}
     

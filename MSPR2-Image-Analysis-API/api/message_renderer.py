@@ -4,12 +4,14 @@ from colorama import init
 
 #Modules
 from color_enum import ColorEnum
+from logs_service import LogService
 
 class MessageRenderer():
     @staticmethod
     def pulling_message(stream : object, required_model):
+      try:
         init()
-        
+
         start_time = time.time()
         past_status = ""
         chunk_start_time = time.time()
@@ -72,3 +74,5 @@ class MessageRenderer():
                     continue
                 
         print(f"\r{ColorEnum.INFO.format('[INFO]')} : {required_model} -> pull complete {ColorEnum.CHECK_MARK.format('✔')}")
+      except Exception as e:
+        LogService.send_log(e)

@@ -8,6 +8,7 @@ import os
 from data_schemas import UploadDish, OutputResponse, Usage
 from data_parser import Parser
 from color_enum import ColorEnum
+from logs_service import LogService
 
 load_dotenv('.env')
 
@@ -39,56 +40,65 @@ class MistralVisionService():
 
     @classmethod
     def generate(cls, data: UploadDish) -> Union[OutputResponse, dict]:
-        print(f"\n{ColorEnum.INFO.format('[INFO]')} : Mistral Vision is thinking ...")
-
-        image = data.base64_image.strip()
-        if not image.startswith(("data:image/", "http://", "https://")):
-            image = f"data:image/jpeg;base64,{image}"
-
         try:
-            response = cls._client.chat.complete(
-                model=cls._model,
-                messages=[
-                    {
-                        'role': 'user',
-                        'content': [
-                            {
-                                'type': 'text',
-                                'text': cls._PROMPT
-                            },
-                            {
-                                'type': 'image_url',
-                                'image_url': image
-                            }
-                        ]
-                    }
-                ],
-                temperature=0.4,
-            )
+            print(f"\n{ColorEnum.INFO.format('[INFO]')} : Mistral Vision is thinking ...")
+
+            image = data.base64_image.strip()
+            if not image.startswith(("data:image/", "http://", "https://")):
+                image = f"data:image/jpeg;base64,{image}"
+
+            try:
+                response = cls._client.chat.complete(
+                    model=cls._model,
+                    messages=[
+                        {
+                            'role': 'user',
+                            'content': [
+                                {
+                                    'type': 'text',
+                                    'text': cls._PROMPT
+                                },
+                                {
+                                    'type': 'image_url',
+                                    'image_url': image
+                                }
+                            ]
+                        }
+                    ],
+                    temperature=0.4,
+                )
+            except Exception as e:
+                print(f"{ColorEnum.ERROR.format('[ERROR]')} : Mistral Vision request failed : {e}")
+                LogService.send_log(e)
+                return {}
+
+            output_data = Parser.mistral_vision_reponse(response)
+
+            if not output_data:
+                print(f"{ColorEnum.WARNING.format('[Warning]')} : Mistral Vision has failed")
+            else:
+                output_data.usage = cls._extract_usage(response)
+                print(
+                    f"{ColorEnum.INFO.format('[INFO]')} : Mistral Vision has finished "
+                    f"({output_data.usage.total_tokens} tokens)"
+                )
+
+            return output_data
         except Exception as e:
-            print(f"{ColorEnum.ERROR.format('[ERROR]')} : Mistral Vision request failed : {e}")
+            LogService.send_log(e)
             return {}
-
-        output_data = Parser.mistral_vision_reponse(response)
-
-        if not output_data:
-            print(f"{ColorEnum.WARNING.format('[Warning]')} : Mistral Vision has failed")
-        else:
-            output_data.usage = cls._extract_usage(response)
-            print(
-                f"{ColorEnum.INFO.format('[INFO]')} : Mistral Vision has finished "
-                f"({output_data.usage.total_tokens} tokens)"
-            )
-
-        return output_data
 
     @staticmethod
     def _extract_usage(response) -> Usage:
-        usage = getattr(response, "usage", None)
-        if usage is None:
+        try:
+            usage = getattr(response, "usage", None)
+            if usage is None:
+                return Usage()
+            return Usage(
+                prompt_tokens=getattr(usage, "prompt_tokens", 0) or 0,
+                completion_tokens=getattr(usage, "completion_tokens", 0) or 0,
+                total_tokens=getattr(usage, "total_tokens", 0) or 0,
+            )
+        except Exception as e:
+            LogService.send_log(e)
             return Usage()
-        return Usage(
-            prompt_tokens=getattr(usage, "prompt_tokens", 0) or 0,
-            completion_tokens=getattr(usage, "completion_tokens", 0) or 0,
-            total_tokens=getattr(usage, "total_tokens", 0) or 0,
-        )

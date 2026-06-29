@@ -161,6 +161,22 @@ services:
       - mspr-network
     restart: unless-stopped
 
+  grafana:
+    build: ../MSPR1-Grafana
+    container_name: mspr1-grafana
+    ports:
+      - "1506:1506"
+    env_file:
+      - ../MSPR1-Grafana/.env
+    volumes:
+      - ../MSPR1-Grafana/data:/var/lib/grafana
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - mspr-network
+    restart: unless-stopped
+
 networks:
   mspr-network:
     driver: bridge

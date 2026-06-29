@@ -10,6 +10,7 @@ from data_schemas import UploadDish, OutputResponse
 from color_enum import ColorEnum
 from message_renderer import MessageRenderer
 from data_parser import Parser
+from logs_service import LogService
 
 load_dotenv('.env')
 
@@ -19,31 +20,39 @@ class OllamaService:
     _client : Client = Client(host=os.getenv('OLLAMA_HOST') + ':' + os.getenv('OLLAMA_PORT'))
 
     @classmethod
-    def check_model_availability(cls, model = None) -> bool:    
-        return any(m['model'] == (cls._selected_model if model == None else model) for m in cls._client.list().models)
-    
+    def check_model_availability(cls, model = None) -> bool:
+        try:
+            return any(m['model'] == (cls._selected_model if model == None else model) for m in cls._client.list().models)
+        except Exception as e:
+            LogService.send_log(e)
+            return False
+
     @classmethod
-    def pull_models(cls, all_models : bool = False) -> Union[bool, list]: 
-        if all_models:
-            if cls.models:
-                pulled_models = []
-                
-                for model in cls.models:
-                    if cls.check_model_availability(model):
-                        continue
-                    
-                    print("")
-                    
-                    passed = cls.download_model(model)
-                    if passed:
-                        pulled_models.append(model)
-                    
-                return pulled_models
-        else:
-            if cls._selected_model:
-                return cls.download_model(cls._selected_model)
-                 
-        return False
+    def pull_models(cls, all_models : bool = False) -> Union[bool, list]:
+        try:
+            if all_models:
+                if cls.models:
+                    pulled_models = []
+
+                    for model in cls.models:
+                        if cls.check_model_availability(model):
+                            continue
+
+                        print("")
+
+                        passed = cls.download_model(model)
+                        if passed:
+                            pulled_models.append(model)
+
+                    return pulled_models
+            else:
+                if cls._selected_model:
+                    return cls.download_model(cls._selected_model)
+
+            return False
+        except Exception as e:
+            LogService.send_log(e)
+            return False
 
     @classmethod
     def download_model(cls, model_name : str) -> bool :
@@ -55,60 +64,65 @@ class OllamaService:
             return True
         except Exception as e:
             print(f"{ColorEnum.ERROR.format('[ERROR]')} : An error occurred while pulling the model : {e}")
+            LogService.send_log(e)
             return False
     
     @classmethod       
-    def generate(cls, data : UploadDish) -> Union[OutputResponse, dict]:    
-        model_pass = True
-        output_data = {}
+    def generate(cls, data : UploadDish) -> Union[OutputResponse, dict]:
+        try:
+                
+            model_pass = True
+            output_data = {}
 
-        if not cls.check_model_availability():
-            print(f"{ColorEnum.WARNING.format('[WARNING]')} : {cls._selected_model} is not found")
-            model_pass = cls.pull_models()
+            if not cls.check_model_availability():
+                print(f"{ColorEnum.WARNING.format('[WARNING]')} : {cls._selected_model} is not found")
+                model_pass = cls.pull_models()
 
-        if model_pass:
-            print(f"\n{ColorEnum.INFO.format('[INFO]')} : {cls._selected_model} is thinking ...")
-            
-            response = cls._client.chat( 
-                model=cls._selected_model,
-                messages=[
-                    {
-                        'role' : 'user',
-                        'content' : """
-                            You are a professional nutritionist. Look carefully at this specific meal photo and identify ONLY the foods you actually see in the image.
+            if model_pass:
+                print(f"\n{ColorEnum.INFO.format('[INFO]')} : {cls._selected_model} is thinking ...")
+                
+                response = cls._client.chat( 
+                    model=cls._selected_model,
+                    messages=[
+                        {
+                            'role' : 'user',
+                            'content' : """
+                                You are a professional nutritionist. Look carefully at this specific meal photo and identify ONLY the foods you actually see in the image.
 
-                            Rules:
-                            - List ONLY foods you can actually see in this photo.
-                            - Do NOT use placeholder or example foods.
-                            - Estimate quantity from the visual portion size.
-                            - quantity_g = estimated total weight in grams (integer).
-                            - confidence = "high" if clearly visible, "medium" if partially visible, "low" if uncertain.
-                            - Respond with ONLY a valid JSON object. No text, no markdown, no explanation before or after.
+                                Rules:
+                                - List ONLY foods you can actually see in this photo.
+                                - Do NOT use placeholder or example foods.
+                                - Estimate quantity from the visual portion size.
+                                - quantity_g = estimated total weight in grams (integer).
+                                - confidence = "high" if clearly visible, "medium" if partially visible, "low" if uncertain.
+                                - Respond with ONLY a valid JSON object. No text, no markdown, no explanation before or after.
 
-                            Use exactly this schema:
-                            {
-                            "foods": [
+                                Use exactly this schema:
                                 {
-                                "name_fr": "<french name of food you see>",
-                                "quantity_g": <integer>,
-                                "confidence": "<high|medium|low>"
-                                }
-                            ]
-                            }""",
-                        'images' : [data.base64_image]
+                                "foods": [
+                                    {
+                                    "name_fr": "<french name of food you see>",
+                                    "quantity_g": <integer>,
+                                    "confidence": "<high|medium|low>"
+                                    }
+                                ]
+                                }""",
+                            'images' : [data.base64_image]
+                        }
+                    ],
+                    options={
+                        "temperature": 0.4,
+                        "num_predict" : 800
                     }
-                ],
-                options={
-                    "temperature": 0.4,
-                    "num_predict" : 800
-                }
-            )
+                )
 
-            output_data = Parser.ollama_reponse(response)
+                output_data = Parser.ollama_reponse(response)
 
-        if not output_data:
-            print(f"{ColorEnum.WARNING.format('[Warning]')} : {cls._selected_model} has failed")
-        else:
-            print(f"{ColorEnum.INFO.format('[INFO]')} : {cls._selected_model} has finished")
+            if not output_data:
+                print(f"{ColorEnum.WARNING.format('[Warning]')} : {cls._selected_model} has failed")
+            else:
+                print(f"{ColorEnum.INFO.format('[INFO]')} : {cls._selected_model} has finished")
 
-        return output_data
+            return output_data
+        except Exception as e:
+            LogService.send_log(e)

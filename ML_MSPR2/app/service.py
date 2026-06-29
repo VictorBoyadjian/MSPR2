@@ -8,6 +8,7 @@ from app.schemas import RecommendInput, RecommendOutput, ProgramOutput, ProfileS
 from app.schemas import NutritionInput, NutritionOutput
 from app.schemas import CaloriesInput, CaloriesOutput, MealsInput, MealsOutput, MealItem
 from app.schemas import SessionInput, SessionOutput, WorkoutSessionOutput, SessionExerciseItem, BODY_REGION_TO_PARTS
+from app.logs_service import LogService
 
 ROOT = Path(__file__).parent.parent
 MODELS_DIR = ROOT / "ml" / "models"
@@ -22,6 +23,7 @@ try:
     from ml.src.recommendation_engine.engine import get_program, program_to_dict
     sys_path_appended = True
 except Exception as e:
+    LogService.send_log(e)
     sys_path_appended = False
     _IMPORT_ERROR = str(e)
 
@@ -51,8 +53,11 @@ class FitnessService:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            cls._instance._model   = joblib.load(MODELS_DIR / "model.pkl")
-            cls._instance._encoder = joblib.load(MODELS_DIR / "encoder.pkl")
+            try:
+                cls._instance._model   = joblib.load(MODELS_DIR / "model.pkl")
+                cls._instance._encoder = joblib.load(MODELS_DIR / "encoder.pkl")
+            except Exception as e:
+                LogService.send_log(e)
         return cls._instance
 
     def recommend(self, data: RecommendInput) -> RecommendOutput:
@@ -92,6 +97,7 @@ class FitnessService:
         try:
             prog = get_program(profile)
         except RuntimeError as e:
+            LogService.send_log(e)
             raise RuntimeError(
                 f"DATABASE_URL non configurée. "
                 f"Lancez : export DATABASE_URL=postgresql://... avant de démarrer l'API. "
@@ -110,6 +116,7 @@ class FitnessService:
             })
             print(f"[Firebase] ✓ prediction {prediction_id} sauvegardée")
         except Exception as e:
+            LogService.send_log(e)
             print(f"[Firebase] ✗ ERREUR log_prediction : {type(e).__name__}: {e}")
 
         return RecommendOutput(

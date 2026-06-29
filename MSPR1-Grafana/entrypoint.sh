@@ -1,0 +1,7 @@
+#!/bin/sh
+export GF_SERVER_HTTP_PORT="${PORT:-1506}"
+export GF_SECURITY_ADMIN_USER="${GF_SECURITY_ADMIN_USER:-test}"
+export GF_SECURITY_ADMIN_PASSWORD="${GF_SECURITY_ADMIN_PASSWORD:-testtest}"
+export GF_SECURITY_ADMIN_EMAIL="${GF_SECURITY_ADMIN_EMAIL:-test@test.com}"
+
+exec /run.sh

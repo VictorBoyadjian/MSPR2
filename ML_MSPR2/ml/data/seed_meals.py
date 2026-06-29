@@ -5,8 +5,13 @@ Allergènes : gluten, lactose, oeufs, fruits_a_coque, arachides, soja, poisson, 
 """
 
 import os
+import sys
+from pathlib import Path
 import psycopg2
 import psycopg2.extras
+
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from app.logs_service import LogService
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 
@@ -158,10 +163,13 @@ def seed(cur):
 
 
 if __name__ == "__main__":
-    with psycopg2.connect(DATABASE_URL) as conn:
-        with conn.cursor() as cur:
-            cur.execute('SET search_path TO "Data"')
-            create_table(cur)
-            n = seed(cur)
-        conn.commit()
-    print(f"✓ Table meals créée — {n} repas insérés.")
+    try:
+        with psycopg2.connect(DATABASE_URL) as conn:
+            with conn.cursor() as cur:
+                cur.execute('SET search_path TO "Data"')
+                create_table(cur)
+                n = seed(cur)
+            conn.commit()
+        print(f"✓ Table meals créée — {n} repas insérés.")
+    except Exception as e:
+        LogService.send_log(e)

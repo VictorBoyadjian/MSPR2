@@ -10,15 +10,22 @@ Features = uniquement ce qui est disponible à l'inscription (pas de leakage tem
 Target = profil fitness (6 classes) → recommandation de programme sportif.
 """
 
+import sys
 import numpy as np
 import pandas as pd
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+from app.logs_service import LogService
 
 RNG = np.random.default_rng(42)
 N = 2000
 
 OUTPUT_DIR = Path(__file__).parent / "processed"
-OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+try:
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+except Exception as e:
+    LogService.send_log(e)
 
 
 
@@ -135,4 +142,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        LogService.send_log(e)
