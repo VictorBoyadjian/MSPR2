@@ -19,36 +19,38 @@ use App\Rest\Controllers\WorkoutSessionController;
 use Illuminate\Support\Facades\Route;
 use Lomkit\Rest\Facades\Rest;
 
-Route::middleware(['logRequests', 'auth:sanctum'])->group(function () {
-    Rest::resource('allergies', AllergyController::class);
-    Rest::resource('dishes', DishController::class);
-    Rest::resource('workout_exercises', WorkoutExerciseController::class);
-    Rest::resource('workout_sessions', WorkoutSessionController::class);
-    Rest::resource('goals', GoalController::class);
-    Rest::resource('handicaps', HandicapController::class);
-    Rest::resource('metrics', MetricController::class);
-    Rest::resource('posts', PostController::class);
-    Rest::resource('comments', CommentController::class);
-    Rest::resource('users', UserController::class)->only('search');
-    Rest::resource('logs', LogController::class)->only('search', 'mutate', 'destroy');
+Route::middleware('logRequests')->group(function (){
+    Route::middleware(['auth:sanctum'])->group(function () {
+        Rest::resource('allergies', AllergyController::class);
+        Rest::resource('dishes', DishController::class);
+        Rest::resource('workout_exercises', WorkoutExerciseController::class);
+        Rest::resource('workout_sessions', WorkoutSessionController::class);
+        Rest::resource('goals', GoalController::class);
+        Rest::resource('handicaps', HandicapController::class);
+        Rest::resource('metrics', MetricController::class);
+        Rest::resource('posts', PostController::class);
+        Rest::resource('comments', CommentController::class);
+        Rest::resource('users', UserController::class)->only('search');
+        Rest::resource('logs', LogController::class)->only('search', 'mutate', 'destroy');
 
-    Route::get('me', [UserController::class, 'me'])->name('me');
-    Route::patch('me', [ProfileController::class, 'update'])->name('me.update');
-    Route::delete('me', [ProfileController::class, 'destroy'])->name('me.destroy');
+        Route::get('me', [UserController::class, 'me'])->name('me');
+        Route::patch('me', [ProfileController::class, 'update'])->name('me.update');
+        Route::delete('me', [ProfileController::class, 'destroy'])->name('me.destroy');
 
-    // Séances de l'utilisateur connecté (faites / planifiées).
-    Route::get('me/sessions', [UserSessionController::class, 'index'])->name('me.sessions.index');
-    Route::get('me/sessions/stats', [UserSessionController::class, 'stats'])->name('me.sessions.stats');
-    Route::post('me/sessions', [UserSessionController::class, 'store'])->name('me.sessions.store');
-    Route::patch('me/sessions/{id}', [UserSessionController::class, 'update'])->name('me.sessions.update');
-    Route::delete('me/sessions/{id}', [UserSessionController::class, 'destroy'])->name('me.sessions.destroy');
+        // Séances de l'utilisateur connecté (faites / planifiées).
+        Route::get('me/sessions', [UserSessionController::class, 'index'])->name('me.sessions.index');
+        Route::get('me/sessions/stats', [UserSessionController::class, 'stats'])->name('me.sessions.stats');
+        Route::post('me/sessions', [UserSessionController::class, 'store'])->name('me.sessions.store');
+        Route::patch('me/sessions/{id}', [UserSessionController::class, 'update'])->name('me.sessions.update');
+        Route::delete('me/sessions/{id}', [UserSessionController::class, 'destroy'])->name('me.sessions.destroy');
 
-    // Suivi santé : une métrique par jour (poids, pouls au repos), calculs sport à part.
-    Route::get('me/metrics/current', [HealthMetricController::class, 'current'])->name('me.metrics.current');
-    Route::put('me/metrics', [HealthMetricController::class, 'upsert'])->name('me.metrics.upsert');
+        // Suivi santé : une métrique par jour (poids, pouls au repos), calculs sport à part.
+        Route::get('me/metrics/current', [HealthMetricController::class, 'current'])->name('me.metrics.current');
+        Route::put('me/metrics', [HealthMetricController::class, 'upsert'])->name('me.metrics.upsert');
 
-    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+        Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+    });
+
+    Route::post('login', [AuthController::class, 'login'])->name('login');
+    Route::post('register', [RegisterController::class, 'register'])->name('register');
 });
-
-Route::post('login', [AuthController::class, 'login'])->name('login');
-Route::post('register', [RegisterController::class, 'register'])->name('register');
