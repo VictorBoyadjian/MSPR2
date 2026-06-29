@@ -7,6 +7,7 @@ import { Goal } from '@/types/goals.type';
 import { Metric } from '@/types/metrics.type';
 import { WorkoutSession } from '@/types/workout-sessions.type';
 import { User } from '@/types/users.type';
+import { Post, Comment } from '@/types/posts.type';
 
 let authToken: string | null = null;
 
@@ -78,7 +79,48 @@ function extractMessage(payload: unknown, fallback: string): string {
   return fallback;
 }
 
+/**
+ * Requête multipart/form-data (upload de fichiers). On NE fixe PAS le
+ * `Content-Type` : `fetch` ajoute lui-même le boundary à partir du FormData.
+ */
+async function requestMultipart<T>(path: string, form: FormData): Promise<T> {
+  const headers: Record<string, string> = { Accept: 'application/json' };
+
+  if (authToken) {
+    headers.Authorization = `Bearer ${authToken}`;
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), CONFIG.API_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(`${CONFIG.API_BASE_URL}${path}`, {
+      method: 'POST',
+      headers,
+      body: form,
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const payload = await response.json().catch(() => null);
+      throw new ApiError(response.status, extractMessage(payload, response.statusText));
+    }
+
+    if (response.status === 204) return undefined as T;
+    return (await response.json()) as T;
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new ApiError(0, 'La requête a expiré.');
+    }
+    throw new ApiError(0, `Impossible de joindre le serveur. ${error}`);
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export const sendRequest = request;
+export const sendMultipart = requestMultipart;
 
 export type SearchQuery = {
   filters?: { field: string; operator?: string; value: unknown }[];
@@ -129,6 +171,8 @@ export const goals = resource<Goal>('/goals');
 export const users = resource<User>('/users');
 export const allergies = resource<Allergy>('/allergies');
 export const handicaps = resource<Handicap>('/handicaps');
+export const posts = resource<Post>('/posts');
+export const comments = resource<Comment>('/comments');
 
 export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack';
 

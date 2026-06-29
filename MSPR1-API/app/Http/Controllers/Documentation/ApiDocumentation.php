@@ -62,6 +62,12 @@ DESC
 #[OA\Tag(name: "Goals", description: "Objectifs")]
 #[OA\Tag(name: "Metrics", description: "Mesures physiologiques d'un utilisateur")]
 #[OA\Tag(name: "Users", description: "Utilisateurs (recherche uniquement)")]
+#[OA\Tag(name: "Posts", description: "Réseau social : publications du fil (avec likes et médias)")]
+#[OA\Tag(name: "Comments", description: "Réseau social : commentaires de posts (avec likes)")]
+#[OA\Tag(name: "Allergies", description: "Catalogue d'allergies (rattachables aux utilisateurs)")]
+#[OA\Tag(name: "Handicaps", description: "Catalogue de handicaps (rattachables aux utilisateurs)")]
+#[OA\Tag(name: "Logs", description: "Journal des requêtes API (recherche, mutation, suppression)")]
+#[OA\Tag(name: "Profile", description: "Gestion du compte courant : profil, séances suivies, suivi santé")]
 class ApiDocumentation
 {
     // ======================================================================
@@ -597,4 +603,662 @@ class ApiDocumentation
         )
     )]
     public function usersSearch() {}
+
+    // ======================================================================
+    // POSTS (réseau social)
+    // ======================================================================
+
+    #[OA\Get(
+        path: "/api/posts",
+        tags: ["Posts"],
+        summary: "Détails de la ressource Posts",
+        description: "Renvoie la description Lomkit de la ressource (champs, relations, limites).",
+        security: [["sanctum" => []]]
+    )]
+    #[OA\Response(response: 200, description: "Description de la ressource")]
+    public function postsDetails() {}
+
+    #[OA\Post(
+        path: "/api/posts/search",
+        tags: ["Posts"],
+        summary: "Rechercher des posts",
+        description: "Champs filtrables/triables : id, content, user_id, created_at, updated_at. Champs calculés renvoyés : `likes`, `hasLiked`. Relations incluables : `user`, `comments`, `likers`, `medias`.",
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(content: new OA\JsonContent(ref: "#/components/schemas/SearchPayload"))
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "Posts paginés",
+        content: new OA\JsonContent(
+            allOf: [
+                new OA\Schema(ref: "#/components/schemas/Pagination"),
+                new OA\Schema(properties: [
+                    new OA\Property(property: "data", type: "array", items: new OA\Items(ref: "#/components/schemas/Post")),
+                ]),
+            ]
+        )
+    )]
+    public function postsSearch() {}
+
+    #[OA\Post(
+        path: "/api/posts/mutate",
+        tags: ["Posts"],
+        summary: "Créer / modifier des posts (+ likes, médias)",
+        description: <<<DESC
+Création/mise à jour d'un post. Les **likes** se gèrent via la relation `likers` (opérations `attach`/`detach`/`toggle`/`sync` avec la `key` de l'utilisateur).
+
+**Upload d'images** : ajouter une clé racine `medias` (au même niveau que `mutate`, PAS sous `attributes`). Chaque entrée a une `collection` (`post_media`) et un `file`. Comme un fichier est envoyé, la requête doit être en `multipart/form-data` : `mutate` est alors une chaîne JSON, et les fichiers sont passés en `medias[0][file]`, `medias[0][collection]`, etc.
+DESC,
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: [
+                new OA\JsonContent(
+                    required: ["mutate"],
+                    properties: [
+                        new OA\Property(
+                            property: "mutate",
+                            type: "array",
+                            items: new OA\Items(
+                                required: ["operation"],
+                                properties: [
+                                    new OA\Property(property: "operation", type: "string", enum: ["create", "update"], example: "create"),
+                                    new OA\Property(property: "key", type: "integer", example: 1, description: "ID ciblé. Requis pour `update`."),
+                                    new OA\Property(property: "attributes", ref: "#/components/schemas/PostInput"),
+                                    new OA\Property(
+                                        property: "relations",
+                                        type: "object",
+                                        description: "Relations. `likers` gère les likes.",
+                                        properties: [
+                                            new OA\Property(property: "likers", type: "array", items: new OA\Items(
+                                                description: "Like/unlike : fournir `operation` et `key` (id utilisateur).",
+                                                properties: [
+                                                    new OA\Property(property: "operation", type: "string", enum: ["attach", "detach", "toggle", "sync"], example: "toggle"),
+                                                    new OA\Property(property: "key", type: "integer", example: 1),
+                                                ]
+                                            )),
+                                            new OA\Property(property: "comments", type: "array", items: new OA\Items(type: "object")),
+                                        ]
+                                    ),
+                                ]
+                            ),
+                            example: [[
+                                "operation" => "create",
+                                "attributes" => ["content" => ["text" => "Première séance de la semaine !"], "user_id" => 1],
+                                "relations" => ["likers" => [["operation" => "attach", "key" => 1]]],
+                            ]]
+                        ),
+                    ]
+                ),
+                new OA\MediaType(
+                    mediaType: "multipart/form-data",
+                    schema: new OA\Schema(
+                        required: ["mutate"],
+                        properties: [
+                            new OA\Property(property: "mutate", type: "string", description: "Tableau `mutate` encodé en JSON.", example: '[{"operation":"create","attributes":{"content":{"text":"Hello"},"user_id":1}}]'),
+                            new OA\Property(
+                                property: "medias",
+                                type: "array",
+                                items: new OA\Items(ref: "#/components/schemas/MediaUpload"),
+                                description: "Images à attacher (collection `post_media`)."
+                            ),
+                        ]
+                    )
+                ),
+            ]
+        )
+    )]
+    #[OA\Response(response: 200, ref: "#/components/responses/MutateResponse")]
+    public function postsMutate() {}
+
+    #[OA\Delete(
+        path: "/api/posts",
+        tags: ["Posts"],
+        summary: "Supprimer des posts",
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(content: new OA\JsonContent(ref: "#/components/schemas/DeletePayload"))
+    )]
+    #[OA\Response(response: 200, description: "Posts supprimés")]
+    public function postsDelete() {}
+
+    #[OA\Post(
+        path: "/api/posts/{id}/like",
+        tags: ["Posts"],
+        summary: "Liker / unliker un post",
+        description: "Bascule le like de l'utilisateur connecté sur le post (relation `likers`). Contrairement à la mutation, tout utilisateur connecté peut liker n'importe quel post (pas seulement l'auteur).",
+        security: [["sanctum" => []]],
+        parameters: [new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "integer"))]
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "État du like à jour",
+        content: new OA\JsonContent(properties: [
+            new OA\Property(property: "data", type: "object", properties: [
+                new OA\Property(property: "id", type: "integer", example: 1),
+                new OA\Property(property: "likes", type: "integer", example: 4),
+                new OA\Property(property: "hasLiked", type: "boolean", example: true),
+            ]),
+        ])
+    )]
+    public function postsLike() {}
+
+    // ======================================================================
+    // COMMENTS (réseau social)
+    // ======================================================================
+
+    #[OA\Get(
+        path: "/api/comments",
+        tags: ["Comments"],
+        summary: "Détails de la ressource Comments",
+        security: [["sanctum" => []]]
+    )]
+    #[OA\Response(response: 200, description: "Description de la ressource")]
+    public function commentsDetails() {}
+
+    #[OA\Post(
+        path: "/api/comments/search",
+        tags: ["Comments"],
+        summary: "Rechercher des commentaires",
+        description: "Champs filtrables/triables : id, content, user_id, post_id, created_at, updated_at. Champs calculés : `likes`, `hasLiked`. Relations incluables : `user`, `post`, `likers`.",
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(content: new OA\JsonContent(ref: "#/components/schemas/SearchPayload"))
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "Commentaires paginés",
+        content: new OA\JsonContent(
+            allOf: [
+                new OA\Schema(ref: "#/components/schemas/Pagination"),
+                new OA\Schema(properties: [
+                    new OA\Property(property: "data", type: "array", items: new OA\Items(ref: "#/components/schemas/Comment")),
+                ]),
+            ]
+        )
+    )]
+    public function commentsSearch() {}
+
+    #[OA\Post(
+        path: "/api/comments/mutate",
+        tags: ["Comments"],
+        summary: "Créer / modifier des commentaires (+ likes)",
+        description: "Création/mise à jour d'un commentaire. Rattacher le commentaire à un post via `attributes.post_id`. Les **likes** se gèrent via la relation `likers` (`attach`/`detach`/`toggle`/`sync` avec la `key` de l'utilisateur).",
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["mutate"],
+                properties: [
+                    new OA\Property(
+                        property: "mutate",
+                        type: "array",
+                        items: new OA\Items(
+                            required: ["operation"],
+                            properties: [
+                                new OA\Property(property: "operation", type: "string", enum: ["create", "update"], example: "create"),
+                                new OA\Property(property: "key", type: "integer", example: 1, description: "ID ciblé. Requis pour `update`."),
+                                new OA\Property(property: "attributes", ref: "#/components/schemas/CommentInput"),
+                                new OA\Property(
+                                    property: "relations",
+                                    type: "object",
+                                    properties: [
+                                        new OA\Property(property: "likers", type: "array", items: new OA\Items(
+                                            properties: [
+                                                new OA\Property(property: "operation", type: "string", enum: ["attach", "detach", "toggle", "sync"], example: "toggle"),
+                                                new OA\Property(property: "key", type: "integer", example: 1),
+                                            ]
+                                        )),
+                                    ]
+                                ),
+                            ]
+                        ),
+                        example: [[
+                            "operation" => "create",
+                            "attributes" => ["content" => ["text" => "Bravo !"], "user_id" => 1, "post_id" => 1],
+                        ]]
+                    ),
+                ]
+            )
+        )
+    )]
+    #[OA\Response(response: 200, ref: "#/components/responses/MutateResponse")]
+    public function commentsMutate() {}
+
+    #[OA\Delete(
+        path: "/api/comments",
+        tags: ["Comments"],
+        summary: "Supprimer des commentaires",
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(content: new OA\JsonContent(ref: "#/components/schemas/DeletePayload"))
+    )]
+    #[OA\Response(response: 200, description: "Commentaires supprimés")]
+    public function commentsDelete() {}
+
+    #[OA\Post(
+        path: "/api/comments/{id}/like",
+        tags: ["Comments"],
+        summary: "Liker / unliker un commentaire",
+        description: "Bascule le like de l'utilisateur connecté sur le commentaire (relation `likers`). Accessible à tout utilisateur connecté.",
+        security: [["sanctum" => []]],
+        parameters: [new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "integer"))]
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "État du like à jour",
+        content: new OA\JsonContent(properties: [
+            new OA\Property(property: "data", type: "object", properties: [
+                new OA\Property(property: "id", type: "integer", example: 1),
+                new OA\Property(property: "likes", type: "integer", example: 2),
+                new OA\Property(property: "hasLiked", type: "boolean", example: true),
+            ]),
+        ])
+    )]
+    public function commentsLike() {}
+
+    // ======================================================================
+    // ALLERGIES
+    // ======================================================================
+
+    #[OA\Get(
+        path: "/api/allergies",
+        tags: ["Allergies"],
+        summary: "Détails de la ressource Allergies",
+        security: [["sanctum" => []]]
+    )]
+    #[OA\Response(response: 200, description: "Description de la ressource")]
+    public function allergiesDetails() {}
+
+    #[OA\Post(
+        path: "/api/allergies/search",
+        tags: ["Allergies"],
+        summary: "Rechercher des allergies",
+        description: "Champs filtrables/triables : id, name, label. Relation incluable : `users`.",
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(content: new OA\JsonContent(ref: "#/components/schemas/SearchPayload"))
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "Allergies paginées",
+        content: new OA\JsonContent(
+            allOf: [
+                new OA\Schema(ref: "#/components/schemas/Pagination"),
+                new OA\Schema(properties: [
+                    new OA\Property(property: "data", type: "array", items: new OA\Items(ref: "#/components/schemas/Allergy")),
+                ]),
+            ]
+        )
+    )]
+    public function allergiesSearch() {}
+
+    #[OA\Post(
+        path: "/api/allergies/mutate",
+        tags: ["Allergies"],
+        summary: "Créer / modifier des allergies",
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["mutate"],
+                properties: [
+                    new OA\Property(
+                        property: "mutate",
+                        type: "array",
+                        items: new OA\Items(
+                            required: ["operation"],
+                            properties: [
+                                new OA\Property(property: "operation", type: "string", enum: ["create", "update"], example: "create"),
+                                new OA\Property(property: "key", type: "integer", example: 1, description: "ID ciblé. Requis pour `update`."),
+                                new OA\Property(property: "attributes", ref: "#/components/schemas/AllergyInput"),
+                            ]
+                        )
+                    ),
+                ]
+            )
+        )
+    )]
+    #[OA\Response(response: 200, ref: "#/components/responses/MutateResponse")]
+    public function allergiesMutate() {}
+
+    #[OA\Delete(
+        path: "/api/allergies",
+        tags: ["Allergies"],
+        summary: "Supprimer des allergies",
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(content: new OA\JsonContent(ref: "#/components/schemas/DeletePayload"))
+    )]
+    #[OA\Response(response: 200, description: "Allergies supprimées")]
+    public function allergiesDelete() {}
+
+    // ======================================================================
+    // HANDICAPS
+    // ======================================================================
+
+    #[OA\Get(
+        path: "/api/handicaps",
+        tags: ["Handicaps"],
+        summary: "Détails de la ressource Handicaps",
+        security: [["sanctum" => []]]
+    )]
+    #[OA\Response(response: 200, description: "Description de la ressource")]
+    public function handicapsDetails() {}
+
+    #[OA\Post(
+        path: "/api/handicaps/search",
+        tags: ["Handicaps"],
+        summary: "Rechercher des handicaps",
+        description: "Champs filtrables/triables : id, name, label. Relation incluable : `users`.",
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(content: new OA\JsonContent(ref: "#/components/schemas/SearchPayload"))
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "Handicaps paginés",
+        content: new OA\JsonContent(
+            allOf: [
+                new OA\Schema(ref: "#/components/schemas/Pagination"),
+                new OA\Schema(properties: [
+                    new OA\Property(property: "data", type: "array", items: new OA\Items(ref: "#/components/schemas/Handicap")),
+                ]),
+            ]
+        )
+    )]
+    public function handicapsSearch() {}
+
+    #[OA\Post(
+        path: "/api/handicaps/mutate",
+        tags: ["Handicaps"],
+        summary: "Créer / modifier des handicaps",
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["mutate"],
+                properties: [
+                    new OA\Property(
+                        property: "mutate",
+                        type: "array",
+                        items: new OA\Items(
+                            required: ["operation"],
+                            properties: [
+                                new OA\Property(property: "operation", type: "string", enum: ["create", "update"], example: "create"),
+                                new OA\Property(property: "key", type: "integer", example: 1, description: "ID ciblé. Requis pour `update`."),
+                                new OA\Property(property: "attributes", ref: "#/components/schemas/HandicapInput"),
+                            ]
+                        )
+                    ),
+                ]
+            )
+        )
+    )]
+    #[OA\Response(response: 200, ref: "#/components/responses/MutateResponse")]
+    public function handicapsMutate() {}
+
+    #[OA\Delete(
+        path: "/api/handicaps",
+        tags: ["Handicaps"],
+        summary: "Supprimer des handicaps",
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(content: new OA\JsonContent(ref: "#/components/schemas/DeletePayload"))
+    )]
+    #[OA\Response(response: 200, description: "Handicaps supprimés")]
+    public function handicapsDelete() {}
+
+    // ======================================================================
+    // LOGS (search / mutate / destroy uniquement)
+    // ======================================================================
+
+    #[OA\Post(
+        path: "/api/logs/search",
+        tags: ["Logs"],
+        summary: "Rechercher des logs",
+        description: "Champs filtrables/triables : id, api_name, data, type, ip, created_at, updated_at. Aucune relation. (Pas de route `details`.)",
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(content: new OA\JsonContent(ref: "#/components/schemas/SearchPayload"))
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "Logs paginés",
+        content: new OA\JsonContent(
+            allOf: [
+                new OA\Schema(ref: "#/components/schemas/Pagination"),
+                new OA\Schema(properties: [
+                    new OA\Property(property: "data", type: "array", items: new OA\Items(ref: "#/components/schemas/Log")),
+                ]),
+            ]
+        )
+    )]
+    public function logsSearch() {}
+
+    #[OA\Post(
+        path: "/api/logs/mutate",
+        tags: ["Logs"],
+        summary: "Créer / modifier des logs",
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["mutate"],
+                properties: [
+                    new OA\Property(
+                        property: "mutate",
+                        type: "array",
+                        items: new OA\Items(
+                            required: ["operation"],
+                            properties: [
+                                new OA\Property(property: "operation", type: "string", enum: ["create", "update"], example: "create"),
+                                new OA\Property(property: "key", type: "string", example: "9b1f...", description: "UUID ciblé. Requis pour `update`."),
+                                new OA\Property(property: "attributes", ref: "#/components/schemas/LogInput"),
+                            ]
+                        )
+                    ),
+                ]
+            )
+        )
+    )]
+    #[OA\Response(response: 200, ref: "#/components/responses/MutateResponse")]
+    public function logsMutate() {}
+
+    #[OA\Delete(
+        path: "/api/logs",
+        tags: ["Logs"],
+        summary: "Supprimer des logs",
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(content: new OA\JsonContent(
+            required: ["resources"],
+            properties: [
+                new OA\Property(property: "resources", type: "array", items: new OA\Items(type: "string"), example: ["9b1f...", "9b20..."], description: "Liste des UUID à supprimer."),
+            ],
+            type: "object"
+        ))
+    )]
+    #[OA\Response(response: 200, description: "Logs supprimés")]
+    public function logsDelete() {}
+
+    // ======================================================================
+    // PROFILE (compte courant : me, séances, suivi santé)
+    // ======================================================================
+
+    #[OA\Patch(
+        path: "/api/me",
+        tags: ["Profile"],
+        summary: "Mettre à jour son profil",
+        description: "Met à jour le compte de l'utilisateur connecté. Les listes `allergies`/`handicaps` (ids) sont synchronisées sur les relations correspondantes.",
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(properties: [
+                new OA\Property(property: "email", type: "string", format: "email", example: "user@example.com"),
+                new OA\Property(property: "password", type: "string", format: "password", example: "newpassword"),
+                new OA\Property(property: "first_name", type: "string", nullable: true, example: "Jean"),
+                new OA\Property(property: "last_name", type: "string", nullable: true, example: "Dupont"),
+                new OA\Property(property: "age", type: "integer", nullable: true, example: 30),
+                new OA\Property(property: "gender", type: "string", enum: ["male", "female", "other"], nullable: true, example: "male"),
+                new OA\Property(property: "weight_kg", type: "number", format: "float", nullable: true, example: 80),
+                new OA\Property(property: "height_cm", type: "number", format: "float", nullable: true, example: 180),
+                new OA\Property(property: "bodyfat", type: "number", format: "float", nullable: true, example: 18.5),
+                new OA\Property(property: "rest_bpm", type: "integer", nullable: true, example: 58),
+                new OA\Property(property: "sport_per_week", type: "number", format: "float", nullable: true, example: 3),
+                new OA\Property(property: "goal_id", type: "integer", nullable: true, example: 1),
+                new OA\Property(property: "target_weight", type: "number", format: "float", nullable: true, example: 75),
+                new OA\Property(property: "weeks_to_goal", type: "integer", nullable: true, example: 12, description: "Entre 1 et 104."),
+                new OA\Property(property: "allergies", type: "array", items: new OA\Items(type: "integer"), example: [1, 2], description: "Ids d'allergies à synchroniser."),
+                new OA\Property(property: "handicaps", type: "array", items: new OA\Items(type: "integer"), example: [3], description: "Ids de handicaps à synchroniser."),
+            ])
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "Profil mis à jour",
+        content: new OA\JsonContent(properties: [
+            new OA\Property(property: "message", type: "string", example: "ok"),
+            new OA\Property(property: "user", ref: "#/components/schemas/User"),
+        ])
+    )]
+    #[OA\Response(response: 401, description: "Non authentifié")]
+    #[OA\Response(response: 422, description: "Erreur de validation")]
+    public function meUpdate() {}
+
+    #[OA\Delete(
+        path: "/api/me",
+        tags: ["Profile"],
+        summary: "Supprimer son compte",
+        description: "Révoque les tokens puis supprime définitivement le compte de l'utilisateur connecté.",
+        security: [["sanctum" => []]]
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "Compte supprimé",
+        content: new OA\JsonContent(properties: [
+            new OA\Property(property: "message", type: "string", example: "ok"),
+        ])
+    )]
+    #[OA\Response(response: 401, description: "Non authentifié")]
+    public function meDestroy() {}
+
+    #[OA\Get(
+        path: "/api/me/sessions",
+        tags: ["Profile"],
+        summary: "Séances suivies par l'utilisateur",
+        description: "Liste les séances rattachées à l'utilisateur (effectuées / planifiées), triées par `performed_at` décroissant. Chaque séance porte sa table pivot (`user_sessions.id`, `performed_at`).",
+        security: [["sanctum" => []]]
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "Séances de l'utilisateur",
+        content: new OA\JsonContent(properties: [
+            new OA\Property(property: "data", type: "array", items: new OA\Items(type: "object")),
+        ])
+    )]
+    public function meSessionsIndex() {}
+
+    #[OA\Get(
+        path: "/api/me/sessions/stats",
+        tags: ["Profile"],
+        summary: "Statistiques de sport",
+        description: "Calcule, à partir des séances passées effectuées : `week` (heures de sport par jour pour la semaine courante, lundi → dimanche) et `weekly_average_hours` (moyenne d'heures par semaine active).",
+        security: [["sanctum" => []]]
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "Statistiques",
+        content: new OA\JsonContent(properties: [
+            new OA\Property(property: "data", type: "object", properties: [
+                new OA\Property(property: "week", type: "array", items: new OA\Items(properties: [
+                    new OA\Property(property: "date", type: "string", format: "date", example: "2024-01-15"),
+                    new OA\Property(property: "hours", type: "number", format: "float", example: 1.5),
+                ])),
+                new OA\Property(property: "weekly_average_hours", type: "number", format: "float", example: 3.25),
+            ]),
+        ])
+    )]
+    public function meSessionsStats() {}
+
+    #[OA\Post(
+        path: "/api/me/sessions",
+        tags: ["Profile"],
+        summary: "Enregistrer une séance",
+        description: "Rattache une séance à l'utilisateur. `performed_at` passé = faite, futur = planifiée, absent = maintenant.",
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ["workout_session_id"],
+                properties: [
+                    new OA\Property(property: "workout_session_id", type: "integer", example: 1),
+                    new OA\Property(property: "performed_at", type: "string", format: "date-time", nullable: true, example: "2024-01-15 08:00:00"),
+                ]
+            )
+        )
+    )]
+    #[OA\Response(response: 201, description: "Séance enregistrée", content: new OA\JsonContent(properties: [
+        new OA\Property(property: "message", type: "string", example: "ok"),
+    ]))]
+    public function meSessionsStore() {}
+
+    #[OA\Patch(
+        path: "/api/me/sessions/{id}",
+        tags: ["Profile"],
+        summary: "Modifier une séance suivie",
+        description: "Modifie une ligne `user_sessions` (par son id), scoping garanti à l'utilisateur courant.",
+        security: [["sanctum" => []]],
+        parameters: [new OA\Parameter(name: "id", in: "path", required: true, description: "Id de la ligne user_sessions.", schema: new OA\Schema(type: "integer"))],
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(properties: [
+                new OA\Property(property: "workout_session_id", type: "integer", example: 2),
+                new OA\Property(property: "performed_at", type: "string", format: "date-time", example: "2024-01-16 08:00:00"),
+            ])
+        )
+    )]
+    #[OA\Response(response: 200, description: "Séance modifiée", content: new OA\JsonContent(properties: [
+        new OA\Property(property: "message", type: "string", example: "ok"),
+    ]))]
+    public function meSessionsUpdate() {}
+
+    #[OA\Delete(
+        path: "/api/me/sessions/{id}",
+        tags: ["Profile"],
+        summary: "Supprimer une séance suivie",
+        description: "Supprime une ligne `user_sessions` (par son id), scoping garanti à l'utilisateur courant.",
+        security: [["sanctum" => []]],
+        parameters: [new OA\Parameter(name: "id", in: "path", required: true, description: "Id de la ligne user_sessions.", schema: new OA\Schema(type: "integer"))]
+    )]
+    #[OA\Response(response: 200, description: "Séance supprimée", content: new OA\JsonContent(properties: [
+        new OA\Property(property: "message", type: "string", example: "ok"),
+    ]))]
+    public function meSessionsDestroy() {}
+
+    #[OA\Get(
+        path: "/api/me/metrics/current",
+        tags: ["Profile"],
+        summary: "Dernière métrique santé",
+        description: "Renvoie la métrique la plus récente (par `recorded_at`) de l'utilisateur, ou `null` si aucune.",
+        security: [["sanctum" => []]]
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "Métrique courante",
+        content: new OA\JsonContent(properties: [
+            new OA\Property(property: "data", ref: "#/components/schemas/Metric", nullable: true),
+        ])
+    )]
+    public function meMetricsCurrent() {}
+
+    #[OA\Put(
+        path: "/api/me/metrics",
+        tags: ["Profile"],
+        summary: "Enregistrer les mesures du jour",
+        description: "Upsert d'une métrique par jour : si une métrique existe pour la date du jour (même user), elle est mise à jour ; sinon créée. Renvoie 201 à la création, 200 à la mise à jour.",
+        security: [["sanctum" => []]],
+        requestBody: new OA\RequestBody(
+            content: new OA\JsonContent(properties: [
+                new OA\Property(property: "weight_kg", type: "number", format: "float", nullable: true, example: 80.5, description: "Entre 20 et 400."),
+                new OA\Property(property: "heart_rate_resting", type: "integer", nullable: true, example: 58, description: "Entre 20 et 220."),
+            ])
+        )
+    )]
+    #[OA\Response(response: 200, description: "Métrique mise à jour", content: new OA\JsonContent(properties: [
+        new OA\Property(property: "data", ref: "#/components/schemas/Metric"),
+    ]))]
+    #[OA\Response(response: 201, description: "Métrique créée", content: new OA\JsonContent(properties: [
+        new OA\Property(property: "data", ref: "#/components/schemas/Metric"),
+    ]))]
+    public function meMetricsUpsert() {}
 }

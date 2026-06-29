@@ -304,6 +304,162 @@ use OpenApi\Attributes as OA;
     ],
     type: "object"
 )]
+/* ========================================================================
+ * Réseau social : posts, commentaires, likes, médias
+ * ===================================================================== */
+
+#[OA\Schema(
+    schema: "Media",
+    title: "Média",
+    description: "Fichier attaché à une ressource (Spatie Media Library, relation polymorphe `model`). Renvoyé en lecture via la relation `medias`.",
+    properties: [
+        new OA\Property(property: "id", type: "integer", example: 12),
+        new OA\Property(property: "collection_name", type: "string", example: "post_media", description: "Collection d'appartenance (ex: `post_media`)."),
+        new OA\Property(property: "name", type: "string", example: "photo"),
+        new OA\Property(property: "file_name", type: "string", example: "photo.jpg"),
+        new OA\Property(property: "mime_type", type: "string", example: "image/jpeg"),
+        new OA\Property(property: "original_url", type: "string", example: "https://.../storage/12/photo.jpg"),
+        new OA\Property(property: "preview_url", type: "string", example: ""),
+        new OA\Property(property: "order_column", type: "integer", example: 1),
+    ],
+    type: "object"
+)]
+#[OA\Schema(
+    schema: "MediaUpload",
+    title: "Média à téléverser (mutation)",
+    description: "Objet d'upload passé dans la clé racine `medias` du corps de mutation (au même niveau que `mutate`, PAS sous `attributes`). Le fichier est ajouté à la collection indiquée du modèle muté.",
+    required: ["collection", "file"],
+    properties: [
+        new OA\Property(property: "collection", type: "string", example: "post_media", description: "Collection enregistrée sur le modèle (Post : `post_media`)."),
+        new OA\Property(property: "file", type: "string", format: "binary", description: "Le fichier image à téléverser (multipart/form-data)."),
+    ],
+    type: "object"
+)]
+#[OA\Schema(
+    schema: "Post",
+    title: "Post",
+    description: "Publication du fil social. `likes` et `hasLiked` sont calculés (likes = nombre de likers ; hasLiked = l'utilisateur courant a liké).",
+    properties: [
+        new OA\Property(property: "id", type: "integer", example: 1),
+        new OA\Property(property: "content", type: "object", description: "Contenu JSON libre du post.", example: ["text" => "Première séance de la semaine !"]),
+        new OA\Property(property: "user_id", type: "integer", example: 1),
+        new OA\Property(property: "likes", type: "integer", example: 3, description: "Nombre de likes (calculé)."),
+        new OA\Property(property: "hasLiked", type: "boolean", example: false, description: "True si l'utilisateur courant a liké (calculé)."),
+        new OA\Property(property: "created_at", type: "string", format: "date-time"),
+        new OA\Property(property: "updated_at", type: "string", format: "date-time"),
+    ],
+    type: "object"
+)]
+#[OA\Schema(
+    schema: "PostInput",
+    title: "Attributs d'un post (mutation)",
+    properties: [
+        new OA\Property(property: "content", type: "object", description: "Contenu JSON libre.", example: ["text" => "Première séance de la semaine !"]),
+        new OA\Property(property: "user_id", type: "integer", example: 1),
+    ],
+    type: "object"
+)]
+#[OA\Schema(
+    schema: "Comment",
+    title: "Commentaire",
+    description: "Commentaire d'un post. `likes` et `hasLiked` sont calculés.",
+    properties: [
+        new OA\Property(property: "id", type: "integer", example: 1),
+        new OA\Property(property: "content", type: "object", description: "Contenu JSON libre du commentaire.", example: ["text" => "Bravo !"]),
+        new OA\Property(property: "user_id", type: "integer", example: 1),
+        new OA\Property(property: "post_id", type: "integer", example: 1),
+        new OA\Property(property: "likes", type: "integer", example: 0, description: "Nombre de likes (calculé)."),
+        new OA\Property(property: "hasLiked", type: "boolean", example: false, description: "True si l'utilisateur courant a liké (calculé)."),
+        new OA\Property(property: "created_at", type: "string", format: "date-time"),
+        new OA\Property(property: "updated_at", type: "string", format: "date-time"),
+    ],
+    type: "object"
+)]
+#[OA\Schema(
+    schema: "CommentInput",
+    title: "Attributs d'un commentaire (mutation)",
+    properties: [
+        new OA\Property(property: "content", type: "object", description: "Contenu JSON libre.", example: ["text" => "Bravo !"]),
+        new OA\Property(property: "user_id", type: "integer", example: 1),
+        new OA\Property(property: "post_id", type: "integer", example: 1),
+    ],
+    type: "object"
+)]
+
+/* ========================================================================
+ * Profil : allergies, handicaps
+ * ===================================================================== */
+
+#[OA\Schema(
+    schema: "Allergy",
+    title: "Allergie",
+    properties: [
+        new OA\Property(property: "id", type: "integer", example: 1),
+        new OA\Property(property: "name", type: "string", example: "gluten"),
+        new OA\Property(property: "label", type: "string", example: "Gluten"),
+    ],
+    type: "object"
+)]
+#[OA\Schema(
+    schema: "AllergyInput",
+    title: "Attributs d'une allergie (mutation)",
+    properties: [
+        new OA\Property(property: "name", type: "string", example: "gluten"),
+        new OA\Property(property: "label", type: "string", example: "Gluten"),
+    ],
+    type: "object"
+)]
+#[OA\Schema(
+    schema: "Handicap",
+    title: "Handicap",
+    properties: [
+        new OA\Property(property: "id", type: "integer", example: 1),
+        new OA\Property(property: "name", type: "string", example: "wheelchair"),
+        new OA\Property(property: "label", type: "string", example: "Fauteuil roulant"),
+    ],
+    type: "object"
+)]
+#[OA\Schema(
+    schema: "HandicapInput",
+    title: "Attributs d'un handicap (mutation)",
+    properties: [
+        new OA\Property(property: "name", type: "string", example: "wheelchair"),
+        new OA\Property(property: "label", type: "string", example: "Fauteuil roulant"),
+    ],
+    type: "object"
+)]
+
+/* ========================================================================
+ * Journalisation : logs
+ * ===================================================================== */
+
+#[OA\Schema(
+    schema: "Log",
+    title: "Log",
+    description: "Entrée de journal des requêtes API. L'`id` est un UUID.",
+    properties: [
+        new OA\Property(property: "id", type: "string", format: "uuid", example: "9b1f...-..."),
+        new OA\Property(property: "api_name", type: "string", example: "MSPR1"),
+        new OA\Property(property: "data", type: "object", description: "Charge utile journalisée."),
+        new OA\Property(property: "type", type: "string", example: "request"),
+        new OA\Property(property: "ip", type: "string", example: "127.0.0.1"),
+        new OA\Property(property: "created_at", type: "string", format: "date-time"),
+        new OA\Property(property: "updated_at", type: "string", format: "date-time"),
+    ],
+    type: "object"
+)]
+#[OA\Schema(
+    schema: "LogInput",
+    title: "Attributs d'un log (mutation)",
+    properties: [
+        new OA\Property(property: "api_name", type: "string", example: "MSPR1"),
+        new OA\Property(property: "data", type: "object"),
+        new OA\Property(property: "type", type: "string", example: "request"),
+        new OA\Property(property: "ip", type: "string", example: "127.0.0.1"),
+    ],
+    type: "object"
+)]
+
 class Schemas
 {
 }

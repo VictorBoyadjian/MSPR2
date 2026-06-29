@@ -26,6 +26,7 @@ export default function AppTabs() {
         tabBarStyle: { backgroundColor: colors.background },
       }}>
       <Tabs.Screen name="index" options={{ title: 'Accueil', tabBarIcon: tabIcon('home') }} />
+      <Tabs.Screen name="community" options={{ title: 'Communauté', tabBarIcon: tabIcon('community') }} />
       <Tabs.Screen name="meals" options={{ title: 'Repas', tabBarIcon: tabIcon('meals') }} />
       <Tabs.Screen name="workouts" options={{ title: 'Sport', tabBarIcon: tabIcon('workouts') }} />
       <Tabs.Screen name="health" options={{ title: 'Santé', tabBarIcon: tabIcon('health') }} />

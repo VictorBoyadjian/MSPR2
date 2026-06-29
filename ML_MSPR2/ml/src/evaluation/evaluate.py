@@ -28,11 +28,9 @@ MODELS_DIR = ROOT / "ml" / "models"
 ARTIFACTS  = ROOT / "ml" / "artifacts"
 
 sys.path.insert(0, str(ROOT / "ml"))
-sys.path.insert(0, str(ROOT))
 from src.preprocessing.cleaner  import clean
 from src.preprocessing.engineer import engineer
 from src.preprocessing.pipeline import build_label_encoder, get_X_y
-from app.logs_service import LogService
 
 
 def load_data():
@@ -70,8 +68,7 @@ def main():
 
     try:
         auc = roc_auc_score(y_test, y_proba, multi_class="ovr", average="macro")
-    except Exception as e:
-        LogService.send_log(e)
+    except Exception:
         auc = None
 
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
@@ -158,7 +155,4 @@ def main():
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        LogService.send_log(e)
+    main()

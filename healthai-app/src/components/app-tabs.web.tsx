@@ -24,6 +24,7 @@ type TabDef = { name: string; href: Href; label: string; icon: IconName };
 
 const TABS: TabDef[] = [
   { name: 'index', href: '/', label: 'Accueil', icon: 'home' },
+  { name: 'community', href: '/community', label: 'Communauté', icon: 'community' },
   { name: 'meals', href: '/meals', label: 'Repas', icon: 'meals' },
   { name: 'workouts', href: '/workouts', label: 'Sport', icon: 'workouts' },
   { name: 'health', href: '/health', label: 'Santé', icon: 'health' },

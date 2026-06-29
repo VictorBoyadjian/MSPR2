@@ -13,9 +13,6 @@
         {
             "url": "https://mspr2-api-production.up.railway.app",
             "description": "Production (Railway)"
-        },
-        {
-            "url": "/api"
         }
     ],
     "paths": {
@@ -225,6 +222,193 @@
                     },
                     "401": {
                         "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Supprimer son compte",
+                "description": "Révoque les tokens puis supprime définitivement le compte de l'utilisateur connecté.",
+                "operationId": "9a5d4463bcd282ef7064e9d9476fa3d9",
+                "responses": {
+                    "200": {
+                        "description": "Compte supprimé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "ok"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Mettre à jour son profil",
+                "description": "Met à jour le compte de l'utilisateur connecté. Les listes `allergies`/`handicaps` (ids) sont synchronisées sur les relations correspondantes.",
+                "operationId": "7ae4d39b27e67ea88f859de56b8f79b5",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "newpassword"
+                                    },
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "Jean",
+                                        "nullable": true
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Dupont",
+                                        "nullable": true
+                                    },
+                                    "age": {
+                                        "type": "integer",
+                                        "example": 30,
+                                        "nullable": true
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "example": "male",
+                                        "nullable": true,
+                                        "enum": [
+                                            "male",
+                                            "female",
+                                            "other"
+                                        ]
+                                    },
+                                    "weight_kg": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 80,
+                                        "nullable": true
+                                    },
+                                    "height_cm": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 180,
+                                        "nullable": true
+                                    },
+                                    "bodyfat": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 18.5,
+                                        "nullable": true
+                                    },
+                                    "rest_bpm": {
+                                        "type": "integer",
+                                        "example": 58,
+                                        "nullable": true
+                                    },
+                                    "sport_per_week": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 3,
+                                        "nullable": true
+                                    },
+                                    "goal_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "target_weight": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 75,
+                                        "nullable": true
+                                    },
+                                    "weeks_to_goal": {
+                                        "description": "Entre 1 et 104.",
+                                        "type": "integer",
+                                        "example": 12,
+                                        "nullable": true
+                                    },
+                                    "allergies": {
+                                        "description": "Ids d'allergies à synchroniser.",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1,
+                                            2
+                                        ]
+                                    },
+                                    "handicaps": {
+                                        "description": "Ids de handicaps à synchroniser.",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            3
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profil mis à jour",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "ok"
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
                     }
                 },
                 "security": [
@@ -1195,6 +1379,1382 @@
                     }
                 ]
             }
+        },
+        "/api/posts": {
+            "get": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Détails de la ressource Posts",
+                "description": "Renvoie la description Lomkit de la ressource (champs, relations, limites).",
+                "operationId": "17e51f90e47a91904dcc3470a035bc37",
+                "responses": {
+                    "200": {
+                        "description": "Description de la ressource"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Supprimer des posts",
+                "operationId": "92de7a347c05a752b75c1ea2d29ec1d0",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeletePayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Posts supprimés"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/posts/search": {
+            "post": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Rechercher des posts",
+                "description": "Champs filtrables/triables : id, content, user_id, created_at, updated_at. Champs calculés renvoyés : `likes`, `hasLiked`. Relations incluables : `user`, `comments`, `likers`, `medias`.",
+                "operationId": "cd0e5ff1f534a3c4052136414b8f17ba",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SearchPayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Posts paginés",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Pagination"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Post"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/posts/mutate": {
+            "post": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Créer / modifier des posts (+ likes, médias)",
+                "description": "Création/mise à jour d'un post. Les **likes** se gèrent via la relation `likers` (opérations `attach`/`detach`/`toggle`/`sync` avec la `key` de l'utilisateur).\n\n**Upload d'images** : ajouter une clé racine `medias` (au même niveau que `mutate`, PAS sous `attributes`). Chaque entrée a une `collection` (`post_media`) et un `file`. Comme un fichier est envoyé, la requête doit être en `multipart/form-data` : `mutate` est alors une chaîne JSON, et les fichiers sont passés en `medias[0][file]`, `medias[0][collection]`, etc.",
+                "operationId": "a942ceb284831cfbd0148ada672d5424",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "mutate"
+                                ],
+                                "properties": {
+                                    "mutate": {
+                                        "description": "Tableau `mutate` encodé en JSON.",
+                                        "type": "string",
+                                        "example": "[{\"operation\":\"create\",\"attributes\":{\"content\":{\"text\":\"Hello\"},\"user_id\":1}}]"
+                                    },
+                                    "medias": {
+                                        "description": "Images à attacher (collection `post_media`).",
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/MediaUpload"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "mutate"
+                                ],
+                                "properties": {
+                                    "mutate": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "operation"
+                                            ],
+                                            "properties": {
+                                                "operation": {
+                                                    "type": "string",
+                                                    "example": "create",
+                                                    "enum": [
+                                                        "create",
+                                                        "update"
+                                                    ]
+                                                },
+                                                "key": {
+                                                    "description": "ID ciblé. Requis pour `update`.",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "attributes": {
+                                                    "$ref": "#/components/schemas/PostInput"
+                                                },
+                                                "relations": {
+                                                    "description": "Relations. `likers` gère les likes.",
+                                                    "properties": {
+                                                        "likers": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "description": "Like/unlike : fournir `operation` et `key` (id utilisateur).",
+                                                                "properties": {
+                                                                    "operation": {
+                                                                        "type": "string",
+                                                                        "example": "toggle",
+                                                                        "enum": [
+                                                                            "attach",
+                                                                            "detach",
+                                                                            "toggle",
+                                                                            "sync"
+                                                                        ]
+                                                                    },
+                                                                    "key": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "comments": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "example": [
+                                            {
+                                                "operation": "create",
+                                                "attributes": {
+                                                    "content": {
+                                                        "text": "Première séance de la semaine !"
+                                                    },
+                                                    "user_id": 1
+                                                },
+                                                "relations": {
+                                                    "likers": [
+                                                        {
+                                                            "operation": "attach",
+                                                            "key": 1
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/MutateResponse"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/posts/{id}/like": {
+            "post": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Liker / unliker un post",
+                "description": "Bascule le like de l'utilisateur connecté sur le post (relation `likers`). Contrairement à la mutation, tout utilisateur connecté peut liker n'importe quel post (pas seulement l'auteur).",
+                "operationId": "c81872ccb1676c0d6a959253bae596b0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "État du like à jour",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "likes": {
+                                                    "type": "integer",
+                                                    "example": 4
+                                                },
+                                                "hasLiked": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/comments": {
+            "get": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Détails de la ressource Comments",
+                "operationId": "08068ad6bd7246f2e1f0b7a602d60f0d",
+                "responses": {
+                    "200": {
+                        "description": "Description de la ressource"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Supprimer des commentaires",
+                "operationId": "347ce011eeb7a34b979340fe3292514c",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeletePayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Commentaires supprimés"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/comments/search": {
+            "post": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Rechercher des commentaires",
+                "description": "Champs filtrables/triables : id, content, user_id, post_id, created_at, updated_at. Champs calculés : `likes`, `hasLiked`. Relations incluables : `user`, `post`, `likers`.",
+                "operationId": "967182337b0ecf0981ed5a556c646316",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SearchPayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Commentaires paginés",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Pagination"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Comment"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/comments/mutate": {
+            "post": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Créer / modifier des commentaires (+ likes)",
+                "description": "Création/mise à jour d'un commentaire. Rattacher le commentaire à un post via `attributes.post_id`. Les **likes** se gèrent via la relation `likers` (`attach`/`detach`/`toggle`/`sync` avec la `key` de l'utilisateur).",
+                "operationId": "c7b6eeed93b667318d9803b688ba52c8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "mutate"
+                                ],
+                                "properties": {
+                                    "mutate": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "operation"
+                                            ],
+                                            "properties": {
+                                                "operation": {
+                                                    "type": "string",
+                                                    "example": "create",
+                                                    "enum": [
+                                                        "create",
+                                                        "update"
+                                                    ]
+                                                },
+                                                "key": {
+                                                    "description": "ID ciblé. Requis pour `update`.",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "attributes": {
+                                                    "$ref": "#/components/schemas/CommentInput"
+                                                },
+                                                "relations": {
+                                                    "properties": {
+                                                        "likers": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "properties": {
+                                                                    "operation": {
+                                                                        "type": "string",
+                                                                        "example": "toggle",
+                                                                        "enum": [
+                                                                            "attach",
+                                                                            "detach",
+                                                                            "toggle",
+                                                                            "sync"
+                                                                        ]
+                                                                    },
+                                                                    "key": {
+                                                                        "type": "integer",
+                                                                        "example": 1
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "example": [
+                                            {
+                                                "operation": "create",
+                                                "attributes": {
+                                                    "content": {
+                                                        "text": "Bravo !"
+                                                    },
+                                                    "user_id": 1,
+                                                    "post_id": 1
+                                                }
+                                            }
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/MutateResponse"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/comments/{id}/like": {
+            "post": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Liker / unliker un commentaire",
+                "description": "Bascule le like de l'utilisateur connecté sur le commentaire (relation `likers`). Accessible à tout utilisateur connecté.",
+                "operationId": "d338fc4c85760c8ecc609ef955f8e877",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "État du like à jour",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "likes": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "hasLiked": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/allergies": {
+            "get": {
+                "tags": [
+                    "Allergies"
+                ],
+                "summary": "Détails de la ressource Allergies",
+                "operationId": "5120d9c75da0471e0323277d9a3942d8",
+                "responses": {
+                    "200": {
+                        "description": "Description de la ressource"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Allergies"
+                ],
+                "summary": "Supprimer des allergies",
+                "operationId": "13c37004d652828a8fdd8e92a0330563",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeletePayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Allergies supprimées"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/allergies/search": {
+            "post": {
+                "tags": [
+                    "Allergies"
+                ],
+                "summary": "Rechercher des allergies",
+                "description": "Champs filtrables/triables : id, name, label. Relation incluable : `users`.",
+                "operationId": "bdf2bbfb35baf96ad00c7afb97b69231",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SearchPayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Allergies paginées",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Pagination"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Allergy"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/allergies/mutate": {
+            "post": {
+                "tags": [
+                    "Allergies"
+                ],
+                "summary": "Créer / modifier des allergies",
+                "operationId": "1b497970da45f9452f7b4632956a8538",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "mutate"
+                                ],
+                                "properties": {
+                                    "mutate": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "operation"
+                                            ],
+                                            "properties": {
+                                                "operation": {
+                                                    "type": "string",
+                                                    "example": "create",
+                                                    "enum": [
+                                                        "create",
+                                                        "update"
+                                                    ]
+                                                },
+                                                "key": {
+                                                    "description": "ID ciblé. Requis pour `update`.",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "attributes": {
+                                                    "$ref": "#/components/schemas/AllergyInput"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/MutateResponse"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/handicaps": {
+            "get": {
+                "tags": [
+                    "Handicaps"
+                ],
+                "summary": "Détails de la ressource Handicaps",
+                "operationId": "aa7b2b3283cf7af3c0bcfe072531375d",
+                "responses": {
+                    "200": {
+                        "description": "Description de la ressource"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Handicaps"
+                ],
+                "summary": "Supprimer des handicaps",
+                "operationId": "a547d5fc444808eda8f7339e7c4687f5",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeletePayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Handicaps supprimés"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/handicaps/search": {
+            "post": {
+                "tags": [
+                    "Handicaps"
+                ],
+                "summary": "Rechercher des handicaps",
+                "description": "Champs filtrables/triables : id, name, label. Relation incluable : `users`.",
+                "operationId": "868386065a97f68fe5cbdccf060ce3d4",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SearchPayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Handicaps paginés",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Pagination"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Handicap"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/handicaps/mutate": {
+            "post": {
+                "tags": [
+                    "Handicaps"
+                ],
+                "summary": "Créer / modifier des handicaps",
+                "operationId": "8bd187b98343efd967ce6eca87141f7e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "mutate"
+                                ],
+                                "properties": {
+                                    "mutate": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "operation"
+                                            ],
+                                            "properties": {
+                                                "operation": {
+                                                    "type": "string",
+                                                    "example": "create",
+                                                    "enum": [
+                                                        "create",
+                                                        "update"
+                                                    ]
+                                                },
+                                                "key": {
+                                                    "description": "ID ciblé. Requis pour `update`.",
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "attributes": {
+                                                    "$ref": "#/components/schemas/HandicapInput"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/MutateResponse"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/logs/search": {
+            "post": {
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Rechercher des logs",
+                "description": "Champs filtrables/triables : id, api_name, data, type, ip, created_at, updated_at. Aucune relation. (Pas de route `details`.)",
+                "operationId": "8079b26c2d3e083c98e93f295ffc814e",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SearchPayload"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Logs paginés",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Pagination"
+                                        },
+                                        {
+                                            "properties": {
+                                                "data": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Log"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/logs/mutate": {
+            "post": {
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Créer / modifier des logs",
+                "operationId": "fa8bf2e28d768b057b384bad92d4d257",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "mutate"
+                                ],
+                                "properties": {
+                                    "mutate": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "operation"
+                                            ],
+                                            "properties": {
+                                                "operation": {
+                                                    "type": "string",
+                                                    "example": "create",
+                                                    "enum": [
+                                                        "create",
+                                                        "update"
+                                                    ]
+                                                },
+                                                "key": {
+                                                    "description": "UUID ciblé. Requis pour `update`.",
+                                                    "type": "string",
+                                                    "example": "9b1f..."
+                                                },
+                                                "attributes": {
+                                                    "$ref": "#/components/schemas/LogInput"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/MutateResponse"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/logs": {
+            "delete": {
+                "tags": [
+                    "Logs"
+                ],
+                "summary": "Supprimer des logs",
+                "operationId": "473aef1c4b17d2e8f1cb7d36f21becd8",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "resources"
+                                ],
+                                "properties": {
+                                    "resources": {
+                                        "description": "Liste des UUID à supprimer.",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "9b1f...",
+                                            "9b20..."
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Logs supprimés"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/me/sessions": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Séances suivies par l'utilisateur",
+                "description": "Liste les séances rattachées à l'utilisateur (effectuées / planifiées), triées par `performed_at` décroissant. Chaque séance porte sa table pivot (`user_sessions.id`, `performed_at`).",
+                "operationId": "bf5963b2e310c94ceebe1a25f64e63e6",
+                "responses": {
+                    "200": {
+                        "description": "Séances de l'utilisateur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Enregistrer une séance",
+                "description": "Rattache une séance à l'utilisateur. `performed_at` passé = faite, futur = planifiée, absent = maintenant.",
+                "operationId": "6d606ee80e5e0e812d66c67e2ef3861c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "workout_session_id"
+                                ],
+                                "properties": {
+                                    "workout_session_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "performed_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2024-01-15 08:00:00",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Séance enregistrée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "ok"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/me/sessions/stats": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Statistiques de sport",
+                "description": "Calcule, à partir des séances passées effectuées : `week` (heures de sport par jour pour la semaine courante, lundi → dimanche) et `weekly_average_hours` (moyenne d'heures par semaine active).",
+                "operationId": "6889afc8c669ee3c11629bcc3b6e4100",
+                "responses": {
+                    "200": {
+                        "description": "Statistiques",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "week": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "date": {
+                                                                "type": "string",
+                                                                "format": "date",
+                                                                "example": "2024-01-15"
+                                                            },
+                                                            "hours": {
+                                                                "type": "number",
+                                                                "format": "float",
+                                                                "example": 1.5
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "weekly_average_hours": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 3.25
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/me/sessions/{id}": {
+            "delete": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Supprimer une séance suivie",
+                "description": "Supprime une ligne `user_sessions` (par son id), scoping garanti à l'utilisateur courant.",
+                "operationId": "bb21ccd3e8120b675ab113e3437ca3e1",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id de la ligne user_sessions.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Séance supprimée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "ok"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Modifier une séance suivie",
+                "description": "Modifie une ligne `user_sessions` (par son id), scoping garanti à l'utilisateur courant.",
+                "operationId": "aa1befd88df7e698367e8efde33d7255",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Id de la ligne user_sessions.",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "workout_session_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "performed_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2024-01-16 08:00:00"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Séance modifiée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "ok"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/me/metrics/current": {
+            "get": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Dernière métrique santé",
+                "description": "Renvoie la métrique la plus récente (par `recorded_at`) de l'utilisateur, ou `null` si aucune.",
+                "operationId": "7ede344d05142268491e487f04ddab92",
+                "responses": {
+                    "200": {
+                        "description": "Métrique courante",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "oneOf": [
+                                                {
+                                                    "$ref": "#/components/schemas/Metric"
+                                                }
+                                            ],
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/me/metrics": {
+            "put": {
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Enregistrer les mesures du jour",
+                "description": "Upsert d'une métrique par jour : si une métrique existe pour la date du jour (même user), elle est mise à jour ; sinon créée. Renvoie 201 à la création, 200 à la mise à jour.",
+                "operationId": "891fc110218ee54505a33fd806cfc202",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "weight_kg": {
+                                        "description": "Entre 20 et 400.",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 80.5,
+                                        "nullable": true
+                                    },
+                                    "heart_rate_resting": {
+                                        "description": "Entre 20 et 220.",
+                                        "type": "integer",
+                                        "example": 58,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Métrique mise à jour",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Metric"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Métrique créée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Metric"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
         }
     },
     "components": {
@@ -1926,6 +3486,310 @@
                     }
                 },
                 "type": "object"
+            },
+            "Media": {
+                "title": "Média",
+                "description": "Fichier attaché à une ressource (Spatie Media Library, relation polymorphe `model`). Renvoyé en lecture via la relation `medias`.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "collection_name": {
+                        "description": "Collection d'appartenance (ex: `post_media`).",
+                        "type": "string",
+                        "example": "post_media"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "photo"
+                    },
+                    "file_name": {
+                        "type": "string",
+                        "example": "photo.jpg"
+                    },
+                    "mime_type": {
+                        "type": "string",
+                        "example": "image/jpeg"
+                    },
+                    "original_url": {
+                        "type": "string",
+                        "example": "https://.../storage/12/photo.jpg"
+                    },
+                    "preview_url": {
+                        "type": "string",
+                        "example": ""
+                    },
+                    "order_column": {
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "MediaUpload": {
+                "title": "Média à téléverser (mutation)",
+                "description": "Objet d'upload passé dans la clé racine `medias` du corps de mutation (au même niveau que `mutate`, PAS sous `attributes`). Le fichier est ajouté à la collection indiquée du modèle muté.",
+                "required": [
+                    "collection",
+                    "file"
+                ],
+                "properties": {
+                    "collection": {
+                        "description": "Collection enregistrée sur le modèle (Post : `post_media`).",
+                        "type": "string",
+                        "example": "post_media"
+                    },
+                    "file": {
+                        "description": "Le fichier image à téléverser (multipart/form-data).",
+                        "type": "string",
+                        "format": "binary"
+                    }
+                },
+                "type": "object"
+            },
+            "Post": {
+                "title": "Post",
+                "description": "Publication du fil social. `likes` et `hasLiked` sont calculés (likes = nombre de likers ; hasLiked = l'utilisateur courant a liké).",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "content": {
+                        "description": "Contenu JSON libre du post.",
+                        "type": "object",
+                        "example": {
+                            "text": "Première séance de la semaine !"
+                        }
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "likes": {
+                        "description": "Nombre de likes (calculé).",
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "hasLiked": {
+                        "description": "True si l'utilisateur courant a liké (calculé).",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "PostInput": {
+                "title": "Attributs d'un post (mutation)",
+                "properties": {
+                    "content": {
+                        "description": "Contenu JSON libre.",
+                        "type": "object",
+                        "example": {
+                            "text": "Première séance de la semaine !"
+                        }
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "Comment": {
+                "title": "Commentaire",
+                "description": "Commentaire d'un post. `likes` et `hasLiked` sont calculés.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "content": {
+                        "description": "Contenu JSON libre du commentaire.",
+                        "type": "object",
+                        "example": {
+                            "text": "Bravo !"
+                        }
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "post_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "likes": {
+                        "description": "Nombre de likes (calculé).",
+                        "type": "integer",
+                        "example": 0
+                    },
+                    "hasLiked": {
+                        "description": "True si l'utilisateur courant a liké (calculé).",
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "CommentInput": {
+                "title": "Attributs d'un commentaire (mutation)",
+                "properties": {
+                    "content": {
+                        "description": "Contenu JSON libre.",
+                        "type": "object",
+                        "example": {
+                            "text": "Bravo !"
+                        }
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "post_id": {
+                        "type": "integer",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "Allergy": {
+                "title": "Allergie",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "gluten"
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "Gluten"
+                    }
+                },
+                "type": "object"
+            },
+            "AllergyInput": {
+                "title": "Attributs d'une allergie (mutation)",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "gluten"
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "Gluten"
+                    }
+                },
+                "type": "object"
+            },
+            "Handicap": {
+                "title": "Handicap",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "wheelchair"
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "Fauteuil roulant"
+                    }
+                },
+                "type": "object"
+            },
+            "HandicapInput": {
+                "title": "Attributs d'un handicap (mutation)",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "wheelchair"
+                    },
+                    "label": {
+                        "type": "string",
+                        "example": "Fauteuil roulant"
+                    }
+                },
+                "type": "object"
+            },
+            "Log": {
+                "title": "Log",
+                "description": "Entrée de journal des requêtes API. L'`id` est un UUID.",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "9b1f...-..."
+                    },
+                    "api_name": {
+                        "type": "string",
+                        "example": "MSPR1"
+                    },
+                    "data": {
+                        "description": "Charge utile journalisée.",
+                        "type": "object"
+                    },
+                    "type": {
+                        "type": "string",
+                        "example": "request"
+                    },
+                    "ip": {
+                        "type": "string",
+                        "example": "127.0.0.1"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "LogInput": {
+                "title": "Attributs d'un log (mutation)",
+                "properties": {
+                    "api_name": {
+                        "type": "string",
+                        "example": "MSPR1"
+                    },
+                    "data": {
+                        "type": "object"
+                    },
+                    "type": {
+                        "type": "string",
+                        "example": "request"
+                    },
+                    "ip": {
+                        "type": "string",
+                        "example": "127.0.0.1"
+                    }
+                },
+                "type": "object"
             }
         },
         "responses": {
@@ -1995,6 +3859,30 @@
         {
             "name": "Users",
             "description": "Utilisateurs (recherche uniquement)"
+        },
+        {
+            "name": "Posts",
+            "description": "Réseau social : publications du fil (avec likes et médias)"
+        },
+        {
+            "name": "Comments",
+            "description": "Réseau social : commentaires de posts (avec likes)"
+        },
+        {
+            "name": "Allergies",
+            "description": "Catalogue d'allergies (rattachables aux utilisateurs)"
+        },
+        {
+            "name": "Handicaps",
+            "description": "Catalogue de handicaps (rattachables aux utilisateurs)"
+        },
+        {
+            "name": "Logs",
+            "description": "Journal des requêtes API (recherche, mutation, suppression)"
+        },
+        {
+            "name": "Profile",
+            "description": "Gestion du compte courant : profil, séances suivies, suivi santé"
         }
     ]
 }
