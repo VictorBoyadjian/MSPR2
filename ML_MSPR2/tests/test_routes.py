@@ -281,10 +281,11 @@ class TestMeals:
     def test_no_database_url_returns_500(self, client):
         from fastapi.testclient import TestClient
         from app.main import app
-        with patch.dict("os.environ", {"DATABASE_URL": ""}):
-            import os; os.environ.pop("DATABASE_URL", None)
-            with TestClient(app, raise_server_exceptions=False) as c:
-                r = c.post("/nutrition/meals", json=self.BASE)
+        with patch("app.main.Authorization.verify_token", return_value=True):
+            with patch.dict("os.environ", {"DATABASE_URL": ""}):
+                import os; os.environ.pop("DATABASE_URL", None)
+                with TestClient(app, raise_server_exceptions=False, headers={"Authorization": "Bearer test-token"}) as c:
+                    r = c.post("/nutrition/meals", json=self.BASE)
         assert r.status_code == 500
 
 
@@ -354,10 +355,11 @@ class TestSessions:
     def test_no_database_url_returns_500(self, client):
         from fastapi.testclient import TestClient
         from app.main import app
-        with patch.dict("os.environ", {"DATABASE_URL": ""}):
-            import os; os.environ.pop("DATABASE_URL", None)
-            with TestClient(app, raise_server_exceptions=False) as c:
-                r = c.post("/sessions/exercises", json=self.BASE)
+        with patch("app.main.Authorization.verify_token", return_value=True):
+            with patch.dict("os.environ", {"DATABASE_URL": ""}):
+                import os; os.environ.pop("DATABASE_URL", None)
+                with TestClient(app, raise_server_exceptions=False, headers={"Authorization": "Bearer test-token"}) as c:
+                    r = c.post("/sessions/exercises", json=self.BASE)
         assert r.status_code == 500
 
 

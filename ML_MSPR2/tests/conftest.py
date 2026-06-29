@@ -85,5 +85,30 @@ def make_mock_conn(cursor):
 @pytest.fixture
 def client():
     from app.main import app
-    with TestClient(app) as c:
-        yield c
+    with patch("app.main.Authorization.verify_token", return_value=True):
+        with TestClient(app, headers={"Authorization": "Bearer test-token"}) as c:
+            yield c
+
+
+@pytest.fixture
+def client_unauthorized():
+    """Client where Authorization.verify_token always returns False."""
+    from app.main import app
+    with patch("app.main.Authorization.verify_token", return_value=False):
+        with TestClient(app) as c:
+            yield c
+
+
+@pytest.fixture
+def mock_fitness_service():
+    """Real FitnessService instance with joblib.load mocked (no model files needed)."""
+    import app.service as svc_module
+    mock_model = MagicMock()
+    mock_encoder = MagicMock()
+    # Reset singleton so each test gets a fresh instance
+    svc_module.FitnessService._instance = None
+    with patch("app.service.joblib.load", side_effect=[mock_model, mock_encoder]):
+        svc = svc_module.FitnessService()
+    yield svc
+    # Clean up singleton after test
+    svc_module.FitnessService._instance = None

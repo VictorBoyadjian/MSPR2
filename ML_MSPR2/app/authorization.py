@@ -1,20 +1,26 @@
 import requests, os
 
-class Authorization():    
+class Authorization():
     @staticmethod
-    def verify_token(token : str) -> bool:
-        host = os.environ.get('LARAVEL_HOST')
-        if not host.startswith(('http://', 'https://')):
-            host = 'http://' + host
+    def verify_token(token: str) -> bool:
+        host = os.environ.get("LARAVEL_HOST", "")
+        port = os.environ.get("LARAVEL_PORT", "")
+        path = os.environ.get("LARAVEL_ME_URL", "")
 
-        response = requests.get(
-            host + ':' + os.environ.get('LARAVEL_PORT') + os.environ.get('LARAVEL_ME_URL'),
-            headers = {
-                "Authorization": "Bearer " + token
-            }
-        )
-        
-        if response.status_code == 200:
-            return True
-        
-        return False
+        if not host:
+            return False
+
+        if not host.startswith(("http://", "https://")):
+            host = "http://" + host
+
+        url = f"{host}:{port}{path}" if port else f"{host}{path}"
+
+        try:
+            response = requests.get(
+                url,
+                headers={"Authorization": "Bearer " + token},
+                timeout=5,
+            )
+            return response.status_code == 200
+        except requests.exceptions.RequestException:
+            return False

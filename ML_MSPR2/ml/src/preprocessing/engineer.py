@@ -54,7 +54,11 @@ def add_hr_zone(df: pd.DataFrame) -> pd.DataFrame:
 def add_fitness_score(df: pd.DataFrame) -> pd.DataFrame:
     bmi_score  = 1 - (df["bmi"] - 21).abs().clip(0, 15) / 15
     fat_norm   = df["body_fat_pct"]
-    fat_score  = 1 - (fat_norm - fat_norm.quantile(0.25)).clip(0) / (fat_norm.max() - fat_norm.min())
+    fat_range  = fat_norm.max() - fat_norm.min()
+    if fat_range == 0:
+        fat_score = pd.Series(0.5, index=df.index)
+    else:
+        fat_score = 1 - (fat_norm - fat_norm.quantile(0.25)).clip(0) / fat_range
     hr_score   = 1 - (df["resting_bpm"] - 50).clip(0, 50) / 50
     exp_score  = (df["experience_level"] - 1) / 2
 

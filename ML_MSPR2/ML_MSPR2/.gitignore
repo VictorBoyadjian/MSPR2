@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Env
+.env
+.env.local
+
+# Firebase credentials — NEVER commit
+*firebase-adminsdk*.json
+*service-account*.json
+
+# ML artifacts
+ml/models/*.pkl
+ml/data/*.csv
+ml/data/*.db
+
+# IDE
+.idea/
+.vscode/
+
+# Tests
+.pytest_cache/
+htmlcov/
+.coverage
