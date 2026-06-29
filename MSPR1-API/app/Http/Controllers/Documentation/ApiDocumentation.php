@@ -721,6 +721,27 @@ DESC,
     #[OA\Response(response: 200, description: "Posts supprimés")]
     public function postsDelete() {}
 
+    #[OA\Post(
+        path: "/api/posts/{id}/like",
+        tags: ["Posts"],
+        summary: "Liker / unliker un post",
+        description: "Bascule le like de l'utilisateur connecté sur le post (relation `likers`). Contrairement à la mutation, tout utilisateur connecté peut liker n'importe quel post (pas seulement l'auteur).",
+        security: [["sanctum" => []]],
+        parameters: [new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "integer"))]
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "État du like à jour",
+        content: new OA\JsonContent(properties: [
+            new OA\Property(property: "data", type: "object", properties: [
+                new OA\Property(property: "id", type: "integer", example: 1),
+                new OA\Property(property: "likes", type: "integer", example: 4),
+                new OA\Property(property: "hasLiked", type: "boolean", example: true),
+            ]),
+        ])
+    )]
+    public function postsLike() {}
+
     // ======================================================================
     // COMMENTS (réseau social)
     // ======================================================================
@@ -811,6 +832,27 @@ DESC,
     )]
     #[OA\Response(response: 200, description: "Commentaires supprimés")]
     public function commentsDelete() {}
+
+    #[OA\Post(
+        path: "/api/comments/{id}/like",
+        tags: ["Comments"],
+        summary: "Liker / unliker un commentaire",
+        description: "Bascule le like de l'utilisateur connecté sur le commentaire (relation `likers`). Accessible à tout utilisateur connecté.",
+        security: [["sanctum" => []]],
+        parameters: [new OA\Parameter(name: "id", in: "path", required: true, schema: new OA\Schema(type: "integer"))]
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "État du like à jour",
+        content: new OA\JsonContent(properties: [
+            new OA\Property(property: "data", type: "object", properties: [
+                new OA\Property(property: "id", type: "integer", example: 1),
+                new OA\Property(property: "likes", type: "integer", example: 2),
+                new OA\Property(property: "hasLiked", type: "boolean", example: true),
+            ]),
+        ])
+    )]
+    public function commentsLike() {}
 
     // ======================================================================
     // ALLERGIES

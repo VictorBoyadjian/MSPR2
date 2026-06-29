@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HealthMetricController;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UserSessionController;
@@ -30,6 +31,11 @@ Route::middleware('logRequests')->group(function (){
         Rest::resource('metrics', MetricController::class);
         Rest::resource('posts', PostController::class);
         Rest::resource('comments', CommentController::class);
+
+        // Likes : tout utilisateur connecté peut liker n'importe quel post/commentaire
+        // (hors contrôle de propriété Lomkit, réservé à l'édition du contenu).
+        Route::post('posts/{id}/like', [LikeController::class, 'togglePost'])->name('posts.like');
+        Route::post('comments/{id}/like', [LikeController::class, 'toggleComment'])->name('comments.like');
         Rest::resource('users', UserController::class)->only('search');
         Rest::resource('logs', LogController::class)->only('search', 'mutate', 'destroy');
 

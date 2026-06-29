@@ -1615,6 +1615,62 @@
                 ]
             }
         },
+        "/api/posts/{id}/like": {
+            "post": {
+                "tags": [
+                    "Posts"
+                ],
+                "summary": "Liker / unliker un post",
+                "description": "Bascule le like de l'utilisateur connecté sur le post (relation `likers`). Contrairement à la mutation, tout utilisateur connecté peut liker n'importe quel post (pas seulement l'auteur).",
+                "operationId": "c81872ccb1676c0d6a959253bae596b0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "État du like à jour",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "likes": {
+                                                    "type": "integer",
+                                                    "example": 4
+                                                },
+                                                "hasLiked": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/comments": {
             "get": {
                 "tags": [
@@ -1803,6 +1859,62 @@
                 "responses": {
                     "200": {
                         "$ref": "#/components/responses/MutateResponse"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/comments/{id}/like": {
+            "post": {
+                "tags": [
+                    "Comments"
+                ],
+                "summary": "Liker / unliker un commentaire",
+                "description": "Bascule le like de l'utilisateur connecté sur le commentaire (relation `likers`). Accessible à tout utilisateur connecté.",
+                "operationId": "d338fc4c85760c8ecc609ef955f8e877",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "État du like à jour",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "likes": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "hasLiked": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [

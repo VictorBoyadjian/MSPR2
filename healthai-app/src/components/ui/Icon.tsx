@@ -17,6 +17,13 @@ export type IconName =
   | 'health-filled'
   | 'profile'
   | 'profile-filled'
+  | 'community'
+  | 'community-filled'
+  | 'like'
+  | 'like-filled'
+  | 'comment'
+  | 'send'
+  | 'image'
   | 'weight'
   | 'pulse'
   | 'camera'
@@ -50,6 +57,13 @@ const GLYPHS: Record<IconName, IoniconName> = {
   'health-filled': 'heart',
   profile: 'person-outline',
   'profile-filled': 'person',
+  community: 'people-outline',
+  'community-filled': 'people',
+  like: 'heart-outline',
+  'like-filled': 'heart',
+  comment: 'chatbubble-outline',
+  send: 'send',
+  image: 'image-outline',
   weight: 'scale-outline',
   pulse: 'fitness-outline',
   camera: 'camera-outline',
