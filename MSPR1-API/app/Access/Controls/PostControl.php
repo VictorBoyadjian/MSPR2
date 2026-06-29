@@ -29,7 +29,7 @@ class PostControl extends Control
                     return true;
                 })
                 ->should(function (Model $user, Model $model) {
-                    return $user->getKey() === $model?->user_id;
+                    return true;
                 })
                 ->query(function (Builder $query, Model $user) {
                     return $query;
