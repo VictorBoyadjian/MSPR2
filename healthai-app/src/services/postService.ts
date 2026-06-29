@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 import {
   comments,
   MutateResponse,
@@ -43,18 +45,25 @@ export const postService = {
    * `mutated` de PostResource) lit la clé racine `medias` et l'ajoute à la
    * collection `post_media`. Sans image, simple mutation JSON.
    */
-  create: ({ text, userId, imageUri, imageName, imageType }: CreatePostInput): Promise<MutateResponse> => {
+  create: async ({ text, userId, imageUri, imageName, imageType }: CreatePostInput): Promise<MutateResponse> => {
     if (imageUri) {
       const form = new FormData();
       form.append('mutate[0][operation]', 'create');
       form.append('mutate[0][attributes][content][text]', text);
       form.append('mutate[0][attributes][user_id]', String(userId));
       form.append('medias[0][collection]', 'post_media');
-      form.append('medias[0][file]', {
-        uri: imageUri,
-        name: imageName ?? `post_${Date.now()}.jpg`,
-        type: imageType ?? 'image/jpeg',
-      } as unknown as Blob);
+
+      const name = imageName ?? `post_${Date.now()}.jpg`;
+      const type = imageType ?? 'image/jpeg';
+      if (Platform.OS === 'web') {
+        // Sur le web, FormData exige un vrai Blob/File : on récupère le binaire
+        // depuis l'URI (data: ou blob:) — sinon l'objet est sérialisé en
+        // "[object Object]" et le backend ne reçoit aucun fichier.
+        const blob = await fetch(imageUri).then((response) => response.blob());
+        form.append('medias[0][file]', blob, name);
+      } else {
+        form.append('medias[0][file]', { uri: imageUri, name, type } as unknown as Blob);
+      }
       return sendMultipart<MutateResponse>('/posts/mutate', form);
     }
 

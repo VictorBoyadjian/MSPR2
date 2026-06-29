@@ -76,6 +76,7 @@ CMD ["sh", "-c", \
     envsubst '${PORT}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && \
     php artisan key:generate && \
     php artisan migrate --force || true && \
+    php artisan storage:link || true && \
     php artisan l5-swagger:generate || true && \
     php artisan config:cache || true && \
     php artisan route:cache || true && \
