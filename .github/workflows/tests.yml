@@ -26,9 +26,15 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          # >=22.13 requis par @testing-library/react-native@14.
+          node-version: '22'
           cache: npm
           cache-dependency-path: healthai-app/package-lock.json
+      # Le package-lock.json a été généré avec npm 11 ; on aligne la version de
+      # npm pour que `npm ci` (synchro stricte) ne diverge pas sur les deps
+      # optionnelles (@emnapi/*).
+      - name: Pin npm 11
+        run: npm install -g npm@11
       - name: Install dependencies
         run: npm ci
       - name: Run unit tests
