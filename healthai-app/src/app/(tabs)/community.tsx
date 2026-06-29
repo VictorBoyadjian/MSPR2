@@ -28,7 +28,15 @@ export default function CommunityScreen() {
       <SafeAreaView style={styles.safeArea} edges={['left', 'right', 'bottom']}>
         <ThemedView style={styles.header}>
           <ThemedText type="subtitle">Communauté</ThemedText>
-          <Button icon="add" label="Publier" onPress={() => router.push('/community/new')} />
+          <ThemedView style={styles.headerActions}>
+            <Button
+              variant="secondary"
+              icon="profile"
+              label="Mes posts"
+              onPress={() => router.push('/community/mine')}
+            />
+            <Button icon="add" label="Publier" onPress={() => router.push('/community/new')} />
+          </ThemedView>
         </ThemedView>
 
         {loading && posts.length === 0 ? (
@@ -76,7 +84,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: Spacing.three,
+    flexWrap: 'wrap',
+    gap: Spacing.two,
   },
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, backgroundColor: 'transparent' },
   list: { gap: Spacing.three, paddingBottom: BottomTabInset + Spacing.four },
   empty: { textAlign: 'center', marginTop: Spacing.six },
 });

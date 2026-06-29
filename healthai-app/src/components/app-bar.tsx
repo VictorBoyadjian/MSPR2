@@ -1,7 +1,8 @@
 import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import ProfileMenu from '@/components/profile/ProfileMenu';
+import ProfileButton from '@/components/profile/ProfileButton';
+import SettingsMenu from '@/components/profile/SettingsMenu';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { MaxContentWidth, Spacing } from '@/constants/theme';
@@ -15,7 +16,10 @@ export default function AppBar() {
       <SafeAreaView edges={['top', 'left', 'right']}>
         <ThemedView style={styles.bar}>
           <ThemedText type="smallBold">HealthAI - Coach</ThemedText>
-          <ProfileMenu />
+          <ThemedView style={styles.actions}>
+            <ProfileButton />
+            <SettingsMenu />
+          </ThemedView>
         </ThemedView>
       </SafeAreaView>
     </ThemedView>
@@ -35,5 +39,11 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
+  },
+  actions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+    backgroundColor: 'transparent',
   },
 });

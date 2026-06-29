@@ -30,7 +30,6 @@ export default function AppTabs() {
       <Tabs.Screen name="meals" options={{ title: 'Repas', tabBarIcon: tabIcon('meals') }} />
       <Tabs.Screen name="workouts" options={{ title: 'Sport', tabBarIcon: tabIcon('workouts') }} />
       <Tabs.Screen name="health" options={{ title: 'Santé', tabBarIcon: tabIcon('health') }} />
-      <Tabs.Screen name="profile" options={{ title: 'Profil', tabBarIcon: tabIcon('profile') }} />
     </Tabs>
   );
 }

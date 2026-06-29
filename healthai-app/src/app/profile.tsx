@@ -8,7 +8,8 @@ import { ThemedView } from '@/components/themed-view';
 import ProfileForm, { ProfileFormValues } from '@/components/profile/ProfileForm';
 import ProgramBanner from '@/components/profile/ProgramBanner';
 import Loader from '@/components/ui/Loader';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import ScreenHeader from '@/components/ui/ScreenHeader';
+import { MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAllergies } from '@/hooks/useAllergies';
 import { useGoals } from '@/hooks/useGoals';
 import { useHandicaps } from '@/hooks/useHandicaps';
@@ -134,13 +135,15 @@ export default function ProfileScreen() {
 
   return (
     <ThemedView style={styles.root}>
-      <SafeAreaView style={styles.safeArea} edges={['left', 'right']}>
-        <ThemedView style={styles.header}>
-          <ThemedText type="subtitle">Profil</ThemedText>
-          <ThemedText themeColor="textSecondary">Modifie tes informations</ThemedText>
-        </ThemedView>
+      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right', 'bottom']}>
+        <ScreenHeader title="Profil" />
 
-        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled">
+          <ThemedText themeColor="textSecondary">Modifie tes informations</ThemedText>
+
           <ProgramBanner
             label={goalLabel}
             targetWeight={user.target_weight}
@@ -177,12 +180,14 @@ const styles = StyleSheet.create({
   root: { flex: 1 },
   safeArea: {
     flex: 1,
-    paddingHorizontal: Spacing.four,
-    paddingTop: Spacing.four,
     width: '100%',
     maxWidth: MaxContentWidth,
     alignSelf: 'center',
   },
-  header: { gap: Spacing.one, marginBottom: Spacing.four },
-  content: { gap: Spacing.three, paddingBottom: BottomTabInset + Spacing.four },
+  content: {
+    gap: Spacing.three,
+    paddingHorizontal: Spacing.four,
+    paddingTop: Spacing.two,
+    paddingBottom: Spacing.six,
+  },
 });

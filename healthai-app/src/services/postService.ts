@@ -40,6 +40,17 @@ export const postService = {
     return response.data[0];
   },
 
+  /** Mes posts : ceux de l'utilisateur, avec médias et commentaires (pour les compteurs). */
+  listMine: async (userId: string): Promise<Post[]> => {
+    const response = await posts.search({
+      filters: [{ field: 'user_id', operator: 'like', value: userId }],
+      includes: [{ relation: 'medias' }, { relation: 'comments' }],
+      sorts: [{ field: 'id', direction: 'desc' }],
+      limit: 50,
+    });
+    return response.data;
+  },
+
   /**
    * Crée un post. Avec une image, on envoie en multipart : le backend (hook
    * `mutated` de PostResource) lit la clé racine `medias` et l'ajoute à la
@@ -78,6 +89,10 @@ export const postService = {
    */
   toggleLike: (postId: string): Promise<LikeState> =>
     sendRequest<LikeState>('POST', `/posts/${postId}/like`),
+
+  /** Modifie le texte d'un post (réservé à l'auteur côté API). */
+  update: (postId: string, text: string): Promise<MutateResponse> =>
+    posts.mutate([{ operation: 'update', key: postId, attributes: { content: { text } } }]),
 
   remove: (id: string) => posts.delete([id]),
 };

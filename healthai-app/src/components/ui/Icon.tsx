@@ -24,6 +24,7 @@ export type IconName =
   | 'comment'
   | 'send'
   | 'image'
+  | 'settings'
   | 'weight'
   | 'pulse'
   | 'camera'
@@ -64,6 +65,7 @@ const GLYPHS: Record<IconName, IoniconName> = {
   comment: 'chatbubble-outline',
   send: 'send',
   image: 'image-outline',
+  settings: 'settings-outline',
   weight: 'scale-outline',
   pulse: 'fitness-outline',
   camera: 'camera-outline',

@@ -10,7 +10,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useTheme } from '@/hooks/use-theme';
 import { useThemePreference, type ThemePreference } from '@/stores/themeStore';
 
-export default function ProfileMenu() {
+export default function SettingsMenu() {
   const { user, logout, deleteAccount } = useAuth();
   const theme = useTheme();
   const confirm = useConfirm();
@@ -50,13 +50,13 @@ export default function ProfileMenu() {
     <>
       <Pressable
         accessibilityRole="button"
-        accessibilityLabel="Profil"
+        accessibilityLabel="Paramètres"
         onPress={() => setOpen(true)}
         style={({ pressed }) => [
           styles.iconButton,
           { backgroundColor: theme.backgroundElement, opacity: pressed ? 0.7 : 1 },
         ]}>
-        <Icon name="profile-filled" size={20} color={theme.text} />
+        <Icon name="settings" size={20} color={theme.text} />
       </Pressable>
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={close}>

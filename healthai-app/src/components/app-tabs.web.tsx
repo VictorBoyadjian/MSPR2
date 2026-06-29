@@ -28,7 +28,6 @@ const TABS: TabDef[] = [
   { name: 'meals', href: '/meals', label: 'Repas', icon: 'meals' },
   { name: 'workouts', href: '/workouts', label: 'Sport', icon: 'workouts' },
   { name: 'health', href: '/health', label: 'Santé', icon: 'health' },
-  { name: 'profile', href: '/profile', label: 'Profil', icon: 'profile' },
 ];
 
 export default function AppTabs() {

@@ -32,6 +32,7 @@ function RootNavigator() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="profile" />
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="onboarding" />
       <Stack.Screen name="meal/[id]" options={{ presentation: 'modal' }} />
@@ -41,6 +42,7 @@ function RootNavigator() {
       <Stack.Screen name="workout/add" options={{ presentation: 'modal' }} />
       <Stack.Screen name="workout/run" options={{ presentation: 'modal' }} />
       <Stack.Screen name="community/new" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="community/mine" />
       <Stack.Screen name="community/[id]" />
     </Stack>
   );
