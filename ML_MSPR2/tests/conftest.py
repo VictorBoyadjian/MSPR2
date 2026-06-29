@@ -1,95 +1,89 @@
-"""Shared fixtures for ML_MSPR2 tests."""
-
-import sys
-import types
+import os
+import pytest
+from fastapi.testclient import TestClient
 from unittest.mock import MagicMock, patch
 
-import pytest
+# engine.py lève RuntimeError à l'import si DATABASE_URL absent — on la fixe avant tout
+os.environ.setdefault("DATABASE_URL", "postgresql://fake:fake@localhost/fake")
 
 
-def _make_mock_ml_modules():
-    """Stub all ML imports so FitnessService can be imported without models on disk."""
-    ml_pkg = types.ModuleType("ml")
-    ml_src = types.ModuleType("ml.src")
-    ml_pre = types.ModuleType("ml.src.preprocessing")
-    ml_eng_mod = types.ModuleType("ml.src.preprocessing.engineer")
-    ml_eng_mod.engineer = lambda df: df
-    ml_pipe = types.ModuleType("ml.src.preprocessing.pipeline")
-    ml_pipe.get_feature_names = lambda: []
-    ml_rec = types.ModuleType("ml.src.recommendation_engine")
-    ml_rec_eng = types.ModuleType("ml.src.recommendation_engine.engine")
-    ml_rec_eng.get_program = MagicMock()
-    ml_rec_eng.program_to_dict = MagicMock(return_value={})
-    ml_rec_eng.list_profiles = MagicMock(return_value=[])
-    ml_rec_eng._PROFILE_CONFIG = {}
+# Données communes réutilisées dans plusieurs tests
+VALID_USER = {
+    "age": 28,
+    "gender": "male",
+    "weight_kg": 78.0,
+    "height_cm": 178.0,
+    "body_fat_pct": 18.0,
+    "resting_bpm": 65,
+    "experience_level": "intermediate",
+}
 
-    for name, mod in [
-        ("ml", ml_pkg),
-        ("ml.src", ml_src),
-        ("ml.src.preprocessing", ml_pre),
-        ("ml.src.preprocessing.engineer", ml_eng_mod),
-        ("ml.src.preprocessing.pipeline", ml_pipe),
-        ("ml.src.recommendation_engine", ml_rec),
-        ("ml.src.recommendation_engine.engine", ml_rec_eng),
-    ]:
-        sys.modules.setdefault(name, mod)
+MOCK_PROGRAM = {
+    "sessions_per_week": 4,
+    "session_duration_min": 60,
+    "focus": "Hypertrophie",
+    "intensity": "Élevée",
+    "weekly_volume_h": 4.0,
+    "progression": "Surcharge progressive",
+    "nutrition_tip": "2g protéines/kg",
+    "objective": "Prise de masse",
+}
 
+MOCK_MEAL = {
+    "name": "Omelette protéinée",
+    "meal_type": "breakfast",
+    "calories_kcal": 350.0,
+    "proteins_g": 30.0,
+    "carbs_g": 10.0,
+    "fats_g": 20.0,
+    "allergens": ["oeufs"],
+}
 
-_make_mock_ml_modules()
+MOCK_SESSION = {
+    "id": 1,
+    "name": "Push Day A",
+    "profile": "prise_masse_confirme",
+    "session_type": "push",
+    "total_duration_min": 60,
+    "difficulty": "Élevée",
+    "description": "Séance poussée",
+    "objective": "Force et hypertrophie",
+}
 
-
-def _stub_firebase():
-    """Stub app.firebase so google-auth is not required."""
-    firebase_mod = types.ModuleType("app.firebase")
-    firebase_mod.log_prediction = MagicMock()
-    firebase_mod.log_feedback = MagicMock()
-    firebase_mod.get_comparison_stats = MagicMock(return_value={
-        "total_with_feedback": 0,
-        "followed_recommendation": 0,
-        "follow_rate_pct": 0.0,
-        "by_profile": {},
-    })
-    for name in [
-        "google", "google.auth", "google.auth.transport",
-        "google.auth.transport.requests", "google.oauth2", "google.oauth2.service_account",
-    ]:
-        sys.modules.setdefault(name, types.ModuleType(name))
-    sys.modules["app.firebase"] = firebase_mod
-
-
-_stub_firebase()
-
-
-@pytest.fixture()
-def mock_fitness_service():
-    """Patch FitnessService singleton so no model files are needed."""
-    with patch("joblib.load", return_value=MagicMock()):
-        from app.service import FitnessService
-
-        FitnessService._instance = None
-        svc = FitnessService.__new__(FitnessService)
-        svc._model = MagicMock()
-        svc._encoder = MagicMock()
-        FitnessService._instance = svc
-        yield svc
-        FitnessService._instance = None
+MOCK_EXERCISE = {
+    "order_num": 1,
+    "exercise_name": "Développé couché",
+    "body_part": "Pectoraux",
+    "category": "Force",
+    "equipment": "Barre",
+    "sets": 4,
+    "reps": "8-10",
+    "rest_sec": 90,
+    "notes": None,
+}
 
 
-@pytest.fixture()
-def client(mock_fitness_service):
-    """FastAPI TestClient with auth always returning True."""
-    from fastapi.testclient import TestClient
+def make_mock_cursor(fetchall_return=None, fetchone_return=None):
+    """Crée un curseur psycopg2 mocké."""
+    cur = MagicMock()
+    cur.fetchall.return_value = fetchall_return or []
+    cur.fetchone.return_value = fetchone_return
+    cur.__enter__ = lambda s: s
+    cur.__exit__ = MagicMock(return_value=False)
+    return cur
 
-    with patch("app.authorization.Authorization.verify_token", return_value=True):
-        from app.main import app
-        yield TestClient(app)
+
+def make_mock_conn(cursor):
+    """Crée une connexion psycopg2 mockée."""
+    conn = MagicMock()
+    conn.cursor.return_value = cursor
+    conn.__enter__ = lambda s: s
+    conn.__exit__ = MagicMock(return_value=False)
+    return conn
 
 
-@pytest.fixture()
-def client_unauthorized(mock_fitness_service):
-    """FastAPI TestClient with auth always returning False."""
-    from fastapi.testclient import TestClient
-
-    with patch("app.authorization.Authorization.verify_token", return_value=False):
-        from app.main import app
-        yield TestClient(app)
+@pytest.fixture
+def client():
+    from app.main import app
+    with TestClient(app) as c:
+        yield c

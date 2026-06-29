@@ -9,8 +9,6 @@ import psycopg2
 import psycopg2.extras
 from dataclasses import dataclass
 
-from app.logs_service import LogService
-
 DATABASE_URL = os.getenv("DATABASE_URL")
 if not DATABASE_URL:
     raise RuntimeError(
@@ -98,64 +96,58 @@ _PROFILE_CONFIG: dict[str, dict] = {
 
 
 def _get_exercises(cur, filters: dict, limit: int = 6) -> list[str]:
-    try:
-        categories_ph = ",".join(["%s"] * len(filters["categories"]))
-        body_parts_ph = ",".join(["%s"] * len(filters["body_parts"]))
-        params = [filters["difficulty"]] + filters["categories"] + filters["body_parts"] + [limit]
-        cur.execute(
-            f"""
-            SELECT name, body_part, category
-            FROM exercises
-            WHERE difficulty = %s
-              AND category   IN ({categories_ph})
-              AND body_part  IN ({body_parts_ph})
-            ORDER BY RANDOM()
-            LIMIT %s
-            """,
-            params,
-        )
-        rows = cur.fetchall()
-        return [f"{r['name']} ({r['body_part']} — {r['category']})" for r in rows]
-    except Exception as e:
-        LogService.send_log(e)
+    categories_ph = ",".join(["%s"] * len(filters["categories"]))
+    body_parts_ph = ",".join(["%s"] * len(filters["body_parts"]))
+    params = [filters["difficulty"]] + filters["categories"] + filters["body_parts"] + [limit]
+    cur.execute(
+        f"""
+        SELECT name, body_part, category
+        FROM exercises
+        WHERE difficulty = %s
+          AND category   IN ({categories_ph})
+          AND body_part  IN ({body_parts_ph})
+        ORDER BY RANDOM()
+        LIMIT %s
+        """,
+        params,
+    )
+    rows = cur.fetchall()
+    return [f"{r['name']} ({r['body_part']} — {r['category']})" for r in rows]
 
 
 def _get_foods(cur, filters: dict, limit: int = 5) -> list[str]:
-    try:
-        conditions = ["meal_type = ANY(%s)"]
-        params: list = [filters["meal_types"]]
+    conditions = ["meal_type = ANY(%s)"]
+    params: list = [filters["meal_types"]]
 
-        if "min_proteins_g" in filters:
-            conditions.append("proteins_g >= %s")
-            params.append(filters["min_proteins_g"])
-        if "max_calories" in filters:
-            conditions.append("calories_kcal <= %s")
-            params.append(filters["max_calories"])
-        if "min_carbs_g" in filters:
-            conditions.append("carbs_g >= %s")
-            params.append(filters["min_carbs_g"])
+    if "min_proteins_g" in filters:
+        conditions.append("proteins_g >= %s")
+        params.append(filters["min_proteins_g"])
+    if "max_calories" in filters:
+        conditions.append("calories_kcal <= %s")
+        params.append(filters["max_calories"])
+    if "min_carbs_g" in filters:
+        conditions.append("carbs_g >= %s")
+        params.append(filters["min_carbs_g"])
 
-        params.append(limit)
-        where = " AND ".join(conditions)
-        sort  = filters.get("sort", "proteins_g DESC")
+    params.append(limit)
+    where = " AND ".join(conditions)
+    sort  = filters.get("sort", "proteins_g DESC")
 
-        cur.execute(
-            f"""
-            SELECT name, calories_kcal, proteins_g, carbs_g, fats_g, meal_type
-            FROM foods
-            WHERE {where}
-            ORDER BY {sort}
-            LIMIT %s
-            """,
-            params,
-        )
-        rows = cur.fetchall()
-        return [
-            f"{r['name']} ({r['meal_type']}) — {r['calories_kcal']} kcal | P:{r['proteins_g']}g G:{r['carbs_g']}g L:{r['fats_g']}g"
-            for r in rows
-        ]
-    except Exception as e:
-        LogService.send_log(e)
+    cur.execute(
+        f"""
+        SELECT name, calories_kcal, proteins_g, carbs_g, fats_g, meal_type
+        FROM foods
+        WHERE {where}
+        ORDER BY {sort}
+        LIMIT %s
+        """,
+        params,
+    )
+    rows = cur.fetchall()
+    return [
+        f"{r['name']} ({r['meal_type']}) — {r['calories_kcal']} kcal | P:{r['proteins_g']}g G:{r['carbs_g']}g L:{r['fats_g']}g"
+        for r in rows
+    ]
 
 
 

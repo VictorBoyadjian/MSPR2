@@ -1,6 +1,6 @@
 import requests as _requests
 
-from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import Union
@@ -16,7 +16,6 @@ from app.schemas import (
     ComparisonOutput,
 )
 from app.service import FitnessService
-from app.logs_service import LogService
 
 app = FastAPI(
     title="HealthAI Coach — API ML",
@@ -37,84 +36,63 @@ bearer_scheme = HTTPBearer()
 service = FitnessService()
 
 @app.get("/health")
-def health(request : Request):
-    LogService.send_log('/health', 'request', request.client.host)
+def health():
     return {"status": "ok", "version": "2.0.0"}
     
 @app.post("/recommend", response_model=RecommendOutput)
-def recommend(data: RecommendInput, request : Request, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> Union[RecommendOutput, HTTPException]:
+def recommend(data: RecommendInput, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> Union[RecommendOutput, HTTPException]:
     if Authorization.verify_token(credentials.credentials):
-        try:
-            LogService.send_log('/recommend', 'request', request.client.host)
-            return service.recommend(data)
-        except Exception as e:
-            LogService.send_log(e)
+        return service.recommend(data)
     else:
         raise HTTPException(status_code=401, detail="Invalid token")
-
+    
 @app.get("/profiles")
-def list_profiles(request : Request, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
+def list_profiles(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
     if Authorization.verify_token(credentials.credentials):
-        try:
-            LogService.send_log('/profiles', 'request', request.client.host)
-            from ml.src.recommendation_engine.engine import list_profiles, _PROFILE_CONFIG
-            return {
-                "profiles": [
-                    {
-                        "id": p,
-                        "focus": _PROFILE_CONFIG[p]["focus"],
-                        "sessions_per_week": _PROFILE_CONFIG[p]["sessions_per_week"],
-                    }
-                    for p in list_profiles()
-                ]
-            }
-        except Exception as e:
-            LogService.send_log(e)
+        from ml.src.recommendation_engine.engine import list_profiles, _PROFILE_CONFIG
+        return {
+            "profiles": [
+                {
+                    "id": p,
+                    "focus": _PROFILE_CONFIG[p]["focus"],
+                    "sessions_per_week": _PROFILE_CONFIG[p]["sessions_per_week"],
+                }
+                for p in list_profiles()
+            ]
+        }
     else:
         raise HTTPException(status_code=401, detail="Invalid token")
     
 
 @app.post("/nutrition/meals", response_model=MealsOutput)
-def meals(data: MealsInput, request : Request, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> Union[MealsOutput, HTTPException]:
+def meals(data: MealsInput, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> Union[MealsOutput, HTTPException]:
     if Authorization.verify_token(credentials.credentials):
-        try:
-            LogService.send_log('/nutrition/meals', 'request', request.client.host)
-            return service.get_meals(data)
-        except Exception as e:
-            LogService.send_log(e)
+        return service.get_meals(data)
     else:
         raise HTTPException(status_code=401, detail="Invalid token")
     
     
 @app.post("/nutrition/calories", response_model=CaloriesOutput)
-def calories(data: CaloriesInput, request : Request, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> Union[CaloriesOutput, HTTPException]:
+def calories(data: CaloriesInput, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> Union[CaloriesOutput, HTTPException]:
     if Authorization.verify_token(credentials.credentials):
-        try:
-            LogService.send_log('/nutrition/calories', 'request', request.client.host)
-            return service.calculate_calories(data)
-        except Exception as e:
-            LogService.send_log(e)
+        return service.calculate_calories(data)
     else:
         raise HTTPException(status_code=401, detail="Invalid token")
 
 @app.post("/logs/feedback", response_model=FeedbackOutput)
-def feedback(data: FeedbackInput, request : Request, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> Union[FeedbackOutput, HTTPException]:
+def feedback(data: FeedbackInput, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> Union[FeedbackOutput, HTTPException]:
     if Authorization.verify_token(credentials.credentials):
         from app.firebase import log_feedback
         try:
-            LogService.send_log('/logs/feedback', 'request', request.client.host)
             doc = log_feedback(data.prediction_id, data.chosen_profile)
         except ValueError as e:
-            LogService.send_log(e)
             raise HTTPException(status_code=404, detail=str(e))
-        except _requests.exceptions.Timeout as e:
-            LogService.send_log(e)
+        except _requests.exceptions.Timeout:
             raise HTTPException(
                 status_code=503,
                 detail="Firebase indisponible (timeout). Réessayez dans quelques secondes.",
             )
         except Exception as e:
-            LogService.send_log(e)
             raise HTTPException(status_code=500, detail=f"Erreur Firebase: {e}")
         return FeedbackOutput(
             prediction_id=data.prediction_id,
@@ -126,32 +104,25 @@ def feedback(data: FeedbackInput, request : Request, credentials: HTTPAuthorizat
         raise HTTPException(status_code=401, detail="Invalid token")
     
 @app.get("/logs/comparison", response_model=ComparisonOutput)
-def comparison(request : Request, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> Union[ComparisonOutput, HTTPException]:
+def comparison(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> Union[ComparisonOutput, HTTPException]:
     if Authorization.verify_token(credentials.credentials):
         from app.firebase import get_comparison_stats
         try:
-            LogService.send_log('/logs/comparison', 'request', request.client.host)
             stats = get_comparison_stats()
-        except _requests.exceptions.Timeout as e:
-            LogService.send_log(e)
+        except _requests.exceptions.Timeout:
             raise HTTPException(
                 status_code=503,
                 detail="Firebase indisponible (timeout). Réessayez dans quelques secondes.",
             )
         except Exception as e:
-            LogService.send_log(e)
             raise HTTPException(status_code=500, detail=f"Erreur Firebase: {e}")
         return ComparisonOutput(**stats)
     else:
         raise HTTPException(status_code=401, detail="Invalid token")
 
 @app.post("/sessions/exercises", response_model=SessionOutput)
-def session_exercises(data: SessionInput, request : Request, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> Union[SessionOutput, HTTPException]:
+def session_exercises(data: SessionInput, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)) -> Union[SessionOutput, HTTPException]:
     if Authorization.verify_token(credentials.credentials):
-        try:
-            LogService.send_log('/sessions/exercises', 'request', request.client.host)
-            return service.get_sessions(data)
-        except Exception as e:
-            LogService.send_log(e)
+        return service.get_sessions(data)
     else:
         raise HTTPException(status_code=401, detail="Invalid token")
