@@ -30,13 +30,12 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: healthai-app/package-lock.json
-      # Le package-lock.json a été généré avec npm 11 ; on aligne la version de
-      # npm pour que `npm ci` (synchro stricte) ne diverge pas sur les deps
-      # optionnelles (@emnapi/*).
-      - name: Pin npm 11
-        run: npm install -g npm@11
+      # `npm ci` (synchro stricte) échoue sur le runner Linux : le lockfile a été
+      # généré sous macOS et n'inclut pas les deps optionnelles spécifiques à
+      # Linux (@emnapi/core, @emnapi/runtime). `npm install` les résout sans
+      # bloquer ; on n'a pas besoin d'un lock strict pour un job de tests.
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
       - name: Run unit tests
         run: npm test -- --ci
 
