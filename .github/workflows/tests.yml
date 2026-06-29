@@ -1,0 +1,101 @@
+name: Tests
+
+# Gate des merges develop -> main : ces tests tournent sur chaque pull request
+# ciblant `main`. Pour BLOQUER réellement le merge si un job échoue, il faut
+# activer la protection de branche sur `main` (voir README ci-dessous) et marquer
+# ces jobs comme "required status checks".
+on:
+  pull_request:
+    branches: [main]
+  # Permet de relancer manuellement depuis l'onglet Actions.
+  workflow_dispatch:
+
+# Annule les exécutions précédentes encore en cours sur la même PR.
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  healthai-app:
+    name: HealthAI App (Jest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: healthai-app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: healthai-app/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Run unit tests
+        run: npm test -- --ci
+
+  mspr1-api:
+    name: MSPR1 API (PHPUnit)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: MSPR1-API
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, bcmath, pcntl, pdo, pdo_sqlite, sqlite3, pdo_pgsql, pgsql
+          coverage: none
+      - name: Prepare environment
+        run: cp .env.example .env
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Generate application key
+        run: php artisan key:generate
+      # Suite "Unit" uniquement : les tests s'exécutent sur SQLite en mémoire
+      # (cf. phpunit.xml). La suite "Feature" par défaut contient encore le test
+      # d'exemple de Laravel qui appelle GET / (route inexistante) — à corriger
+      # avant de l'inclure dans le gate.
+      - name: Run unit tests
+        run: php artisan test --testsuite=Unit
+
+  image-analysis-api:
+    name: Image Analysis API (pytest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: MSPR2-Image-Analysis-API/requirements.txt
+      - name: Install dependencies
+        working-directory: MSPR2-Image-Analysis-API
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run unit tests
+        working-directory: MSPR2-Image-Analysis-API/api
+        run: pytest
+
+  ml-api:
+    name: ML API (pytest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ML_MSPR2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: ML_MSPR2/requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run unit tests
+        run: pytest
