@@ -177,6 +177,19 @@ services:
       - mspr-network
     restart: unless-stopped
 
+  backup:
+    build: ../MSPR3-BACKUP
+    container_name: mspr3-backup
+    volumes:
+      - ../MSPR3-BACKUP/backup:/app/backup
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/healthai"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - mspr-network
+
 networks:
   mspr-network:
     driver: bridge
