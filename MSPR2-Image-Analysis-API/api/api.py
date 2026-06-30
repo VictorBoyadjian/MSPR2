@@ -8,12 +8,13 @@ from typing import Union
 #Modules
 from data_schemas import UploadDish, OutputResponse
 from ollama_service import OllamaService
-from data_schemas import UploadDish, OutputResponse, DishCalculateInput, DishCalculateOutput
-from ollama_service import OllamaService 
+from data_schemas import UploadDish, OutputResponse, DishCalculateInput, DishCalculateOutput, CoachMessageInput, CoachMessageOutput
+from ollama_service import OllamaService
 from color_enum import ColorEnum
 from authorization import Authorization
 from mistral_service import MistralService
 from mistral_vision_service import MistralVisionService
+from mistral_coach_service import MistralCoachService
 from logs_service import LogService
 
 app = FastAPI()
@@ -72,6 +73,20 @@ async def dish_calculate(data : DishCalculateInput, request : Request, credentia
         LogService.send_log('/dish-calculate', 'request', request.client.host)
         if Authorization.verify_token(credentials.credentials):
             return MistralService.generate(data)
+        else:
+            raise HTTPException(status_code=401, detail="Invalid token")
+    except HTTPException:
+        raise
+    except Exception as e:
+        LogService.send_log(e)
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@router.post('/coach-message', response_model=Union[CoachMessageOutput, dict])
+async def coach_message(data : CoachMessageInput, request : Request, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
+    try:
+        LogService.send_log('/coach-message', 'request', request.client.host)
+        if Authorization.verify_token(credentials.credentials):
+            return MistralCoachService.generate(data)
         else:
             raise HTTPException(status_code=401, detail="Invalid token")
     except HTTPException:

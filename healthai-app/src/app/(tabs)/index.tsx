@@ -1,6 +1,6 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useMemo } from 'react';
-import { Pressable, ScrollView, StyleSheet } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedText } from '@/components/themed-text';
@@ -10,6 +10,7 @@ import Card from '@/components/ui/Card';
 import Icon, { IconName } from '@/components/ui/Icon';
 import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
 import { useAuth } from '@/hooks/useAuth';
+import { useCoachMessage } from '@/hooks/useCoachMessage';
 import { useTheme } from '@/hooks/use-theme';
 import { useDishes } from '@/hooks/useDishes';
 import { useWorkouts } from '@/hooks/useWorkouts';
@@ -21,6 +22,7 @@ export default function DashboardScreen() {
   const router = useRouter();
   const { dishes, refresh: refreshDishes } = useDishes();
   const { sessions, refresh: refreshWorkouts } = useWorkouts();
+  const { message: coachMessage, loading: coachLoading } = useCoachMessage();
 
   useFocusEffect(
     useCallback(() => {
@@ -106,6 +108,8 @@ export default function DashboardScreen() {
               onPress={() => router.push('/workout/add')}
             />
           </ThemedView>
+
+          <CoachMessageCard message={coachMessage} loading={coachLoading} />
         </ScrollView>
       </SafeAreaView>
     </ThemedView>
@@ -141,6 +145,35 @@ function SummaryCard({
         </ThemedText>
       </Card>
     </Pressable>
+  );
+}
+
+function CoachMessageCard({ message, loading }: { message: string | null; loading: boolean }) {
+  const theme = useTheme();
+
+  // Tant qu'aucun message n'est disponible pour aujourd'hui (et qu'on n'est pas en
+  // train d'en générer un), on n'affiche pas la carte.
+  if (!message && !loading) return null;
+
+  return (
+    <Card style={styles.coachCard}>
+      <ThemedView style={styles.coachHeader}>
+        <Icon name="coach" size={18} color={theme.accent} />
+        <ThemedText type="smallBold" themeColor="textSecondary">
+          LE MESSAGE DU COACH
+        </ThemedText>
+      </ThemedView>
+      {message ? (
+        <ThemedText style={styles.coachText}>{message}</ThemedText>
+      ) : (
+        <ThemedView style={styles.coachLoading}>
+          <ActivityIndicator color={theme.accent} />
+          <ThemedText type="small" themeColor="textSecondary">
+            Ton coach prépare son message…
+          </ThemedText>
+        </ThemedView>
+      )}
+    </Card>
   );
 }
 
@@ -202,4 +235,23 @@ const styles = StyleSheet.create({
     gap: Spacing.half,
   },
   actions: { gap: Spacing.three, marginTop: Spacing.two },
+  coachCard: {
+    marginTop: Spacing.two,
+    gap: Spacing.two,
+  },
+  coachHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.one,
+    backgroundColor: 'transparent',
+  },
+  coachText: {
+    lineHeight: 22,
+  },
+  coachLoading: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+    backgroundColor: 'transparent',
+  },
 });

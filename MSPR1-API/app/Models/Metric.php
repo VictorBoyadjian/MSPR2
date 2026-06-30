@@ -28,6 +28,7 @@ class Metric extends Model
         'workout_frequency',
         'water_intake_l',
         'experience_level',
+        'coach_message',
         'created_at',
         'updated_at'
     ];

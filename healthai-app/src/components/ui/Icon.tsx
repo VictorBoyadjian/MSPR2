@@ -43,6 +43,7 @@ export type IconName =
   | 'time'
   | 'flame'
   | 'list'
+  | 'coach'
   | 'theme-auto'
   | 'theme-light'
   | 'theme-dark';
@@ -84,6 +85,7 @@ const GLYPHS: Record<IconName, IoniconName> = {
   time: 'time-outline',
   flame: 'flame-outline',
   list: 'list-outline',
+  coach: 'sparkles-outline',
   'theme-auto': 'contrast-outline',
   'theme-light': 'sunny-outline',
   'theme-dark': 'moon-outline',

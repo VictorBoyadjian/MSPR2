@@ -14,6 +14,7 @@ export type Metric = {
   workout_frequency: number | null;
   water_intake_l: number | null;
   experience_level: number | null;
+  coach_message: string | null;
   created_at: string;
   updated_at: string;
 };

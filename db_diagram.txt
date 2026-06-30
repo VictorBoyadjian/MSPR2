@@ -62,6 +62,7 @@ Table "metrics" {
   "body_fat_pct" FLOAT
   "heart_rate_resting" INT
   "calories_burned" FLOAT
+  "coach_message" TEXT
   "created_at" TIMESTAMP [default: `NOW()`]
   "updated_at" TIMESTAMP [default: `NOW()`]
 

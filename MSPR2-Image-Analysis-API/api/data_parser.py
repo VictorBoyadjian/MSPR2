@@ -6,7 +6,7 @@ from mistralai import ChatCompletionResponse
 import re
 
 #Modules
-from data_schemas import OutputResponse, DishCalculateOutput, Food, ScannedFood
+from data_schemas import OutputResponse, DishCalculateOutput, Food, ScannedFood, CoachMessageOutput
 from color_enum import ColorEnum
 from logs_service import LogService
 
@@ -142,6 +142,26 @@ class Parser():
             return {}
         return cls._foods_response(content)
         
+    @classmethod
+    def mistral_coach_reponse(cls, response : ChatCompletionResponse) -> Union[CoachMessageOutput, dict]:
+        try:
+            content = response.choices[0].message.content
+
+            if not content:
+                return {}
+
+            # Réponse en texte libre : on enlève juste guillemets et espaces parasites.
+            message = str(content).strip().strip('"').strip()
+
+            if not message:
+                return {}
+
+            return CoachMessageOutput(message=message)
+        except Exception as e:
+            print(f"{ColorEnum.ERROR.format('[ERROR]')}: An error occurred while parsing the model response : {e}")
+            LogService.send_log(e)
+            return {}
+
     @classmethod
     def mistral_reponse(cls, response : ChatCompletionResponse) -> Union[DishCalculateOutput, dict]:
         try:    
