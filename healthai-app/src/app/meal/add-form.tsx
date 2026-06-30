@@ -50,7 +50,7 @@ export default function AddMealScreen() {
       <ThemedView style={styles.centered}>
         <ActivityIndicator size="large" color={theme.accent} />
         <ThemedText type="small" themeColor="textSecondary">
-          Analyse de votre repas…
+          Calcul des calories avec l&apos;IA&nbsp;!
         </ThemedText>
       </ThemedView>
     );
@@ -70,7 +70,7 @@ export default function AddMealScreen() {
           <View style={styles.headerText}>
             <ThemedText type="subtitle">Mon repas</ThemedText>
             <ThemedText type="small" themeColor="textSecondary">
-              Listez vos aliments, on calcule les calories.
+              Listez vos aliments, l&apos;IA calcule les calories.
             </ThemedText>
           </View>
           <Pressable

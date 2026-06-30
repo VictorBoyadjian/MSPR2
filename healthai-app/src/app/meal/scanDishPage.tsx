@@ -104,6 +104,9 @@ export default function ScanDishPage() {
       <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.content}>
           <ThemedText type="subtitle">Scanner mon plat</ThemedText>
+          <ThemedText type="small" themeColor="textSecondary">
+            Reconnais les aliments de ton assiette, grâce à l&apos;IA&nbsp;!
+          </ThemedText>
 
           {/* Zone carrée : caméra ou aperçu */}
           <View style={styles.square}>

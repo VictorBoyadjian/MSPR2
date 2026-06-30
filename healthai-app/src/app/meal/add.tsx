@@ -30,7 +30,7 @@ export default function AddMealScreen() {
               <Icon name="camera" size={40} color={theme.text} />
               <ThemedText type="smallBold">Scanner mon repas</ThemedText>
               <ThemedText type="small" style={styles.cardHint}>
-                Prenez une photo, l&apos;analyse est automatique.
+                Reconnais les aliments de ton assiette, grâce à l&apos;IA&nbsp;!
               </ThemedText>
             </Pressable>
 

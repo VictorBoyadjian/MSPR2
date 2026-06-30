@@ -42,7 +42,7 @@ export default function ProgramStep({ data, selectedGoalId, onSelect }: ProgramS
       <StepHeader
         eyebrow="TON PROGRAMME"
         title="Quel programme veux-tu suivre ?"
-        sub="On a classé les programmes selon ton profil. Tu peux en choisir un autre."
+        sub="Proposition de programme selon notre modèle privé d'Intelligence artificielle. Tu peux en choisir un autre."
       />
 
       {loading ? (
