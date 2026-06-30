@@ -54,3 +54,17 @@ class DishCalculateOutput(BaseModel):
     fats_g : int = 30
     fiber_g : float = 10.0
     proteins_g : int = 60
+
+class CoachMessageInput(BaseModel):
+    first_name : str = ""
+    goal : str = "Maintien et bien-être"
+    current_weight_kg : Optional[float] = None
+    target_weight_kg : Optional[float] = None
+    sport_hours_this_week : float = 0.0
+    weekly_average_hours : float = 0.0
+    sessions_count : int = 0
+    meals_logged : int = 0
+    avg_daily_calories : float = 0.0
+
+class CoachMessageOutput(BaseModel):
+    message : str = ""

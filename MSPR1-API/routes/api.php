@@ -54,6 +54,11 @@ Route::middleware('logRequests')->group(function (){
         Route::get('me/metrics/current', [HealthMetricController::class, 'current'])->name('me.metrics.current');
         Route::put('me/metrics', [HealthMetricController::class, 'upsert'])->name('me.metrics.upsert');
 
+        // Message quotidien du coach IA (stocké dans la métrique du jour).
+        // L'app lit le message du jour et l'écrit en arrière-plan après génération Mistral.
+        Route::get('me/coach-message', [HealthMetricController::class, 'coachMessage'])->name('me.coach.show');
+        Route::put('me/coach-message', [HealthMetricController::class, 'saveCoachMessage'])->name('me.coach.save');
+
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
     });
 
