@@ -115,7 +115,7 @@ class TestGenerate:
 
         assert result == {}
 
-    def test_returns_empty_dict_when_request_raises(self, monkeypatch) -> None:
+    def test_returns_fallback_when_request_raises(self, monkeypatch) -> None:
         def boom(**kwargs):
             raise RuntimeError("401 unauthorized")
 
@@ -127,7 +127,8 @@ class TestGenerate:
 
         result = MistralVisionService.generate(_input())
 
-        assert result == {}
+        assert isinstance(result, OutputResponse)
+        assert result.aliments
 
     def test_logs_failure_when_output_empty(self, monkeypatch, capsys) -> None:
         monkeypatch.setattr(
