@@ -1590,6 +1590,8 @@ COPY "Data".dishes (id, name, calories_kcal, proteins_g, carbs_g, fats_g, fiber_
 92	Pizza jambon champignons roquette	1980	95	180	95	\N	\N	\N	\N	lunch	\N	7	2026-06-27 10:51:50	2026-06-27 10:52:03	2026-06-27 10:52:03
 93	Salade grecque	85	3	18	0	\N	\N	\N	\N	lunch	\N	7	2026-06-27 18:38:13	2026-06-27 18:38:27	2026-06-27 18:38:27
 94	Croissant	406	8	46	21	\N	\N	\N	\N	breakfast	\N	7	2026-06-29 09:32:15	2026-06-29 09:32:32	2026-06-29 09:32:32
+95	Burger Mozzarella Beef Cheese McDonald's	889	44	70	47	\N	\N	\N	\N	lunch	\N	7	2026-06-29 13:46:17	2026-06-29 13:46:51	2026-06-29 14:54:01
+97	McFlurry M&M's au chocolat	320	6	45	14	\N	\N	\N	\N	lunch	\N	7	2026-06-29 14:54:07	2026-06-29 14:54:39	2026-06-29 14:54:39
 \.
 
 
@@ -1767,6 +1769,7 @@ COPY "Data".media (id, model_type, model_id, uuid, collection_name, name, file_n
 1	App\\Models\\Post	10	2f164b37-be3a-457b-acd1-19c5f9e652ad	post_media	channels4_profile	channels4_profile.jpg	image/jpeg	public	public	8579	[]	[]	[]	[]	1	2026-06-19 14:39:12	2026-06-19 14:39:12
 2	App\\Models\\Post	1	6413c7c5-3aab-4dd0-9bb2-36c094d58351	post_media	channels4_profile	channels4_profile.jpg	image/jpeg	public	public	8579	[]	[]	[]	[]	1	2026-06-20 09:13:45	2026-06-20 09:13:45
 3	App\\Models\\Post	6	4223d2de-64ad-42d7-99f5-254490729c7a	post_media	poulet-saute-au-brocoli-bpb1-1200	poulet-saute-au-brocoli-bpb1-1200.webp	image/webp	public	public	109904	[]	[]	[]	[]	1	2026-06-29 13:20:15	2026-06-29 13:20:15
+4	App\\Models\\Post	7	d28a40b4-e12e-482c-90ac-fdc827ee792f	post_media	poulet-broco	poulet-broco.jpeg	image/jpeg	public	public	28875	[]	[]	[]	[]	1	2026-06-29 13:32:21	2026-06-29 13:32:21
 \.
 
 
@@ -1782,6 +1785,7 @@ COPY "Data".metrics (id, user_id, recorded_at, weight_kg, bmi, body_fat_pct, hea
 5	20	2026-06-17 00:35:17	74.5	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	2026-06-17 00:35:17	2026-06-17 00:35:17
 6	7	2026-06-19 00:39:16	66	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	2026-06-19 00:39:16	2026-06-19 00:39:16
 7	7	2026-06-21 08:58:50	66.5	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	2026-06-21 08:58:50	2026-06-21 08:58:50
+8	7	2026-06-30 00:16:04	66.5	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	\N	2026-06-30 00:16:04	2026-06-30 00:16:04
 \.
 
 
@@ -1792,6 +1796,7 @@ COPY "Data".metrics (id, user_id, recorded_at, weight_kg, bmi, body_fat_pct, hea
 COPY "Data".posts (id, content, user_id, created_at, updated_at) FROM stdin;
 1	{"title":"test","message":"test"}	10	2026-06-20 09:07:17	2026-06-20 09:07:17
 6	{"text":"Regardez g mang\\u00e9 !!"}	40	2026-06-29 13:20:15	2026-06-29 13:20:15
+7	{"text":"Regardez g mang\\u00e9 !"}	40	2026-06-29 13:32:21	2026-06-29 13:32:21
 \.
 
 
@@ -1988,6 +1993,7 @@ COPY "Data".user_like_comments (user_id, comment_id) FROM stdin;
 COPY "Data".user_like_posts (user_id, post_id) FROM stdin;
 10	1
 40	1
+40	7
 \.
 
 
@@ -2055,6 +2061,7 @@ COPY "Data".users (id, email, password, first_name, last_name, age, gender, weig
 41	iae@test.com	$2y$12$6yBxAS1N.jwnm9OWcRDkYOaPox.x7Y3lnh67ONvc9PEpexPya0o1y	Idma	Moaen	\N	\N	\N	\N	f	t	\N	2026-06-19 09:59:22	2026-06-19 09:59:22	\N	\N	\N	\N	\N	12
 42	doso@gmail.com	$2y$12$NC40pVdpYQX3S7LDDbwgIuLkJjRIwnx9Utzo28FL8mmqE/bp8TsxW	Dldlsm	Dispos	21	female	74	162	f	t	\N	2026-06-19 16:08:47	2026-06-19 16:11:25	7	27	82	1.5	70.3	12
 43	faustine.ozil01@orange.fr	$2y$12$WCT6ZHHvxkZhG5iWlgDaM.0ajTlCkVVqouKvMCJiegGmcNgepxTZy	Faustine	Ozil	19	female	53	153	f	t	\N	2026-06-19 17:53:27	2026-06-19 17:57:04	5	17	80	0	55.65	12
+45	e.tchenar@gmail.com	$2y$12$xJ4zc16SIjjB/wqqQRPgs.cFYIRZFWr0.dUwWSKf17KQUCC4VrMVa	\N	\N	\N	\N	\N	\N	f	t	\N	2026-06-29 15:20:53	2026-06-29 15:20:53	\N	\N	\N	\N	\N	12
 \.
 
 
@@ -2179,7 +2186,6 @@ laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..3	Tzoz
 laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..17	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781644875
 laravel-cache-rest.authorization.dish_resource.delete.dish.32.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781613241
 laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..1	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781589535
-laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782725853
 laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..9	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781613670
 laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..17	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781644875
 laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..4	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781599921
@@ -2215,7 +2221,6 @@ laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..
 laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..17	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781645097
 laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..17	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781645097
 laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..3	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781563584
-laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782725854
 laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..4	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781601121
 laravel-cache-rest.authorization.dish_resource.update.dish.36.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781636093
 laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..14	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781636519
@@ -2285,6 +2290,7 @@ laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap
 laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..2	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781665787
 laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..2	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781665787
 laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..2	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781665788
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782746396
 laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..34	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781820291
 laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..25	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781685461
 laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..25	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781685461
@@ -2308,16 +2314,16 @@ laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\W
 laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..22	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781679962
 laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..43	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781892154
 laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..43	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781892154
-laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782725854
 laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..24	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781682078
-laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782725854
 laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..25	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781755789
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782746396
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782746396
+laravel-cache-rest.authorization.log_resource.create.log..10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782748540
 laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..43	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781892038
 laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..43	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781892199
 laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..32	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781823167
-laravel-cache-rest.authorization.post_resource.create.post..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782739515
 laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..34	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781820292
-laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782725831
+laravel-cache-rest.authorization.dish_resource.update.dish.95.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782745141
 laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..34	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781820656
 laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..34	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781820709
 laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..34	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781820709
@@ -2330,10 +2336,14 @@ laravel-cache-rest.authorization.comment_resource.create.comment..40	TzozMToiSWx
 laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..32	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781823066
 laravel-cache-rest.authorization.dish_resource.delete.dish.64.32	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781823074
 laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..32	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781823180
+laravel-cache-rest.authorization.post_resource.create.post..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782740241
+laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782741024
 laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..35	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781823827
 laravel-cache-rest.authorization.workout_session_resource.viewAny.App\\Models\\WorkoutSession..35	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781823980
 laravel-cache-rest.authorization.workout_exercise_resource.viewAny.App\\Models\\WorkoutExercise..35	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781823980
+laravel-cache-rest.authorization.post_resource.viewAny.App\\Models\\Post..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782745355
 laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..33	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782210819
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782746396
 laravel-cache-rest.authorization.dish_resource.delete.dish.89.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782471414
 laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..43	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781892042
 laravel-cache-rest.authorization.dish_resource.delete.dish.66.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781829764
@@ -2368,9 +2378,7 @@ laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..39	Tzo
 laravel-cache-rest.authorization.dish_resource.create.dish..39	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781859290
 laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..39	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781859294
 laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..39	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781859299
-laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781861146
-laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781861157
-laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781861163
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782778845
 laravel-cache-rest.authorization.dish_resource.create.dish..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781861255
 laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781861284
 laravel-cache-rest.authorization.allergy_resource.viewAny.App\\Models\\Allergy..42	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781885760
@@ -2383,24 +2391,28 @@ laravel-cache-rest.authorization.dish_resource.update.dish.76.33	TzozMToiSWxsdW1
 laravel-cache-rest.authorization.dish_resource.update.dish.77.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781897887
 laravel-cache-rest.authorization.comment_resource.create.comment..10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781946860
 laravel-cache-rest.authorization.dish_resource.delete.dish.71.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781868874
-laravel-cache-rest.authorization.comment_resource.viewAny.App\\Models\\Comment..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782739492
+laravel-cache-rest.authorization.comment_resource.viewAny.App\\Models\\Comment..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782740671
+laravel-cache-rest.authorization.goal_resource.viewAny.App\\Models\\Goal..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782741024
+laravel-cache-rest.authorization.media_resource.viewAny.App\\Models\\Media..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782745355
+laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782778847
 laravel-cache-rest.authorization.post_resource.update.post.10.10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781881237
 laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..42	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781885764
 laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..43	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781892124
 laravel-cache-spatie.permission.cache	a:3:{s:5:"alias";a:4:{s:1:"a";s:2:"id";s:1:"b";s:4:"name";s:1:"c";s:10:"guard_name";s:1:"r";s:5:"roles";}s:11:"permissions";a:24:{i:0;a:4:{s:1:"a";i:1;s:1:"b";s:11:"view dishes";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:1;a:4:{s:1:"a";i:2;s:1:"b";s:13:"create dishes";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:2;a:4:{s:1:"a";i:3;s:1:"b";s:13:"update dishes";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:3;a:4:{s:1:"a";i:4;s:1:"b";s:13:"delete dishes";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:4;a:4:{s:1:"a";i:5;s:1:"b";s:14:"view exercises";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:5;a:4:{s:1:"a";i:6;s:1:"b";s:16:"create exercises";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:6;a:4:{s:1:"a";i:7;s:1:"b";s:16:"update exercises";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:7;a:4:{s:1:"a";i:8;s:1:"b";s:16:"delete exercises";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:8;a:4:{s:1:"a";i:9;s:1:"b";s:10:"view goals";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:9;a:4:{s:1:"a";i:10;s:1:"b";s:12:"create goals";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:10;a:4:{s:1:"a";i:11;s:1:"b";s:12:"update goals";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:11;a:4:{s:1:"a";i:12;s:1:"b";s:12:"delete goals";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:12;a:4:{s:1:"a";i:13;s:1:"b";s:12:"view metrics";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:13;a:4:{s:1:"a";i:14;s:1:"b";s:14:"create metrics";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:14;a:4:{s:1:"a";i:15;s:1:"b";s:14:"update metrics";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:15;a:4:{s:1:"a";i:16;s:1:"b";s:14:"delete metrics";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:16;a:4:{s:1:"a";i:17;s:1:"b";s:13:"view sessions";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:17;a:4:{s:1:"a";i:18;s:1:"b";s:15:"create sessions";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:18;a:4:{s:1:"a";i:19;s:1:"b";s:15:"update sessions";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:19;a:4:{s:1:"a";i:20;s:1:"b";s:15:"delete sessions";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:20;a:4:{s:1:"a";i:21;s:1:"b";s:10:"view users";s:1:"c";s:3:"web";s:1:"r";a:2:{i:0;i:1;i:1;i:2;}}i:21;a:4:{s:1:"a";i:22;s:1:"b";s:12:"create users";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:22;a:4:{s:1:"a";i:23;s:1:"b";s:12:"update users";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}i:23;a:4:{s:1:"a";i:24;s:1:"b";s:12:"delete users";s:1:"c";s:3:"web";s:1:"r";a:1:{i:0;i:1;}}}s:5:"roles";a:2:{i:0;a:3:{s:1:"a";i:1;s:1:"b";s:13:"Administrator";s:1:"c";s:3:"web";}i:1;a:3:{s:1:"a";i:2;s:1:"b";s:4:"User";s:1:"c";s:3:"web";}}}	1782811791
 laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..33	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781893435
-laravel-cache-rest.authorization.dish_resource.create.dish..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782725852
 laravel-cache-rest.authorization.post_resource.create.post..10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781946737
 laravel-cache-rest.authorization.user_resource.view.user.10.10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781946738
-laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782738211
 laravel-cache-rest.authorization.post_resource.update.post.1.10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781947123
 laravel-cache-rest.authorization.media_resource.viewAny.App\\Models\\Media..13	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781947293
 laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..13	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1781947293
-laravel-cache-rest.authorization.post_resource.viewAny.App\\Models\\Post..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782739378
-laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782739378
-laravel-cache-rest.authorization.media_resource.viewAny.App\\Models\\Media..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782739378
-laravel-cache-rest.authorization.log_resource.create.log..10	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782739515
-laravel-cache-rest.authorization.metric_resource.viewAny.App\\Models\\Metric..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782032620
+laravel-cache-rest.authorization.media_resource.viewAny.App\\Models\\Media..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782740668
+laravel-cache-rest.authorization.dish_resource.viewAny.App\\Models\\Dish..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782740871
+laravel-cache-rest.authorization.user_resource.viewAny.App\\Models\\User..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782741024
+laravel-cache-rest.authorization.handicap_resource.viewAny.App\\Models\\Handicap..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782741024
+laravel-cache-rest.authorization.post_resource.viewAny.App\\Models\\Post..40	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782740668
+laravel-cache-rest.authorization.dish_resource.delete.dish.96.7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782741380
+laravel-cache-rest.authorization.dish_resource.create.dish..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782745179
+laravel-cache-rest.authorization.comment_resource.viewAny.App\\Models\\Comment..7	TzozMToiSWxsdW1pbmF0ZVxBdXRoXEFjY2Vzc1xSZXNwb25zZSI6NDp7czoxMDoiACoAYWxsb3dlZCI7YjoxO3M6MTA6IgAqAG1lc3NhZ2UiO047czo3OiIAKgBjb2RlIjtOO3M6OToiACoAc3RhdHVzIjtOO30=	1782745390
 \.
 
 
@@ -7214,6 +7226,7 @@ COPY "System".logs (id, api_name, data, type, ip, created_at, updated_at) FROM s
 019f1352-ed09-733d-beab-90f93c6bc43d	Laravel	api/logs/mutate	request	10.250.18.253	2026-06-29 12:20:29	2026-06-29 12:20:29
 019f1352-ed60-73d0-95bf-3251eadaee5d	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 12:20:29	2026-06-29 12:20:29
 019f1352-ed83-70f8-8edb-89b8a137a3e8	Laravel	api/logs/mutate	request	10.250.18.253	2026-06-29 12:20:29	2026-06-29 12:20:29
+019f13a5-3a97-71a6-b89f-3a931a6fa9bb	Laravel	api/me	request	10.136.204.79	2026-06-29 13:50:23	2026-06-29 13:50:23
 019f1352-ed8a-72b1-ad44-f1a45b063b18	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 12:20:29	2026-06-29 12:20:29
 019f1352-eda3-73d6-8858-79f95c184285	Laravel	api/logs/mutate	request	10.250.18.253	2026-06-29 12:20:29	2026-06-29 12:20:29
 019f1352-edaa-7285-b84f-6e74d7096766	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 12:20:29	2026-06-29 12:20:29
@@ -7314,6 +7327,256 @@ COPY "System".logs (id, api_name, data, type, ip, created_at, updated_at) FROM s
 019f138a-683f-72c8-b83b-a87d800b2699	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:21:05	2026-06-29 13:21:05
 019f138a-6858-7127-9f44-82f60e673291	Laravel	api/logs/mutate	request	10.253.66.29	2026-06-29 13:21:05	2026-06-29 13:21:05
 019f138a-685e-717d-bf3a-9eb74ce96297	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 13:21:05	2026-06-29 13:21:05
+019f1392-d128-71ac-9d9a-1a69960d0479	Laravel	api/logs/mutate	request	10.133.27.228	2026-06-29 13:30:16	2026-06-29 13:30:16
+019f1392-d15d-7381-a84e-6ee898978957	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:30:16	2026-06-29 13:30:16
+019f1392-d178-7238-8616-1776e4f22d79	Laravel	api/logs/mutate	request	10.133.27.228	2026-06-29 13:30:16	2026-06-29 13:30:16
+019f1392-d17c-716a-9d7d-f11190951719	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:30:16	2026-06-29 13:30:16
+019f1392-d197-7081-b004-e66c1b21b43a	Laravel	api/logs/mutate	request	10.133.27.228	2026-06-29 13:30:16	2026-06-29 13:30:16
+019f1392-d19c-72c1-bf54-c6bc8c368abb	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 13:30:16	2026-06-29 13:30:16
+019f1394-69e2-7343-aa89-e4da967f1e23	Laravel	api/me	request	79.127.178.82	2026-06-29 13:32:01	2026-06-29 13:32:01
+019f1394-6a76-71e3-b7c2-9aef4d5c8831	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:32:01	2026-06-29 13:32:01
+019f1394-6a94-7186-afa1-cf1ee28b298e	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:32:01	2026-06-29 13:32:01
+019f1394-6920-705e-998e-46135e09ca11	Laravel	api/logs/mutate	request	172.20.0.1	2026-06-29 13:32:01	2026-06-29 13:32:01
+019f1394-6a59-70d1-8fc8-816e10272fe1	image-analysis-api	can only concatenate str (not "int") to str	error	null	2026-06-29 13:32:01	2026-06-29 13:32:01
+019f1394-b930-73ca-abf5-2a7493a9d59b	Laravel	api/posts/mutate	request	79.127.178.82	2026-06-29 13:32:21	2026-06-29 13:32:21
+019f1394-b9c2-72e9-845d-5bdfd2626a78	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:32:21	2026-06-29 13:32:21
+019f1394-f371-700a-84a4-1f64f5f22e17	Laravel	api/posts/7/like	request	79.127.178.82	2026-06-29 13:32:36	2026-06-29 13:32:36
+019f1395-0481-70e8-863e-2ba3f12b98ae	Laravel	api/comments/search	request	79.127.178.82	2026-06-29 13:32:40	2026-06-29 13:32:40
+019f1395-0482-724a-b27c-0fa492198157	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:32:40	2026-06-29 13:32:40
+019f1395-0936-7265-a689-3d1b0ce4bd89	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:32:42	2026-06-29 13:32:42
+019f1395-0d3f-70e6-af57-d533656d3ac3	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:32:43	2026-06-29 13:32:43
+019f1395-0d40-7369-ba91-811c5dde16a6	Laravel	api/comments/search	request	79.127.178.82	2026-06-29 13:32:43	2026-06-29 13:32:43
+019f1395-13bb-7343-b58a-3605e3fe1c50	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:32:44	2026-06-29 13:32:44
+019f1395-1bf0-704d-a08f-225bfae38bca	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:32:46	2026-06-29 13:32:46
+019f1395-1bf0-718f-acc2-b02567215801	Laravel	api/comments/search	request	79.127.178.82	2026-06-29 13:32:46	2026-06-29 13:32:46
+019f1395-21b9-7054-8885-6fdb6b641de5	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:32:48	2026-06-29 13:32:48
+019f1395-2755-7017-b5ce-1323d564a002	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:32:49	2026-06-29 13:32:49
+019f1395-2756-7046-8d36-dbfc47810970	Laravel	api/comments/search	request	79.127.178.82	2026-06-29 13:32:49	2026-06-29 13:32:49
+019f1395-3873-73a3-a577-67fc7297f629	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:32:54	2026-06-29 13:32:54
+019f1396-b635-7206-a470-2f296bbf84d7	Laravel	api/logs/mutate	request	10.234.17.207	2026-06-29 13:34:31	2026-06-29 13:34:31
+019f1396-b66f-7166-9130-6afc7a895771	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:34:32	2026-06-29 13:34:32
+019f1396-b69f-710e-857d-ea92b3ea0957	Laravel	api/logs/mutate	request	10.234.17.207	2026-06-29 13:34:32	2026-06-29 13:34:32
+019f1396-b6a4-71c5-911d-dde4d0381609	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:34:32	2026-06-29 13:34:32
+019f1396-b6c1-707f-bb66-a5ba53304ff5	Laravel	api/logs/mutate	request	10.234.17.207	2026-06-29 13:34:32	2026-06-29 13:34:32
+019f1396-b6c7-7104-93df-d0a1bafdb926	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 13:34:32	2026-06-29 13:34:32
+019f1396-e48b-70e7-b899-4b54f2c4ba8e	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:34:43	2026-06-29 13:34:43
+019f1396-e48b-72f8-9c9a-510107603d69	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:34:43	2026-06-29 13:34:43
+019f1396-ffdc-71b0-952f-f89a9bf98f91	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:34:50	2026-06-29 13:34:50
+019f1396-ffe5-70f5-8145-35cfff8ad650	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:34:50	2026-06-29 13:34:50
+019f1397-2701-7152-996c-bfed0ebe0279	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:35:00	2026-06-29 13:35:00
+019f1397-2701-7326-8646-08ce4f286b5b	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:35:00	2026-06-29 13:35:00
+019f1397-4a02-703e-b7ef-09cbd7b328a2	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:35:09	2026-06-29 13:35:09
+019f1397-4a07-704b-bdfb-ec4a3a87a8a9	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:35:09	2026-06-29 13:35:09
+019f1397-c716-732f-881f-1448ca6725e9	Laravel	api/me	request	79.127.178.82	2026-06-29 13:35:41	2026-06-29 13:35:41
+019f1397-c7ad-70d1-8b95-b3a9ccd4430e	Laravel	api/me/sessions	request	79.127.178.82	2026-06-29 13:35:41	2026-06-29 13:35:41
+019f1397-c7af-7121-86dd-49469f53687f	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:35:41	2026-06-29 13:35:41
+019f1397-c7c5-72db-93c3-a791ce21e459	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:35:42	2026-06-29 13:35:42
+019f1397-c7f3-727a-9680-e3368cf09e05	Laravel	api/me/sessions	request	79.127.178.82	2026-06-29 13:35:42	2026-06-29 13:35:42
+019f139b-3df3-7244-9560-495e4207c2d4	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:39:28	2026-06-29 13:39:28
+019f139b-3df4-730a-9b14-682d2984e55a	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:39:28	2026-06-29 13:39:28
+019f139b-48c5-7301-a573-bf5c15d9819d	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:39:31	2026-06-29 13:39:31
+019f139b-50fa-7379-85ce-f6859baa416f	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:39:33	2026-06-29 13:39:33
+019f139b-5f29-7186-abd3-6929190292d7	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:39:37	2026-06-29 13:39:37
+019f139b-61d6-7169-a6d2-2474582e23bb	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:39:38	2026-06-29 13:39:38
+019f139b-75f8-7343-9f21-5d9a11f98910	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:39:43	2026-06-29 13:39:43
+019f139b-7d53-70b2-833c-c7fb9099e3ff	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:39:45	2026-06-29 13:39:45
+019f139b-7d56-7193-90bd-0e089d9efc02	Laravel	api/comments/search	request	79.127.178.82	2026-06-29 13:39:45	2026-06-29 13:39:45
+019f139b-8693-720b-824a-44b418a705c7	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:39:47	2026-06-29 13:39:47
+019f139b-9426-72be-95dc-877c31991c84	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:39:50	2026-06-29 13:39:50
+019f139b-afa7-7020-a6d0-f0ec0a98b766	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:39:57	2026-06-29 13:39:57
+019f139b-afa7-701d-a9a1-61311092ffd2	Laravel	api/comments/search	request	79.127.178.82	2026-06-29 13:39:57	2026-06-29 13:39:57
+019f139b-c5f9-70d2-aa15-e166f51c8df8	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 13:40:03	2026-06-29 13:40:03
+019f139e-55e3-7068-abf8-fb5cd28d1f11	Laravel	api/me	request	79.127.178.82	2026-06-29 13:42:51	2026-06-29 13:42:51
+019f139e-5670-7290-bb6e-8ff07c20025e	Laravel	api/me/sessions	request	79.127.178.82	2026-06-29 13:42:51	2026-06-29 13:42:51
+019f139e-5670-73f9-bc97-230fc22c6fcb	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:42:51	2026-06-29 13:42:51
+019f139e-567a-701c-986e-045da9745d85	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:42:51	2026-06-29 13:42:51
+019f139e-56b0-71ff-beab-5f4522b39172	Laravel	api/me/sessions	request	79.127.178.82	2026-06-29 13:42:51	2026-06-29 13:42:51
+019f139e-7d85-7360-9c35-dced1eef0b9b	Laravel	api/me	request	79.127.178.82	2026-06-29 13:43:01	2026-06-29 13:43:01
+019f139e-7e0c-73af-acda-c2faa374cb16	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:43:01	2026-06-29 13:43:01
+019f139e-7e0c-715d-9766-42ecd27a881d	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:43:01	2026-06-29 13:43:01
+019f139e-7e0e-70fe-a082-bd5b7fd726f4	Laravel	api/me/sessions	request	79.127.178.82	2026-06-29 13:43:01	2026-06-29 13:43:01
+019f139e-7e49-723d-835a-5db4bc005712	Laravel	api/me/sessions	request	79.127.178.82	2026-06-29 13:43:01	2026-06-29 13:43:01
+019f13a0-aaf7-708a-8bd1-cb8a82931c7e	Laravel	api/allergies/search	request	79.127.178.82	2026-06-29 13:45:24	2026-06-29 13:45:24
+019f13a0-aaf8-733c-bd01-84c7cffe1bbb	Laravel	api/goals/search	request	79.127.178.82	2026-06-29 13:45:24	2026-06-29 13:45:24
+019f13a0-aafc-7285-8717-e3b9832e362b	Laravel	api/users/search	request	79.127.178.82	2026-06-29 13:45:24	2026-06-29 13:45:24
+019f13a0-ab20-7292-a91e-0ca745dd5c05	Laravel	api/handicaps/search	request	79.127.178.82	2026-06-29 13:45:24	2026-06-29 13:45:24
+019f13a0-b92d-70cf-9fb1-64da7faa0777	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:45:28	2026-06-29 13:45:28
+019f13a0-b92e-733e-9239-0e18f66f180c	Laravel	api/me/sessions	request	79.127.178.82	2026-06-29 13:45:28	2026-06-29 13:45:28
+019f13a1-28ca-70d7-ab94-59f1f4c84eda	Laravel	api/logout	request	79.127.178.82	2026-06-29 13:45:56	2026-06-29 13:45:56
+019f13a1-4b24-70e2-9ed1-df2170627ed4	Laravel	api/login	request	79.127.178.82	2026-06-29 13:46:05	2026-06-29 13:46:05
+019f13a1-4c57-7323-8434-0ac7fad0382f	Laravel	api/me	request	79.127.178.82	2026-06-29 13:46:05	2026-06-29 13:46:05
+019f13a1-4ced-7055-b247-7a1b70b8b7f4	Laravel	api/me/sessions	request	79.127.178.82	2026-06-29 13:46:05	2026-06-29 13:46:05
+019f13a1-4cf0-7389-aae2-35a24a6b5b68	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:46:05	2026-06-29 13:46:05
+019f13a1-4cf9-727c-a7c7-fe9cbdf5c243	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:46:05	2026-06-29 13:46:05
+019f13a1-4d2b-738c-aaa0-3cfd60b6b3fc	Laravel	api/me/sessions	request	79.127.178.82	2026-06-29 13:46:05	2026-06-29 13:46:05
+019f13a1-61cc-7171-984e-efd00acea53d	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:46:11	2026-06-29 13:46:11
+019f13a1-61cd-70ac-b5e8-36b7254e75a4	Laravel	api/goals/search	request	79.127.178.82	2026-06-29 13:46:11	2026-06-29 13:46:11
+019f13a1-61ce-70dd-a4c3-c5134448ac85	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:46:11	2026-06-29 13:46:11
+019f13a1-6247-7369-b782-f48110f38c30	Laravel	api/users/search	request	79.127.178.82	2026-06-29 13:46:11	2026-06-29 13:46:11
+019f13a1-635b-72f3-a960-038030b47802	Laravel	api/me	request	152.233.12.245	2026-06-29 13:46:11	2026-06-29 13:46:11
+019f13a1-635c-73d2-908d-f38267ec1b8a	Laravel	api/me	request	152.233.12.241	2026-06-29 13:46:11	2026-06-29 13:46:11
+019f13a1-f323-7226-8103-1bca51aee3f6	Laravel	api/logs/mutate	request	10.234.17.207	2026-06-29 13:46:48	2026-06-29 13:46:48
+019f13a1-f32f-70f4-8fde-30781c679c88	image-analysis-api	/dish-calculate	request	100.64.0.3	2026-06-29 13:46:48	2026-06-29 13:46:48
+019f13a1-f350-7248-849f-646f36d3584e	Laravel	api/me	request	10.234.17.207	2026-06-29 13:46:48	2026-06-29 13:46:48
+019f13a2-003b-7274-8217-ecbf35c7b97f	Laravel	api/dishes/mutate	request	79.127.178.82	2026-06-29 13:46:51	2026-06-29 13:46:51
+019f13a2-0b66-71d6-a132-5d7f562f95fc	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:46:54	2026-06-29 13:46:54
+019f13a2-1134-7330-a9fa-45887060996c	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:46:56	2026-06-29 13:46:56
+019f13a2-2fdc-72dd-a19a-27ce3418cb38	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:47:04	2026-06-29 13:47:04
+019f13a3-c0b3-70ae-a625-e8551c47415b	Laravel	api/logs/mutate	request	10.136.204.79	2026-06-29 13:48:46	2026-06-29 13:48:46
+019f13a3-c0db-73ff-9c32-7cfc33c8ac74	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:48:46	2026-06-29 13:48:46
+019f13a3-c0f6-7155-9852-63897acd6430	Laravel	api/logs/mutate	request	10.136.204.79	2026-06-29 13:48:46	2026-06-29 13:48:46
+019f13a3-c0fc-705e-a898-d033f45a7bd6	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:48:46	2026-06-29 13:48:46
+019f13a3-c11b-73a6-a22c-43d06f4b2304	Laravel	api/logs/mutate	request	10.136.204.79	2026-06-29 13:48:46	2026-06-29 13:48:46
+019f13a3-c121-7312-9aa6-3d7e86bcb37a	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 13:48:46	2026-06-29 13:48:46
+019f13a5-1092-71c2-ac6f-df4ecea2ebb2	Laravel	api/me	request	79.127.178.82	2026-06-29 13:50:12	2026-06-29 13:50:12
+019f13a5-10e7-72dd-9593-0a968932a700	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:50:12	2026-06-29 13:50:12
+019f13a5-10e7-7276-8adb-57a2794be0ea	Laravel	api/me/sessions	request	79.127.178.82	2026-06-29 13:50:12	2026-06-29 13:50:12
+019f13a5-1104-734d-b7f8-83a78fcc3be0	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:50:12	2026-06-29 13:50:12
+019f13a5-1106-7020-9b5a-fabb16ff36da	Laravel	api/me/sessions	request	79.127.178.82	2026-06-29 13:50:12	2026-06-29 13:50:12
+019f13a5-3a7a-70d0-b784-35a91d21b766	Laravel	api/logs/mutate	request	10.136.204.79	2026-06-29 13:50:23	2026-06-29 13:50:23
+019f13a5-3a7f-705b-b844-f2979fa30ff9	image-analysis-api	/analyze-by-mistral	request	100.64.0.2	2026-06-29 13:50:23	2026-06-29 13:50:23
+019f13a5-6cc8-7070-a606-10d531360cb0	Laravel	api/logs/mutate	request	10.136.204.79	2026-06-29 13:50:36	2026-06-29 13:50:36
+019f13a5-6ccd-7023-89ae-4267068f5338	image-analysis-api	/dish-calculate	request	100.64.0.3	2026-06-29 13:50:36	2026-06-29 13:50:36
+019f13a5-6ce6-70a7-a457-0073501637ee	Laravel	api/me	request	10.136.204.79	2026-06-29 13:50:36	2026-06-29 13:50:36
+019f13a5-7253-735b-9012-9baa83b47977	Laravel	api/dishes/mutate	request	79.127.178.82	2026-06-29 13:50:37	2026-06-29 13:50:37
+019f13a5-d58f-7151-a556-70d56dc5d498	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:51:03	2026-06-29 13:51:03
+019f13a5-d591-70ae-84ca-a2a3be2c641f	Laravel	api/goals/search	request	79.127.178.82	2026-06-29 13:51:03	2026-06-29 13:51:03
+019f13a5-d5b2-72d1-8831-2e7d1f384066	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:51:03	2026-06-29 13:51:03
+019f13a5-d5eb-73c5-8374-942c815a77ef	Laravel	api/users/search	request	79.127.178.82	2026-06-29 13:51:03	2026-06-29 13:51:03
+019f13a5-d6cb-73bc-83bc-9cbd7dc89c4e	Laravel	api/me	request	152.233.13.165	2026-06-29 13:51:03	2026-06-29 13:51:03
+019f13a5-d6cc-7007-bad6-2d0dc6fff363	Laravel	api/me	request	152.233.13.164	2026-06-29 13:51:03	2026-06-29 13:51:03
+019f13a6-01be-7376-b15e-932c57994fac	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:51:14	2026-06-29 13:51:14
+019f13a6-01be-726d-8451-aef68362efc1	Laravel	api/me/sessions	request	79.127.178.82	2026-06-29 13:51:14	2026-06-29 13:51:14
+019f13a6-038c-7173-9f69-24580a43c7e9	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:51:14	2026-06-29 13:51:14
+019f13a6-0ba4-73ff-bb00-837d43c9ddd7	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:51:16	2026-06-29 13:51:16
+019f13a6-17b8-7365-8bcd-9e8ff49da454	Laravel	api/dishes	request	79.127.178.82	2026-06-29 13:51:19	2026-06-29 13:51:19
+019f13a6-1812-7150-a223-0c07132bd256	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 13:51:20	2026-06-29 13:51:20
+019f13a6-3a2e-7318-ac70-6a291f6591b4	Laravel	api/logs/mutate	request	10.191.84.152	2026-06-29 13:51:28	2026-06-29 13:51:28
+019f13a6-3a35-7023-a2be-6f2fd253b7bf	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:51:28	2026-06-29 13:51:28
+019f13a6-3a4f-70d1-93a2-2165d076d2a9	Laravel	api/logs/mutate	request	10.191.84.152	2026-06-29 13:51:28	2026-06-29 13:51:28
+019f13a6-3a54-73b1-a920-5eb79627c390	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:51:28	2026-06-29 13:51:28
+019f13a6-3a75-72f3-8dff-5ff6c7040a27	Laravel	api/logs/mutate	request	10.191.84.152	2026-06-29 13:51:28	2026-06-29 13:51:28
+019f13a6-3a79-7095-a86d-decd2cb7798f	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 13:51:28	2026-06-29 13:51:28
+019f13a6-c57f-719b-89f3-b199bb528ce6	Laravel	api/logs/mutate	request	10.209.106.237	2026-06-29 13:52:04	2026-06-29 13:52:04
+019f13a6-c5b2-7032-8fbf-dcd5053cc563	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:52:04	2026-06-29 13:52:04
+019f13a6-c5d0-738f-a9f5-1894aee24234	Laravel	api/logs/mutate	request	10.209.106.237	2026-06-29 13:52:04	2026-06-29 13:52:04
+019f13a6-c5d7-71b5-9f74-c1b2c116d1cd	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:52:04	2026-06-29 13:52:04
+019f13a6-c5f2-7330-a62c-5966b4940506	Laravel	api/logs/mutate	request	10.209.106.237	2026-06-29 13:52:04	2026-06-29 13:52:04
+019f13a6-c5f8-70b8-9a26-bda347bf50af	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 13:52:04	2026-06-29 13:52:04
+019f13a7-3b07-729e-a30f-ab959d052f64	Laravel	api/logs/mutate	request	10.246.71.84	2026-06-29 13:52:34	2026-06-29 13:52:34
+019f13a7-3b23-72ed-a2b2-18945959c3b4	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:52:34	2026-06-29 13:52:34
+019f13a7-3b43-71e0-83cd-cf3151d2b78b	Laravel	api/logs/mutate	request	10.246.71.84	2026-06-29 13:52:34	2026-06-29 13:52:34
+019f13a7-3b48-7213-973b-642f26445f53	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 13:52:34	2026-06-29 13:52:34
+019f13a7-3b61-72ff-9374-ba4e5e6356a6	Laravel	api/logs/mutate	request	10.246.71.84	2026-06-29 13:52:34	2026-06-29 13:52:34
+019f13a7-3b65-7188-ba87-e78f952018d3	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 13:52:34	2026-06-29 13:52:34
+019f13d7-f428-7375-8759-6c0eceedaf29	Laravel	api/logs/mutate	request	10.146.111.45	2026-06-29 14:45:47	2026-06-29 14:45:47
+019f13d7-f460-7288-a34f-bbfdea70050b	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 14:45:47	2026-06-29 14:45:47
+019f13d7-f47b-73f1-abc2-931e18d630f8	Laravel	api/logs/mutate	request	10.146.111.45	2026-06-29 14:45:47	2026-06-29 14:45:47
+019f13d7-f480-717f-b6a1-74532e33e567	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 14:45:47	2026-06-29 14:45:47
+019f13d7-f495-7253-b86a-547fb5c7cfcb	Laravel	api/logs/mutate	request	10.146.111.45	2026-06-29 14:45:47	2026-06-29 14:45:47
+019f13d7-f49a-72da-9d3f-0bf7f2076a4f	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 14:45:47	2026-06-29 14:45:47
+019f13de-5096-7110-a573-6410a1c419a9	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 14:52:44	2026-06-29 14:52:44
+019f13df-7d59-72c6-9fb9-d40f45f69178	Laravel	api/dishes/mutate	request	79.127.178.82	2026-06-29 14:54:01	2026-06-29 14:54:01
+019f13df-7dfc-710a-b473-9e8f8ca4f761	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 14:54:01	2026-06-29 14:54:01
+019f13e0-07b5-7182-b5e1-b3caf4ec8bd6	Laravel	api/logs/mutate	request	10.146.111.45	2026-06-29 14:54:36	2026-06-29 14:54:36
+019f13e0-07be-7013-8ff1-051664597b63	image-analysis-api	/dish-calculate	request	100.64.0.2	2026-06-29 14:54:36	2026-06-29 14:54:36
+019f13e0-07d9-72f8-8498-78d1268917ac	Laravel	api/me	request	10.146.111.45	2026-06-29 14:54:37	2026-06-29 14:54:37
+019f13e0-1173-70bb-be61-7e2adfef763a	Laravel	api/dishes/mutate	request	79.127.178.82	2026-06-29 14:54:39	2026-06-29 14:54:39
+019f13e1-6205-7238-9ffa-12339eb5ed6f	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 14:56:05	2026-06-29 14:56:05
+019f13e1-67c4-703f-bc44-818ccd1a10a4	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 14:56:07	2026-06-29 14:56:07
+019f13e1-70c9-70dd-9c41-2051b77898cd	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 14:56:09	2026-06-29 14:56:09
+019f13e1-74d2-7163-b0b2-de2a15f40b44	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 14:56:10	2026-06-29 14:56:10
+019f13e1-b876-72b1-8c33-ebe92fa17ecc	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 14:56:27	2026-06-29 14:56:27
+019f13e2-c0ca-7278-896d-0dbf2f9eb057	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 14:57:35	2026-06-29 14:57:35
+019f13e2-c0ca-7219-aaad-d46b7d0c617d	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 14:57:35	2026-06-29 14:57:35
+019f13e3-4898-7332-891c-affb9c54d0f8	Laravel	api/comments/search	request	79.127.178.82	2026-06-29 14:58:10	2026-06-29 14:58:10
+019f13e3-4898-7368-94da-2e0091b59234	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 14:58:10	2026-06-29 14:58:10
+019f13e3-4f2a-70d0-8181-449e8424c809	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 14:58:11	2026-06-29 14:58:11
+019f13e3-546a-7314-81ba-899d713fc4b4	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 14:58:13	2026-06-29 14:58:13
+019f13e3-5be6-728a-9cd8-168b9bd12e72	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 14:58:15	2026-06-29 14:58:15
+019f13e3-6d85-72e8-924a-9d37d7b683e3	Laravel	api/me	request	79.127.178.82	2026-06-29 14:58:19	2026-06-29 14:58:19
+019f13e3-6e1d-73d7-ab7d-f99db94c0656	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 14:58:19	2026-06-29 14:58:19
+019f13e3-6e2f-72fa-9298-e57ff90d0165	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 14:58:19	2026-06-29 14:58:19
+019f13e3-746f-7255-80c7-f823fa90f564	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 14:58:21	2026-06-29 14:58:21
+019f13e3-7a01-7151-9669-e5596490cd21	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 14:58:22	2026-06-29 14:58:22
+019f13e3-7e80-7225-8cf2-2ad63c75feb1	Laravel	api/allergies/search	request	79.127.178.82	2026-06-29 14:58:24	2026-06-29 14:58:24
+019f13e3-7e81-703e-8a84-2a309cccaa5b	Laravel	api/handicaps/search	request	79.127.178.82	2026-06-29 14:58:24	2026-06-29 14:58:24
+019f13e3-7e88-719b-a4f1-be548d3825d3	Laravel	api/goals/search	request	79.127.178.82	2026-06-29 14:58:24	2026-06-29 14:58:24
+019f13e3-7e9c-7153-bc34-8a844104b55d	Laravel	api/users/search	request	79.127.178.82	2026-06-29 14:58:24	2026-06-29 14:58:24
+019f13e3-9da0-7237-9f87-9a1949628074	Laravel	api/posts/search	request	79.127.178.82	2026-06-29 14:58:31	2026-06-29 14:58:31
+019f13e3-b050-7103-81bd-01eae4df81e8	Laravel	api/goals/search	request	79.127.178.82	2026-06-29 14:58:36	2026-06-29 14:58:36
+019f13e3-b051-70ca-8909-5305a36985be	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 14:58:36	2026-06-29 14:58:36
+019f13e3-b054-706b-8b82-69ad3cff6647	Laravel	api/dishes/search	request	79.127.178.82	2026-06-29 14:58:36	2026-06-29 14:58:36
+019f13e3-b0c8-7226-8ca8-fce7330b0755	Laravel	api/users/search	request	79.127.178.82	2026-06-29 14:58:36	2026-06-29 14:58:36
+019f13e3-b1e3-73f1-9d44-95726c15030c	Laravel	api/me	request	152.233.12.242	2026-06-29 14:58:37	2026-06-29 14:58:37
+019f13e3-b1e4-72dd-83a9-7d3460275a34	Laravel	api/me	request	152.233.13.166	2026-06-29 14:58:37	2026-06-29 14:58:37
+019f13e6-94df-7226-9bc2-8f5490461ce8	Laravel	api/me/sessions/stats	request	79.127.178.82	2026-06-29 15:01:46	2026-06-29 15:01:46
+019f13e6-94e1-71cc-9309-f8f81a3fc9ec	Laravel	api/me/metrics/current	request	79.127.178.82	2026-06-29 15:01:46	2026-06-29 15:01:46
+019f13e6-94e1-7029-8aa3-ac6068564f87	Laravel	api/metrics/search	request	79.127.178.82	2026-06-29 15:01:46	2026-06-29 15:01:46
+019f13e6-94f9-7205-8a7e-5003551a1a96	Laravel	api/metrics/search	request	79.127.178.82	2026-06-29 15:01:46	2026-06-29 15:01:46
+019f13e6-951e-7018-a3ed-c37e7c1b6634	Laravel	api/me/metrics/current	request	79.127.178.82	2026-06-29 15:01:46	2026-06-29 15:01:46
+019f13e6-951f-702c-afde-4cec89af6286	Laravel	api/me/sessions/stats	request	79.127.178.82	2026-06-29 15:01:46	2026-06-29 15:01:46
+019f13e6-ae88-708e-92af-355657e19077	Laravel	api/allergies/search	request	79.127.178.82	2026-06-29 15:01:52	2026-06-29 15:01:52
+019f13e6-ae89-73e0-92b8-b5d777c65fee	Laravel	api/goals/search	request	79.127.178.82	2026-06-29 15:01:52	2026-06-29 15:01:52
+019f13e6-ae8a-73ca-a4b8-38e654152265	Laravel	api/handicaps/search	request	79.127.178.82	2026-06-29 15:01:52	2026-06-29 15:01:52
+019f13e6-ae9f-7252-a16a-3c52cbdb339b	Laravel	api/users/search	request	79.127.178.82	2026-06-29 15:01:52	2026-06-29 15:01:52
+019f13e6-b378-72ee-8266-d253c154801b	Laravel	api/goals/search	request	79.127.178.82	2026-06-29 15:01:54	2026-06-29 15:01:54
+019f13e6-b399-7184-b3bb-aa2bc4e2d108	Laravel	api/me	request	152.233.12.241	2026-06-29 15:01:54	2026-06-29 15:01:54
+019f13e6-f443-7168-8147-41e6f5f87dfd	Laravel	api/me/metrics/current	request	79.127.178.82	2026-06-29 15:02:10	2026-06-29 15:02:10
+019f13e6-f460-70fc-a518-585699b3df0b	Laravel	api/me/sessions/stats	request	79.127.178.82	2026-06-29 15:02:10	2026-06-29 15:02:10
+019f13e6-f47c-7053-a7e0-21198501da51	Laravel	api/metrics/search	request	79.127.178.82	2026-06-29 15:02:10	2026-06-29 15:02:10
+019f13e6-fbe0-717d-a30e-9a0c64f0ea7c	Laravel	api/me/sessions	request	79.127.178.82	2026-06-29 15:02:12	2026-06-29 15:02:12
+019f13e6-fbe1-7367-b0b1-cfaa14a14810	Laravel	api/goals/search	request	79.127.178.82	2026-06-29 15:02:12	2026-06-29 15:02:12
+019f13e6-fc22-705e-979d-583849ceb20d	Laravel	api/me/sessions	request	79.127.178.82	2026-06-29 15:02:12	2026-06-29 15:02:12
+019f13e6-fc4a-7072-9412-2c8bddba23bc	Laravel	api/users/search	request	79.127.178.82	2026-06-29 15:02:12	2026-06-29 15:02:12
+019f13e6-fcd2-702c-b3a3-30992196be5a	Laravel	api/me	request	152.233.12.245	2026-06-29 15:02:12	2026-06-29 15:02:12
+019f13f0-dca9-71c4-a2f2-53698bee4935	Laravel	api/logs/mutate	request	10.150.241.155	2026-06-29 15:13:00	2026-06-29 15:13:00
+019f13f0-dcd4-72ca-abc3-156521648b44	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 15:13:00	2026-06-29 15:13:00
+019f13f0-dcf3-70d0-8e45-0edfd53b2e17	Laravel	api/logs/mutate	request	10.150.241.155	2026-06-29 15:13:00	2026-06-29 15:13:00
+019f13f0-dcfb-7364-baeb-3e1a942f3c3d	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 15:13:00	2026-06-29 15:13:00
+019f13f0-dd11-710f-a872-0a644bc20ea7	Laravel	api/logs/mutate	request	10.150.241.155	2026-06-29 15:13:00	2026-06-29 15:13:00
+019f13f0-dd17-73f0-adea-8d8dab44b216	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 15:13:00	2026-06-29 15:13:00
+019f13f2-a1ad-73a1-984f-f9fa4dc49f01	Laravel	api/users/search	request	79.127.178.81	2026-06-29 15:14:56	2026-06-29 15:14:56
+019f13f2-a1ad-722b-9c7c-525da401e507	Laravel	api/allergies/search	request	79.127.178.81	2026-06-29 15:14:56	2026-06-29 15:14:56
+019f13f2-a1d8-7218-b2f1-924dd043a399	Laravel	api/handicaps/search	request	79.127.178.81	2026-06-29 15:14:56	2026-06-29 15:14:56
+019f13f2-a1e1-726f-b5fd-efb92989a88f	Laravel	api/goals/search	request	79.127.178.81	2026-06-29 15:14:56	2026-06-29 15:14:56
+019f13f2-a8b8-7146-b384-9d0876426889	Laravel	api/goals/search	request	79.127.178.81	2026-06-29 15:14:57	2026-06-29 15:14:57
+019f13f2-a92b-7059-a963-6bc5d7ef7219	Laravel	api/me	request	152.233.12.245	2026-06-29 15:14:57	2026-06-29 15:14:57
+019f13f8-14b7-7126-9852-2b7bf44e659e	Laravel	api/register	request	152.233.15.123	2026-06-29 15:20:53	2026-06-29 15:20:53
+019f13f8-246d-7019-a521-cb913ce1621d	Laravel	api/login	request	152.233.68.97	2026-06-29 15:20:57	2026-06-29 15:20:57
+019f13f9-60c7-71dc-9189-e267271a3dc1	Laravel	api/me	request	152.233.68.98	2026-06-29 15:22:18	2026-06-29 15:22:18
+019f13fa-1dcc-714f-bb11-b444ac2022be	Laravel	api/me	request	152.233.12.245	2026-06-29 15:23:06	2026-06-29 15:23:06
+019f1403-a59f-7339-87e2-5088092c1622	Laravel	api/logs/mutate	request	10.165.61.146	2026-06-29 15:33:31	2026-06-29 15:33:31
+019f1403-a5d5-70c6-911d-15c993e8ad43	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 15:33:31	2026-06-29 15:33:31
+019f1403-a5ee-7140-9cba-364171262b08	Laravel	api/logs/mutate	request	10.165.61.146	2026-06-29 15:33:31	2026-06-29 15:33:31
+019f1403-a5f3-725d-8497-e011438fd899	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 15:33:31	2026-06-29 15:33:31
+019f1403-a60a-72bc-a898-e4b2e6f31233	Laravel	api/logs/mutate	request	10.165.61.146	2026-06-29 15:33:31	2026-06-29 15:33:31
+019f1403-a612-701e-a6ff-8229894d6162	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 15:33:31	2026-06-29 15:33:31
+019f1407-479c-72c0-8931-85a3f4616c39	Laravel	api/logs/mutate	request	10.193.129.203	2026-06-29 15:37:29	2026-06-29 15:37:29
+019f1407-47be-712c-9376-1ee2c03f9114	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 15:37:29	2026-06-29 15:37:29
+019f1407-47db-72e8-aca9-95feab39bd7d	Laravel	api/logs/mutate	request	10.193.129.203	2026-06-29 15:37:29	2026-06-29 15:37:29
+019f1407-47e1-71d8-9ccd-a09a3f8c8c39	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 15:37:29	2026-06-29 15:37:29
+019f1407-47fc-71ef-9e42-c5750de214d7	Laravel	api/logs/mutate	request	10.193.129.203	2026-06-29 15:37:29	2026-06-29 15:37:29
+019f1407-4801-7372-a170-6da4324cbaae	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 15:37:29	2026-06-29 15:37:29
+019f1413-58a0-73dd-8ad0-89b7e38c4c46	Laravel	api/logs/mutate	request	10.158.62.4	2026-06-29 15:50:40	2026-06-29 15:50:40
+019f1413-58df-7348-8d4f-737d8eb3216d	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 15:50:40	2026-06-29 15:50:40
+019f1413-58ff-716b-83a4-5771367e25b6	Laravel	api/logs/mutate	request	10.158.62.4	2026-06-29 15:50:40	2026-06-29 15:50:40
+019f1413-5905-71e9-91c6-b70252a307b8	image-analysis-api	Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download	error	null	2026-06-29 15:50:40	2026-06-29 15:50:40
+019f1413-5920-71ba-987d-663d668a3936	Laravel	api/logs/mutate	request	10.158.62.4	2026-06-29 15:50:40	2026-06-29 15:50:40
+019f1413-5926-73aa-81c8-c9b41013d2f4	image-analysis-api	[Errno -2] Name or service not known	error	null	2026-06-29 15:50:40	2026-06-29 15:50:40
+019f141a-8877-7124-8cae-ee2234c1186c	Laravel	api/logs/mutate	request	172.21.0.3	2026-06-29 15:58:31	2026-06-29 15:58:31
+019f15e1-c439-71a0-8d75-c0fc00753b85	Laravel	api/me	request	79.127.178.81	2026-06-30 00:15:45	2026-06-30 00:15:45
+019f15e1-c481-72b1-a264-147762d430cf	Laravel	api/dishes/search	request	79.127.178.81	2026-06-30 00:15:45	2026-06-30 00:15:45
+019f15e1-c485-724d-9b26-28df7a008574	Laravel	api/dishes/search	request	79.127.178.81	2026-06-30 00:15:45	2026-06-30 00:15:45
+019f15e1-c4ae-7017-b06b-0dd0c014157b	Laravel	api/me/sessions	request	79.127.178.81	2026-06-30 00:15:45	2026-06-30 00:15:45
+019f15e1-c4ae-7205-8c93-f8a8b2516eb8	Laravel	api/me/sessions	request	79.127.178.81	2026-06-30 00:15:45	2026-06-30 00:15:45
+019f15e1-cd36-7222-a1a5-3f64dcd74b34	Laravel	api/metrics/search	request	79.127.178.81	2026-06-30 00:15:47	2026-06-30 00:15:47
+019f15e1-cd37-72fc-975f-a12db572614d	Laravel	api/me/sessions/stats	request	79.127.178.81	2026-06-30 00:15:47	2026-06-30 00:15:47
+019f15e1-cd4d-71c0-ae59-5e701a55bfc2	Laravel	api/me/metrics/current	request	79.127.178.81	2026-06-30 00:15:47	2026-06-30 00:15:47
+019f15e1-cd58-71ff-bfe2-0eed634e9adf	Laravel	api/me/metrics/current	request	79.127.178.81	2026-06-30 00:15:47	2026-06-30 00:15:47
+019f15e1-cd63-7366-b6a0-a3d723b9b79d	Laravel	api/metrics/search	request	79.127.178.81	2026-06-30 00:15:47	2026-06-30 00:15:47
+019f15e1-cd6b-7039-9d25-52e3e025642e	Laravel	api/me/sessions/stats	request	79.127.178.81	2026-06-30 00:15:47	2026-06-30 00:15:47
+019f15e2-0f81-70e2-aced-f2b87dcd7782	Laravel	api/me/metrics	request	79.127.178.81	2026-06-30 00:16:04	2026-06-30 00:16:04
 \.
 
 
@@ -7492,6 +7755,7 @@ COPY "System".model_has_roles (role_id, model_type, model_id) FROM stdin;
 1	App\\Models\\User	41
 1	App\\Models\\User	42
 1	App\\Models\\User	43
+1	App\\Models\\User	45
 \.
 
 
@@ -7535,20 +7799,21 @@ COPY "System".personal_access_tokens (id, tokenable_type, tokenable_id, name, to
 40	App\\Models\\User	27	api-token	4610d7579982090b87695935840752da86363d069944e8710a7a6be29f7ee51a	["*"]	2026-06-17 09:24:08	\N	2026-06-17 09:24:08	2026-06-17 09:24:08
 59	App\\Models\\User	13	api-token	147b2cdfb3473563924918fd0d39bac0fa3054b5cac87ee0321c3c4cc0b8956e	["*"]	2026-06-20 09:16:31	\N	2026-06-20 09:16:11	2026-06-20 09:16:31
 55	App\\Models\\User	10	api-token	ce54d7632484e58b9041f6c2bf4527938a8b04dd123b27f94cf9206c939aa55f	["*"]	2026-06-20 09:17:06	\N	2026-06-19 14:17:16	2026-06-20 09:17:06
-60	App\\Models\\User	7	api-token	e726fb7c5c423692782b2973dc114a32292038ca44d5e2ef1e3fce1a6377f568	["*"]	2026-06-29 09:32:34	\N	2026-06-21 08:57:36	2026-06-29 09:32:34
+61	App\\Models\\User	10	api-token	0b29c9da7b80f46e9c46664cf5b7420d293d56c082cb3c3948c0853a5850463a	["*"]	2026-06-29 15:58:30	\N	2026-06-29 08:58:15	2026-06-29 15:58:30
 19	App\\Models\\User	10	api-token	d976cd94843f6d03bbec72f47f912cdc9d892ac36ebf35840a7c627cc12f8095	["*"]	2026-06-16 13:47:25	\N	2026-06-16 13:43:10	2026-06-16 13:47:25
 22	App\\Models\\User	13	api-token	6b4352a2e0b1a007483b323ee8bc80b51ac17c4996fcd000bc44252debc4a976	["*"]	2026-06-16 19:08:16	\N	2026-06-16 18:48:37	2026-06-16 19:08:16
 13	App\\Models\\User	5	api-token	f6f745982e046357fb3fc7fefc4e2732ec34dcce52fa0ed571106ad1a8655c1a	["*"]	2026-06-16 00:06:46	\N	2026-06-16 00:06:46	2026-06-16 00:06:46
 14	App\\Models\\User	6	api-token	ad5611f57285590cace92f45b0b6a6c4305b8e6585e668116b6cbce1dc3987bd	["*"]	2026-06-16 00:07:23	\N	2026-06-16 00:07:23	2026-06-16 00:07:23
+60	App\\Models\\User	7	api-token	e726fb7c5c423692782b2973dc114a32292038ca44d5e2ef1e3fce1a6377f568	["*"]	2026-06-30 00:16:04	\N	2026-06-21 08:57:36	2026-06-30 00:16:04
 10	App\\Models\\User	3	api-token	933830aa03fcbcf0b245064594c3e00f09876ef91290b38fe499cf7bb60b0289	["*"]	2026-06-15 22:42:42	\N	2026-06-15 14:42:06	2026-06-15 22:42:42
 58	App\\Models\\User	33	api-token	20581e2f674c044cef6da7bd1677b73b7c28d628c66ff0b4db2203b33017404b	["*"]	2026-06-23 10:29:00	\N	2026-06-19 18:04:55	2026-06-23 10:29:00
 34	App\\Models\\User	22	api-token	549f6682faa2720d72021f46d28857f1fa061773b013468e61fbd6437d218473	["*"]	2026-06-17 07:01:14	\N	2026-06-17 02:44:07	2026-06-17 07:01:14
 43	App\\Models\\User	32	api-token	033fb9a8733cb28090f5e1345c75ac5ba1a6553cc2cb8fce087ab7bb6ccbb49b	["*"]	2026-06-19 06:53:33	\N	2026-06-18 09:29:49	2026-06-19 06:53:33
 24	App\\Models\\User	15	api-token	199a95730f1f270d1681bfa02eb1462ac378d9516b06fd243ee4b0ad38830f4c	["*"]	2026-06-16 19:26:51	\N	2026-06-16 19:01:36	2026-06-16 19:26:51
 38	App\\Models\\User	25	api-token	68da2958dbf09b17f40d7dca24ea5461a98355a772182c6029d50dc87e808381	["*"]	2026-06-18 04:04:49	\N	2026-06-17 07:36:50	2026-06-18 04:04:49
-51	App\\Models\\User	40	api-token	a476f714507e2bfb9d3c86e8ad675cd24e051a1b793370bb17281f7cf9513eec	["*"]	2026-06-29 13:20:24	\N	2026-06-19 09:19:51	2026-06-29 13:20:24
-61	App\\Models\\User	10	api-token	0b29c9da7b80f46e9c46664cf5b7420d293d56c082cb3c3948c0853a5850463a	["*"]	2026-06-29 13:21:05	\N	2026-06-29 08:58:15	2026-06-29 13:21:05
+62	App\\Models\\User	7	api-token	a9296903b6a29ed4850352a6b62571eaba3fb2be5658b9bf11af00c4cd5726b8	["*"]	2026-06-29 15:14:57	\N	2026-06-29 13:46:05	2026-06-29 15:14:57
 54	App\\Models\\User	7	api-token	0e83477572f8e8bed96451f2a9f1651c32867e73cdb22280d8debe8d6c981ff6	["*"]	2026-06-20 15:23:04	\N	2026-06-19 11:28:42	2026-06-20 15:23:04
+63	App\\Models\\User	45	api-token	8c3e0fc1a7759f89968bf0542bdaca5af4ef3a42354dffcb70a562409776fd87	["*"]	2026-06-29 15:23:06	\N	2026-06-29 15:20:57	2026-06-29 15:23:06
 \.
 
 
@@ -7830,7 +8095,7 @@ SELECT pg_catalog.setval('"Data".comments_id_seq', 2, true);
 -- Name: dishes_id_seq; Type: SEQUENCE SET; Schema: Data; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"Data".dishes_id_seq', 94, true);
+SELECT pg_catalog.setval('"Data".dishes_id_seq', 97, true);
 
 
 --
@@ -7858,21 +8123,21 @@ SELECT pg_catalog.setval('"Data".meals_id_seq', 102, true);
 -- Name: media_id_seq; Type: SEQUENCE SET; Schema: Data; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"Data".media_id_seq', 3, true);
+SELECT pg_catalog.setval('"Data".media_id_seq', 4, true);
 
 
 --
 -- Name: metrics_id_seq; Type: SEQUENCE SET; Schema: Data; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"Data".metrics_id_seq', 7, true);
+SELECT pg_catalog.setval('"Data".metrics_id_seq', 8, true);
 
 
 --
 -- Name: posts_id_seq; Type: SEQUENCE SET; Schema: Data; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"Data".posts_id_seq', 6, true);
+SELECT pg_catalog.setval('"Data".posts_id_seq', 7, true);
 
 
 --
@@ -7900,7 +8165,7 @@ SELECT pg_catalog.setval('"Data".user_sessions_id_seq', 17, true);
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: Data; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"Data".users_id_seq', 44, true);
+SELECT pg_catalog.setval('"Data".users_id_seq', 45, true);
 
 
 --
@@ -7963,7 +8228,7 @@ SELECT pg_catalog.setval('"System".permissions_id_seq', 24, true);
 -- Name: personal_access_tokens_id_seq; Type: SEQUENCE SET; Schema: System; Owner: postgres
 --
 
-SELECT pg_catalog.setval('"System".personal_access_tokens_id_seq', 61, true);
+SELECT pg_catalog.setval('"System".personal_access_tokens_id_seq', 63, true);
 
 
 --
