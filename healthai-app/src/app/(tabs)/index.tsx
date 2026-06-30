@@ -160,7 +160,7 @@ function CoachMessageCard({ message, loading }: { message: string | null; loadin
       <ThemedView style={styles.coachHeader}>
         <Icon name="coach" size={18} color={theme.accent} />
         <ThemedText type="smallBold" themeColor="textSecondary">
-          LE MESSAGE DU COACH
+          MESSAGE DU COACH · IA
         </ThemedText>
       </ThemedView>
       {message ? (

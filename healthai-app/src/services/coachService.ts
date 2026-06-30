@@ -4,12 +4,12 @@
 // métrique du jour). L'app génère et enregistre en arrière-plan, puis affiche.
 import { CONFIG } from '@/constants/config';
 import { getToken, sendRequest } from '@/services/api';
-import { CoachMessageInput, CoachMessageOfDay, CoachMessageOutput } from '@/types/coach.type';
+import { CoachMessageInput, CoachMessageOutput, CoachMessageStatus } from '@/types/coach.type';
 
 export const coachService = {
-  /** Message du coach du jour (depuis la métrique du jour), ou message null si pas encore généré. */
-  getToday: async (): Promise<CoachMessageOfDay> => {
-    const res = await sendRequest<{ data: CoachMessageOfDay }>('GET', '/me/coach-message');
+  /** Message du jour + dernier message disponible (repli), pour décider quoi afficher/générer. */
+  getStatus: async (): Promise<CoachMessageStatus> => {
+    const res = await sendRequest<{ data: CoachMessageStatus }>('GET', '/me/coach-message');
     return res.data;
   },
 

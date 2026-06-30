@@ -20,10 +20,13 @@ function startOfWeek(now: Date): Date {
 }
 
 /**
- * Message du coach IA affiché sur l'accueil. Lit le message du jour (stocké dans la
- * métrique du jour) ; s'il n'existe pas encore et qu'il est au moins 18h, génère le
- * message via Mistral à partir du bilan de la semaine puis l'enregistre en arrière-plan
- * (une seule génération par jour : une fois enregistré, la lecture le renvoie).
+ * Message du coach IA affiché sur l'accueil. Comportement :
+ *  - si le message du jour existe déjà → on l'affiche (1 génération max par jour) ;
+ *  - sinon, s'il n'existe AUCUN message précédent → on génère dès la connexion,
+ *    quelle que soit l'heure ;
+ *  - sinon (un message précédent existe) → on l'affiche tout de suite comme repli, et
+ *    on régénère le message du jour à partir de 18h.
+ * La génération se fait via Mistral (bilan de la semaine) puis l'enregistre en arrière-plan.
  */
 export function useCoachMessage() {
   const { user } = useAuthStore();
@@ -85,14 +88,24 @@ export function useCoachMessage() {
   const refresh = useCallback(async () => {
     if (!userId) return;
     try {
-      const today = await coachService.getToday();
-      if (today.message) {
-        setMessage(today.message);
+      const status = await coachService.getStatus();
+
+      // Déjà généré aujourd'hui : on l'affiche, pas de régénération (1/jour).
+      if (status.today) {
+        setMessage(status.today);
         return;
       }
-      setMessage(null);
-      // Génération une fois par jour, déclenchée à la connexion à partir de 18h.
-      if (new Date().getHours() >= COACH_GENERATION_HOUR) {
+
+      if (status.latest) {
+        // Un message précédent existe : on l'affiche en repli...
+        setMessage(status.latest.message);
+        // ...et on régénère le message du jour à partir de 18h.
+        if (new Date().getHours() >= COACH_GENERATION_HOUR) {
+          await generate();
+        }
+      } else {
+        // Aucun message existant : on génère dès la connexion, quelle que soit l'heure.
+        setMessage(null);
         await generate();
       }
     } catch (err) {

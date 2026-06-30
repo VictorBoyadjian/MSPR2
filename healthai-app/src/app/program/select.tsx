@@ -81,7 +81,8 @@ export default function ProgramSelectScreen() {
           <ThemedText type="subtitle">Changer de programme</ThemedText>
         </View>
         <ThemedText themeColor="textSecondary" style={styles.sub}>
-          Classés selon ton profil actuel. Choisis celui que tu veux suivre.
+          Proposition de programme selon notre modèle privé d&apos;Intelligence artificielle.
+          Choisis celui que tu veux suivre.
         </ThemedText>
 
         <ScrollView

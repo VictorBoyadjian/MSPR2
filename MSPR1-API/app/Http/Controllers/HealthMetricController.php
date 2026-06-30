@@ -46,18 +46,31 @@ class HealthMetricController
     }
 
     /**
-     * Message du coach IA du jour (stocké dans la métrique du jour). Sert à la fois
-     * à afficher le message et à décider, côté app, s'il faut le générer (message null).
+     * Message du coach IA de l'utilisateur. Renvoie :
+     *  - `today`  : le message du jour (null s'il n'a pas encore été généré aujourd'hui) ;
+     *  - `latest` : le dernier message disponible (n'importe quel jour), pour servir de
+     *               repli à afficher et décider, côté app, s'il faut générer / régénérer.
      */
     public function coachMessage(Request $request): JsonResponse
     {
-        $metric = Metric::where('user_id', $request->user()->id)
+        $userId = $request->user()->id;
+
+        $today = Metric::where('user_id', $userId)
             ->whereDate('recorded_at', now()->toDateString())
-            ->first();
+            ->value('coach_message');
+
+        $latest = Metric::where('user_id', $userId)
+            ->whereNotNull('coach_message')
+            ->orderByDesc('recorded_at')
+            ->first(['coach_message', 'recorded_at']);
 
         return response()->json(['data' => [
-            'date'    => now()->toDateString(),
-            'message' => $metric?->coach_message,
+            'date'   => now()->toDateString(),
+            'today'  => $today,
+            'latest' => $latest ? [
+                'message' => $latest->coach_message,
+                'date'    => $latest->recorded_at?->toDateString(),
+            ] : null,
         ]]);
     }
 

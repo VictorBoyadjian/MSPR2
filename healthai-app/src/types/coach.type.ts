@@ -16,8 +16,13 @@ export type CoachMessageOutput = {
   message: string;
 };
 
-/** Message du coach du jour, tel que stocké dans la métrique du jour (API Laravel). */
-export type CoachMessageOfDay = {
+/**
+ * État du message du coach (API Laravel) :
+ *  - `today`  : message du jour, ou null s'il n'a pas encore été généré aujourd'hui ;
+ *  - `latest` : dernier message disponible (n'importe quel jour), repli à afficher.
+ */
+export type CoachMessageStatus = {
   date: string;
-  message: string | null;
+  today: string | null;
+  latest: { message: string; date: string } | null;
 };
