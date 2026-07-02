@@ -8,13 +8,13 @@ scrape_configs:
     params:
       module: [http_2xx]
     static_configs:
-      - targets: ["http://laravel:80/up"]
+      - targets: ["https://mspr2-api-production.up.railway.app/up"]
         labels:
           service: "API metier (Laravel)"
-      - targets: ["http://image-analysis-api:2021/health/"]
+      - targets: ["https://ollama-api-production-44b6.up.railway.app/health/"]
         labels:
           service: "Image Analysis API"
-      - targets: ["http://ml-engine-api:8000/health"]
+      - targets: ["https://mlmspr2-production.up.railway.app/health"]
         labels:
           service: "ML / Reco API"
     relabel_configs:
@@ -23,4 +23,5 @@ scrape_configs:
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
-        replacement: blackbox-exporter:9115
+        # Nom du service blackbox sur Railway -> <service>.railway.internal
+        replacement: blackbox.railway.internal:9115
