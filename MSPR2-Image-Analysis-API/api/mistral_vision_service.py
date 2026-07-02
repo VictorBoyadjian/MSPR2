@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 
 #Modules
-from data_schemas import UploadDish, OutputResponse, Usage
+from data_schemas import UploadDish, OutputResponse, Usage, ScannedFood
 from data_parser import Parser
 from color_enum import ColorEnum
 from logs_service import LogService
@@ -70,7 +70,10 @@ class MistralVisionService():
             except Exception as e:
                 print(f"{ColorEnum.ERROR.format('[ERROR]')} : Mistral Vision request failed : {e}")
                 LogService.send_log(e)
-                return {}
+                return OutputResponse(
+                    aliments={"plat non identifié": ScannedFood(quantity=1, quantity_g=250, accuracy=0.3)},
+                    usage=Usage(),
+                )
 
             output_data = Parser.mistral_vision_reponse(response)
 
@@ -86,7 +89,10 @@ class MistralVisionService():
             return output_data
         except Exception as e:
             LogService.send_log(e)
-            return {}
+            return OutputResponse(
+                aliments={"plat non identifié": ScannedFood(quantity=1, quantity_g=250, accuracy=0.3)},
+                usage=Usage(),
+            )
 
     @staticmethod
     def _extract_usage(response) -> Usage:

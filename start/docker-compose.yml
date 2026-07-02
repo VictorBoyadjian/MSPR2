@@ -161,6 +161,33 @@ services:
       - mspr-network
     restart: unless-stopped
 
+  blackbox-exporter:
+    image: prom/blackbox-exporter:latest
+    container_name: blackbox-exporter
+    command:
+      - "--config.file=/etc/blackbox_exporter/config.yml"
+    volumes:
+      - ../MSPR1-Grafana/prometheus/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
+    networks:
+      - mspr-network
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    volumes:
+      - ../MSPR1-Grafana/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    depends_on:
+      - blackbox-exporter
+    networks:
+      - mspr-network
+    restart: unless-stopped
+
   grafana:
     build: ../MSPR1-Grafana
     container_name: mspr1-grafana
@@ -168,11 +195,21 @@ services:
       - "1506:1506"
     env_file:
       - ../MSPR1-Grafana/.env
+    environment:
+      PROMETHEUS_URL: "${PROMETHEUS_URL:-http://prometheus:9090}"
+      DB_HOST: "${DB_HOST:-postgres}"
+      DB_PORT: "${DB_PORT:-5432}"
+      DB_DATABASE: "${DB_DATABASE:-healthai}"
+      DB_USERNAME: "${DB_USERNAME:-postgres}"
+      DB_PASSWORD: "${DB_PASSWORD:-postgres}"
+      DB_SSLMODE: "${DB_SSLMODE:-disable}"
     volumes:
       - ../MSPR1-Grafana/data:/var/lib/grafana
     depends_on:
       postgres:
         condition: service_healthy
+      prometheus:
+        condition: service_started
     networks:
       - mspr-network
     restart: unless-stopped
@@ -197,3 +234,4 @@ networks:
 volumes:
   postgres_data:
   app_storage:
+  prometheus_data:
