@@ -1,11 +1,12 @@
 FROM prom/prometheus:latest
 
-COPY prometheus.yml /etc/prometheus/prometheus.yml
+# root pour que l'entrypoint puisse chown le volume Railway (monté root),
+# puis Prometheus démarre (il tourne en root, ce qui lui permet d'écrire
+# la TSDB sur le volume).
+USER root
 
-# Railway private networking est IPv6-only -> il faut binder sur [::]
-# sinon le service n'est pas joignable en interne (Grafana ne le voit pas).
-CMD [ "--config.file=/etc/prometheus/prometheus.yml", \
-      "--storage.tsdb.path=/prometheus", \
-      "--storage.tsdb.retention.time=30d", \
-      "--web.listen-address=[::]:9090", \
-      "--web.enable-lifecycle" ]
+COPY prometheus.yml /etc/prometheus/prometheus.yml
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
